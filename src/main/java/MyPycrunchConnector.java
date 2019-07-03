@@ -160,4 +160,14 @@ public class MyPycrunchConnector {
     public void clear_markers_cache() {
         _visited_lines = new HashSet<>();
     }
+
+    public Set<Integer> GetCoveredLineForFile(String absolute_path) {
+        if (!_result.files_covered.containsKey(absolute_path))
+        {
+            return new HashSet<>();
+        }
+        TestRunResultFileCoverage fileCoverage = _result.files_covered.get(absolute_path);
+
+        return fileCoverage.lines_covered;
+    }
 }

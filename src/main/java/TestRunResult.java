@@ -4,11 +4,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 public class TestRunResult {
     public String captured_output;
-    public Dictionary<String, TestRunResultFileCoverage> files_covered;
+    public Hashtable<String, TestRunResultFileCoverage> files_covered;
 
     public static TestRunResult from_json(JSONObject json) throws JSONException {
         TestRunResult result = new TestRunResult();

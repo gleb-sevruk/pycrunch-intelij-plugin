@@ -12,11 +12,14 @@ import com.intellij.openapi.editor.ex.RangeHighlighterEx;
 import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.impl.PsiDocumentManagerImpl;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ObjectUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class MyPyHighlighter extends  AnAction {
     private static ArrayList<RangeHighlighterEx> _highlighters = new ArrayList<>()   ;
@@ -38,12 +41,18 @@ public class MyPyHighlighter extends  AnAction {
 
         Project project = event.getData(PlatformDataKeys.PROJECT);
         Document document = editor.getDocument();
+        PsiFile psiFile = PsiDocumentManagerImpl.getInstance(project).getPsiFile(document);
+        String absolute_path = psiFile.getVirtualFile().getPath();
+
+        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
+        Set<Integer> lines_covered = connector.GetCoveredLineForFile(absolute_path);
         MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
         RangeHighlighterEx highlighter;
+        lines_covered.forEach(__ -> addHighlighterForLine(__ - 1, markup));
         if (myLine >= 0) {
-            addHighlighterForLine(myLine, markup);
-            addHighlighterForLine(myLine+1, markup);
-            addHighlighterForLine(myLine+2, markup);
+//            addHighlighterForLine(myLine, markup);
+//            addHighlighterForLine(myLine+1, markup);
+//            addHighlighterForLine(myLine+2, markup);
         } else {
             highlighter = null;
         }

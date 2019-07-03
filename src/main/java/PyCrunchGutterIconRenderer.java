@@ -38,12 +38,12 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 
     @Override
     public @NotNull Icon getIcon() {
-        if (_line % 3 == 0 ){
-            return _imageIcon3;
-        }
-        if (_line % 2 == 0 ){
-            return _imageIcon2;
-        }
+//        if (_line % 3 == 0 ){
+//            return _imageIcon3;
+//        }
+//        if (_line % 2 == 0 ){
+//            return _imageIcon2;
+//        }
 
         return _imageIcon;
     }
