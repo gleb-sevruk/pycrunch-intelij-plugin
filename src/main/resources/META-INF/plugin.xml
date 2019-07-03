@@ -36,6 +36,7 @@
                             serviceImplementation="MyPycrunchConnector"/>
         <toolWindow id="PyCrunch" icon="/cherry-icon.png" anchor="right" factoryClass="MyToolWindowFactory"/>
 
+        <codeInsight.lineMarkerProvider language="Python" implementationClass="SimpleLineMarkerProvider"/>
 
     </extensions>
 
