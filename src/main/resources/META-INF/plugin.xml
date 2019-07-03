@@ -44,6 +44,7 @@
         <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch">
             <add-to-group group-id="MainMenu" anchor="last"  />
             <action id="PyChrunch.Textboxes" class="TextBoxes" text="Attach to PyCrunch-Engine" description="A test menu item" />
+            <action id="PyChrunch.Hightligthing" class="MyPyHighlighter" text="Highlight some lines" description="A test menu item" />
             <action id="PyCrunch.DiscoveryDisplay" class="PycrunchDiscoveryDisplay" text="Show _Tests" description="A test menu item" />
         </group>
     </actions>

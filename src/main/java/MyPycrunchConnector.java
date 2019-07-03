@@ -3,6 +3,7 @@ import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.psi.PsiFile;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,15 +21,14 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MyPycrunchConnector {
     private static int CounterOfSingletons = 0;
     // Sets the maximum allowed number of opened projects.
     private static Project _project;
     private TestRunResult _result;
+    private Set<Integer> _visited_lines;
 
     public MyPycrunchConnector() {
         MyPycrunchConnector.CounterOfSingletons++;
@@ -143,5 +143,21 @@ public class MyPycrunchConnector {
         }
 
         return sb.toString();
+    }
+
+    public boolean should_create_marker_for(PsiFile containingFile, int lineNum) {
+        if (_visited_lines == null) {
+            _visited_lines = new HashSet<>();
+        }
+
+        if (_visited_lines.contains(lineNum)){
+            return false;
+        }
+        _visited_lines.add(lineNum);
+        return true;
+    }
+
+    public void clear_markers_cache() {
+        _visited_lines = new HashSet<>();
     }
 }
