@@ -18,6 +18,15 @@ public class PycrunchTestMetadata {
         return metadata;
     }
 
+    public JSONObject to_json() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("fqn", fqn);
+        o.put("filename", filename);
+        o.put("module", module);
+        o.put("state", state);
+        o.put("name", name);
+        return o;
+    }
     @Override
     public String toString() {
         return this.state + " - " + this.fqn;

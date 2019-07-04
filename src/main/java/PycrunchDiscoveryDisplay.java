@@ -11,7 +11,7 @@ public class PycrunchDiscoveryDisplay extends AnAction {
     // You can omit this constructor when registering the action in the plugin.xml file.
     public PycrunchDiscoveryDisplay() {
         // Set the menu item name.
-        super("Show _Tests");
+        super("Show Discovered _Tests");
         // Set the menu item name, description and icon.
         // super("Text _Boxes","Item description",IconLoader.getIcon("/Mypackage/icon.png"));
     }

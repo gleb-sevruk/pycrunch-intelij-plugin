@@ -67,7 +67,7 @@ public class MyPyHighlighter extends  AnAction {
         }
 //        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
 //        try {
-//            connector.CollectDiagnostics(project);
+//            connector.AttachToEngine(project);
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
@@ -77,13 +77,13 @@ public class MyPyHighlighter extends  AnAction {
 
     private void addHighlighterForLine(int myLine, MarkupModelEx markup, ArrayList<RangeHighlighterEx> all_highlighters_per_current_file) {
         RangeHighlighterEx highlighter;
-        highlighter = markup.addPersistentLineHighlighter(myLine, 6001, (TextAttributes)null);
+        highlighter = markup.addPersistentLineHighlighter(myLine, 5001, (TextAttributes)null);
         if (highlighter != null) {
             highlighter.setGutterIconRenderer(new PyCrunchGutterIconRenderer(myLine));
             TextAttributes textAttributes = (TextAttributes) ObjectUtils.notNull(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(CodeInsightColors.BOOKMARKS_ATTRIBUTES), new TextAttributes());
-            Color stripeColor = (Color)ObjectUtils.notNull(textAttributes.getErrorStripeColor(), new JBColor(0, 14408667));
-            highlighter.setErrorStripeMarkColor(stripeColor);
-            highlighter.setErrorStripeTooltip("abc");
+//            Color stripeColor = (Color)ObjectUtils.notNull(textAttributes.getErrorStripeColor(), new JBColor(0, 14408667));
+//            highlighter.setErrorStripeMarkColor(stripeColor);
+//            highlighter.setErrorStripeTooltip("abc");
             TextAttributes attributes = highlighter.getTextAttributes();
             if (attributes == null) {
                 attributes = new TextAttributes();
