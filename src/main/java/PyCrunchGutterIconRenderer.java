@@ -1,28 +1,28 @@
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.util.PlatformIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.io.InputStream;
 import java.net.URL;
 
 public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements DumbAware {
-    private final Icon _imageIcon3;
+    private final Icon _imageRed;
     private final Icon _imageIcon2;
-    private final Icon _imageIcon;
+    private final Icon _imageGreen;
     private int _line;
+    private String status;
 
-    public PyCrunchGutterIconRenderer(int line) {
+    public PyCrunchGutterIconRenderer(int line, String status) {
         super();
         this._line = line;
+        this.status = status;
 
         URL resource = getClass().getResource("/circle-green.png");
-        _imageIcon = new ImageIcon(resource);
+        _imageGreen = new ImageIcon(resource);
         _imageIcon2 =new ImageIcon(getClass().getResource("/cherry-icon.png"));
-        _imageIcon3 = new ImageIcon(getClass().getResource("/circle-red.png"));
+        _imageRed = new ImageIcon(getClass().getResource("/circle-red.png"));
 
     }
 
@@ -39,19 +39,22 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 
     @Override
     public int hashCode() {
-        return _imageIcon.hashCode();
+        return _imageGreen.hashCode();
     }
 
     @Override
     public @NotNull Icon getIcon() {
 //        if (_line % 3 == 0 ){
-//            return _imageIcon3;
+//            return _imageRed;
 //        }
 //        if (_line % 2 == 0 ){
 //            return _imageIcon2;
 //        }
+        if (status.equals("failed")) {
+            return _imageRed;
+        }
 
-        return _imageIcon;
+        return _imageGreen;
     }
     public AnAction getClickAction() {
         return null;

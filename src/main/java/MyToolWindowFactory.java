@@ -1,11 +1,16 @@
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.*;
 import com.intellij.ui.content.*;
+import com.intellij.util.messages.MessageBus;
 
 public class MyToolWindowFactory implements ToolWindowFactory {
     // Create the tool window content.
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
-        MyToolWindow myToolWindow = new MyToolWindow(toolWindow);
+        MessageBus bus = project.getMessageBus();
+        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
+// todo connector.start() for automatic
+        MyToolWindow myToolWindow = new MyToolWindow(toolWindow, project, bus, connector);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(myToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);

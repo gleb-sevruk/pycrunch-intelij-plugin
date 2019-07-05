@@ -24,7 +24,6 @@ import java.util.Hashtable;
 import java.util.Set;
 
 public class MyPyHighlighter extends  AnAction {
-    private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
     // If you register the action from Java code, this constructor is used to set the menu item name
     // (optionally, you can specify the menu description and an icon to display next to the menu item).
     // You can omit this constructor when registering the action in the plugin.xml file.
@@ -36,67 +35,14 @@ public class MyPyHighlighter extends  AnAction {
     }
 
     public void actionPerformed(AnActionEvent event) {
+        PycrunchHighlighterMarkersState connector = ServiceManager.getService(PycrunchHighlighterMarkersState.class);
+
         Editor editor = event.getData(PlatformDataKeys.EDITOR);
-        int myLine = editor.getCaretModel().getLogicalPosition().line;
-        System.out.println(myLine);
-
         Project project = event.getData(PlatformDataKeys.PROJECT);
-        Document document = editor.getDocument();
-        PsiFile psiFile = PsiDocumentManagerImpl.getInstance(project).getPsiFile(document);
-        String absolute_path = psiFile.getVirtualFile().getPath();
-        ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
-
-        if (!_highlighters_per_file.containsKey(absolute_path)) {
-            all_highlighters_per_current_file = new ArrayList<>();
-            _highlighters_per_file.put(absolute_path, all_highlighters_per_current_file);
-        } else {
-            all_highlighters_per_current_file = _highlighters_per_file.get(absolute_path);
-            all_highlighters_per_current_file.forEach(__ -> __.dispose());
-        }
-        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
-        Set<Integer> lines_covered = connector.GetCoveredLineForFile(absolute_path);
-        MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
-        RangeHighlighterEx highlighter;
-        lines_covered.forEach(__ -> addHighlighterForLine(__ - 1, markup, all_highlighters_per_current_file));
-        if (myLine >= 0) {
-//            addHighlighterForLine(myLine, markup);
-//            addHighlighterForLine(myLine+1, markup);
-//            addHighlighterForLine(myLine+2, markup);
-        } else {
-            highlighter = null;
-        }
-//        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
-//        try {
-//            connector.AttachToEngine(project);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        String txt= Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
-//        Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
+        connector.invalidate_markers(editor.getDocument(), project);
     }
 
-    private void addHighlighterForLine(int myLine, MarkupModelEx markup, ArrayList<RangeHighlighterEx> all_highlighters_per_current_file) {
-        RangeHighlighterEx highlighter;
-        highlighter = markup.addPersistentLineHighlighter(myLine, 5001, (TextAttributes)null);
-        if (highlighter != null) {
-            highlighter.setGutterIconRenderer(new PyCrunchGutterIconRenderer(myLine));
-            TextAttributes textAttributes = (TextAttributes) ObjectUtils.notNull(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(CodeInsightColors.BOOKMARKS_ATTRIBUTES), new TextAttributes());
-//            Color stripeColor = (Color)ObjectUtils.notNull(textAttributes.getErrorStripeColor(), new JBColor(0, 14408667));
-//            highlighter.setErrorStripeMarkColor(stripeColor);
-//            highlighter.setErrorStripeTooltip("abc");
-            TextAttributes attributes = highlighter.getTextAttributes();
-            if (attributes == null) {
-                attributes = new TextAttributes();
-            }
 
-            attributes.setBackgroundColor(new JBColor(0x35D5DB, 14408667));
-            attributes.setForegroundColor(textAttributes.getForegroundColor());
-            highlighter.setTextAttributes(attributes);
-            all_highlighters_per_current_file.add(highlighter);
-            markup.fireAfterAdded(highlighter);
-
-        }
-    }
 }
 
 

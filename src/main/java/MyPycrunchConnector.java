@@ -29,7 +29,7 @@ public class MyPycrunchConnector {
     private static Project _project;
     private TestRunResult _result;
     private Set<Integer> _visited_lines;
-    private MessageBus myBus;
+    private MessageBus _bus;
     private String api_uri = "http://127.0.0.1:5000";
 
     public MyPycrunchConnector() {
@@ -47,7 +47,6 @@ public class MyPycrunchConnector {
             String str = data.toString();
             String username;
             String message;
-//            Messages.showMessageDialog(_project, "Socket data:\n" +str, "Information", Messages.getInformationIcon());
 
             try {
                 String evt = data.getString("event_type");
@@ -107,7 +106,7 @@ public class MyPycrunchConnector {
             _result = TestRunResult.from_json(value);
         }
         EventQueue.invokeLater(() -> {
-            ((ChangeActionNotifier)this.myBus.syncPublisher(ChangeActionNotifier.CHANGE_ACTION_TOPIC)).beforeAction("huilo");
+            ((ChangeActionNotifier)this._bus.syncPublisher(ChangeActionNotifier.CHANGE_ACTION_TOPIC)).beforeAction("huilo");
         });
     }
 
@@ -121,13 +120,13 @@ public class MyPycrunchConnector {
             _tests.add(PycrunchTestMetadata.from_json(x));
         }
         EventQueue.invokeLater(() -> {
-            ((ChangeActionNotifier)this.myBus.syncPublisher(ChangeActionNotifier.CHANGE_ACTION_TOPIC)).beforeAction("huilo");
+            ((ChangeActionNotifier)this._bus.syncPublisher(ChangeActionNotifier.CHANGE_ACTION_TOPIC)).beforeAction("huilo");
         });
     }
 
     public void AttachToEngine(Project project) throws Exception {
         MyPycrunchConnector._project = project;
-        myBus = project.getMessageBus();
+        _bus = project.getMessageBus();
         try {
             _socket = IO.socket(api_uri);
             _socket.on("event", onNewMessage);
@@ -209,7 +208,19 @@ public class MyPycrunchConnector {
         return fileCoverage.lines_covered;
     }
 
+    public TestRunResult get_result(){
+        return _result;
+    }
+
     public MessageBus GetMessageBus() {
-        return myBus;
+        return _bus;
+    }
+
+    public String get_result_status() {
+        if (_result == null) {
+            return "unknown";
+        }
+
+        return _result.status;
     }
 }

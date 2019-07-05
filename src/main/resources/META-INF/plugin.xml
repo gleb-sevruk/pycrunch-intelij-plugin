@@ -34,6 +34,10 @@
                             serviceImplementation="MyCounter"/>
         <applicationService serviceInterface="MyPycrunchConnector"
                             serviceImplementation="MyPycrunchConnector"/>
+
+        <applicationService serviceInterface="PycrunchHighlighterMarkersState"
+                            serviceImplementation="PycrunchHighlighterMarkersState"/>
+
         <toolWindow id="PyCrunch" icon="/cherry-icon.png" anchor="right" factoryClass="MyToolWindowFactory"/>
 
         <codeInsight.lineMarkerProvider language="Python" implementationClass="SimpleLineMarkerProvider"/>

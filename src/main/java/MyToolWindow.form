@@ -32,10 +32,10 @@
               <text value="Refresh"/>
             </properties>
           </component>
-          <component id="30d9e" class="javax.swing.JButton" binding="initMessageBusButton" default-binding="true">
+          <component id="1d8ea" class="javax.swing.JButton" binding="highlightFileButton">
             <constraints/>
             <properties>
-              <text value="Init Message bus"/>
+              <text value="Highlight FIle"/>
             </properties>
           </component>
           <component id="3edc1" class="javax.swing.JButton" binding="hideToolWindowButton">

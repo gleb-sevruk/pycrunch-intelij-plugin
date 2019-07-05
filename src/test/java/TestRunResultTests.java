@@ -171,6 +171,7 @@ public class TestRunResultTests  extends TestCase {
             TestRunResult result = TestRunResult.from_json(value);
             assertTrue(result.captured_output.contains("E       assert 3 == 2"));
             assertEquals(1, result.files_covered.size());
+            assertEquals("failed", result.status);
             System.out.println(value.toString());
         }
     }

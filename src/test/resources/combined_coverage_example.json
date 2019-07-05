@@ -1,0 +1,193 @@
+{
+    "event_type": "combined_coverage_updated",
+    "combined_coverage": [
+        {
+            "filename": "/Users/gleb/code/PyCrunch/tests_one.py",
+            "lines_with_entrypoints": {
+                "1": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "2": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "3": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "4": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "5": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "7": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "8": [
+                    "tests_one:test_1"
+                ],
+                "9": [
+                    "tests_one:test_1"
+                ],
+                "10": [
+                    "tests_one:test_1"
+                ],
+                "13": [
+                    "tests_one:test_1"
+                ],
+                "14": [
+                    "tests_one:test_1"
+                ],
+                "15": [
+                    "tests_one:test_1"
+                ],
+                "16": [
+                    "tests_one:test_1"
+                ],
+                "17": [
+                    "tests_one:test_1"
+                ],
+                "18": [
+                    "tests_one:test_1"
+                ],
+                "19": [
+                    "tests_one:test_1"
+                ],
+                "20": [
+                    "tests_one:test_1"
+                ],
+                "22": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ],
+                "23": [
+                    "tests_one:test_6"
+                ],
+                "24": [
+                    "tests_one:test_6"
+                ],
+                "27": [
+                    "tests_one:test_6"
+                ],
+                "30": [
+                    "tests_one:test_6",
+                    "tests_one:test_1"
+                ]
+            }
+        },
+        {
+            "filename": "/Users/gleb/code/PyCrunch/playground.py",
+            "lines_with_entrypoints": {
+                "1": [
+                    "tests_one:test_6"
+                ],
+                "6": [
+                    "tests_one:test_6"
+                ],
+                "10": [
+                    "tests_one:test_6"
+                ],
+                "11": [
+                    "tests_one:test_6"
+                ],
+                "14": [
+                    "tests_one:test_6"
+                ],
+                "15": [
+                    "tests_one:test_6"
+                ],
+                "20": [
+                    "tests_one:test_6"
+                ],
+                "22": [
+                    "tests_one:test_6"
+                ]
+            }
+        },
+        {
+            "filename": "/Users/gleb/code/PyCrunch/tests_two.py",
+            "lines_with_entrypoints": {
+                "1": [
+                    "tests_two:test_failing"
+                ],
+                "2": [
+                    "tests_two:test_failing"
+                ],
+                "5": [
+                    "tests_two:test_failing"
+                ],
+                "15": [
+                    "tests_two:test_failing"
+                ],
+                "23": [
+                    "tests_two:test_failing"
+                ],
+                "26": [
+                    "tests_two:test_failing"
+                ],
+                "27": [
+                    "tests_two:test_failing"
+                ],
+                "28": [
+                    "tests_two:test_failing"
+                ]
+            }
+        }
+    ],
+    "dependencies": {
+        "/Users/gleb/code/PyCrunch/tests_one.py": [
+            {
+                "fqn": "tests_one:test_1",
+                "module": "tests_one",
+                "filename": "/Users/gleb/code/PyCrunch/tests_one.py",
+                "name": "test_1",
+                "state": "pending"
+            },
+            {
+                "fqn": "tests_one:test_6",
+                "module": "tests_one",
+                "filename": "/Users/gleb/code/PyCrunch/tests_one.py",
+                "name": "test_6",
+                "state": "pending"
+            }
+        ],
+        "/Users/gleb/code/PyCrunch/playground.py": [
+            {
+                "fqn": "tests_one:test_6",
+                "module": "tests_one",
+                "filename": "/Users/gleb/code/PyCrunch/tests_one.py",
+                "name": "test_6",
+                "state": "pending"
+            }
+        ],
+        "/Users/gleb/code/PyCrunch/tests_two.py": [
+            {
+                "fqn": "tests_two:test_failing",
+                "module": "tests_two",
+                "filename": "/Users/gleb/code/PyCrunch/tests_two.py",
+                "name": "test_failing",
+                "state": "pending"
+            }
+        ]
+    },
+    "aggregated_results": {
+        "tests_one:test_1": {
+            "state": "success"
+        },
+        "tests_one:test_6": {
+            "state": "success"
+        },
+        "tests_two:test_failing": {
+            "state": "failed"
+        }
+    },
+    "timings": {
+        "start": 510910.193906875,
+        "end": 510911.008116594
+    }
+}
