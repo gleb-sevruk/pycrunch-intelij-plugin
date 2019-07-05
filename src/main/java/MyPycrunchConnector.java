@@ -31,6 +31,7 @@ public class MyPycrunchConnector {
     private Set<Integer> _visited_lines;
     private MessageBus _bus;
     private String api_uri = "http://127.0.0.1:5000";
+    private PycrunchCombinedCoverage _combined_coverage;
 
     public MyPycrunchConnector() {
         MyPycrunchConnector.CounterOfSingletons++;
@@ -40,33 +41,39 @@ public class MyPycrunchConnector {
     private ArrayList<PycrunchTestMetadata> _tests;
     private Socket _socket;
 
-    private Emitter.Listener onNewMessage = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            JSONObject data = (JSONObject) args[args.length - 1];
-            String str = data.toString();
-            String username;
-            String message;
+    private Emitter.Listener onNewMessage = args -> didReceiveSocketEvent(args);
+    private Emitter.Listener onSocketClose = args -> socketDidDisconnect(args);
+    private Emitter.Listener onSocketConnect = args -> socketDidConnect(args);
 
-            try {
-                String evt = data.getString("event_type");
-                if (evt.equals("discovery_did_become_available")){
+    private void socketDidDisconnect(Object... args) {
+        engineWillDisconnect();
+    }
 
-                    ApplyTestDiscoveryResults(data);
-                }
-                if (evt.equals("test_run_completed")){
+    private void socketDidConnect(Object... args) {
+        engineWillConnect();
+    }
+    private void ApplyCombinedCoverage(JSONObject data) throws JSONException {
+        _combined_coverage = PycrunchCombinedCoverage.from_json(data);
 
-                    ApplyTestRunResults(data);
-                }
-//                username = data.getString("username");
-//                message = data.getString("message");
-            } catch (JSONException e) {
+        queueMessageBusEvent();
 
-                }
+    }
 
-            // add the message to view
-        }
-    };
+    public void AttachToEngine(Project project) throws Exception {
+        MyPycrunchConnector._project = project;
+        _bus = project.getMessageBus();
+        try {
+            _socket = IO.socket(api_uri);
+            _socket.on("event", onNewMessage)
+                    .on(Socket.EVENT_DISCONNECT, onSocketClose)
+                    .on(Socket.EVENT_CONNECT, onSocketConnect);
+
+            _socket.connect();
+        } catch (URISyntaxException e) {}
+
+        post_discovery_command();
+    }
+
     public String GetCapturedOutput(String fqn) {
         if (_result == null) {
             return "_result is null";
@@ -105,11 +112,24 @@ public class MyPycrunchConnector {
             JSONObject value = all_runs.getJSONObject(key);
             _result = TestRunResult.from_json(value);
         }
+        queueMessageBusEvent();
+    }
+    private void queueMessageBusEvent() {
         EventQueue.invokeLater(() -> {
-            ((ChangeActionNotifier)this._bus.syncPublisher(ChangeActionNotifier.CHANGE_ACTION_TOPIC)).beforeAction("huilo");
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).beforeAction("---");
         });
     }
 
+    private void engineWillConnect() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidConnect("---");
+        });
+    }
+    private void engineWillDisconnect() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidDisconnect("---");
+        });
+    }
     private void ApplyTestDiscoveryResults(JSONObject data) throws JSONException {
 
         _discovered_tests = data;
@@ -119,21 +139,8 @@ public class MyPycrunchConnector {
             JSONObject x = tests.getJSONObject(i);
             _tests.add(PycrunchTestMetadata.from_json(x));
         }
-        EventQueue.invokeLater(() -> {
-            ((ChangeActionNotifier)this._bus.syncPublisher(ChangeActionNotifier.CHANGE_ACTION_TOPIC)).beforeAction("huilo");
-        });
-    }
 
-    public void AttachToEngine(Project project) throws Exception {
-        MyPycrunchConnector._project = project;
-        _bus = project.getMessageBus();
-        try {
-            _socket = IO.socket(api_uri);
-            _socket.on("event", onNewMessage);
-            _socket.connect();
-        } catch (URISyntaxException e) {}
-
-        post_discovery_command();
+        queueMessageBusEvent();
     }
 
     private void post_discovery_command() throws IOException {
@@ -198,14 +205,12 @@ public class MyPycrunchConnector {
         _visited_lines = new HashSet<>();
     }
 
-    public Set<Integer> GetCoveredLineForFile(String absolute_path) {
-        if (!_result.files_covered.containsKey(absolute_path))
-        {
-            return new HashSet<>();
+    public SingleFileCombinedCoverage GetCoveredLinesForFile(String absolute_path) {
+        if (_combined_coverage == null) {
+            return null;
         }
-        TestRunResultFileCoverage fileCoverage = _result.files_covered.get(absolute_path);
 
-        return fileCoverage.lines_covered;
+        return _combined_coverage.GetLinesCovering(absolute_path);
     }
 
     public TestRunResult get_result(){
@@ -222,5 +227,36 @@ public class MyPycrunchConnector {
         }
 
         return _result.status;
+    }
+
+    public String get_marker_color_for(String absolute_path, Integer line_number) {
+        return _combined_coverage.get_marker_color_for(absolute_path, line_number);
+    }
+
+    private void didReceiveSocketEvent(Object... args) {
+        JSONObject data = (JSONObject) args[args.length - 1];
+        String str = data.toString();
+        String username;
+        String message;
+
+        try {
+            String evt = data.getString("event_type");
+            if (evt.equals("discovery_did_become_available")) {
+
+                ApplyTestDiscoveryResults(data);
+            }
+            if (evt.equals("test_run_completed")) {
+
+                ApplyTestRunResults(data);
+            }
+            if (evt.equals("combined_coverage_updated")) {
+
+                ApplyCombinedCoverage(data);
+            }
+//                username = data.getString("username");
+//                message = data.getString("message");
+        } catch (JSONException e) {
+
+        }
     }
 }

@@ -13,7 +13,7 @@ import javax.swing.event.ListSelectionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyToolWindow {
+public class PycrunchToolWindow {
     private MyPycrunchConnector _connector;
     private JButton refreshToolWindowButton;
     private JButton hideToolWindowButton;
@@ -25,15 +25,15 @@ public class MyToolWindow {
     private JButton runSelectedButton;
     private JTextArea textArea1;
     private JButton highlightFileButton;
+    private JLabel label_engine_status;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
 
-    public MyToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, MyPycrunchConnector connector) {
+    public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, MyPycrunchConnector connector) {
         _bus = bus;
         _project = project;
         _connector = connector;
-        hideToolWindowButton.addActionListener(e -> toolWindow.hide(null));
         attach_events();
         this.ui_will_mount();
         list1.setLayoutOrientation(JList.VERTICAL);
@@ -67,7 +67,7 @@ public class MyToolWindow {
             if (cachedDocument != null) {
                 connector.invalidate_markers(cachedDocument, _project);
             } else {
-                System.out.println("cached document is null");
+                System.out.println("cached document is null " + __.filename);
             }
 
 
@@ -75,18 +75,23 @@ public class MyToolWindow {
     }
 
     public void connect_to_message_bus() {
-        _bus.connect().subscribe(ChangeActionNotifier.CHANGE_ACTION_TOPIC, new ChangeActionNotifier() {
+        _bus.connect().subscribe(PycrunchBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchBusNotifier() {
             @Override
-            public void beforeAction(String context) {
-                textArea1.setText(_connector.GetCapturedOutput(context));
+            public void beforeAction(String event) {
+                textArea1.setText(_connector.GetCapturedOutput("todo"));
                 fill_test_list();
                 update_all_highlighting();
 
             }
             @Override
-            public void afterAction(String context) {
-                // Process 'after action' event.
+            public void engineDidConnect(String apiRoot) {
+                label_engine_status.setText("Connected to " + apiRoot);
             }
+            @Override
+            public void engineDidDisconnect(String context){
+                label_engine_status.setText("Lost connection to PyCrunch Engine");
+            }
+
         });
     }
 

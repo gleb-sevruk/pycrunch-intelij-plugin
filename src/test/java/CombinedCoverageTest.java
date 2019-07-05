@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class CombinedCoverageTest extends TestCase {
@@ -23,13 +22,13 @@ public class CombinedCoverageTest extends TestCase {
 
         String filename = "/Users/gleb/code/PyCrunch/tests_one.py";
         SingleFileCombinedCoverage actual = target.GetLinesCovering(filename);
-        HashSet<String> strings = actual._state.get(1);
+        HashSet<String> strings = actual._lines_hit_by_run.get(1);
         assertTrue(strings.contains("tests_one:test_1"));
         assertTrue(strings.contains("tests_one:test_6"));
 
 
-        assertTrue(actual._state.get(9).contains("tests_one:test_1"));
-        assertEquals(1, actual._state.get(9).size());
+        assertTrue(actual._lines_hit_by_run.get(9).contains("tests_one:test_1"));
+        assertEquals(1, actual._lines_hit_by_run.get(9).size());
 
 
     }

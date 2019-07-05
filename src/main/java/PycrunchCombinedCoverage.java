@@ -3,6 +3,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class PycrunchCombinedCoverage {
 
@@ -47,5 +48,22 @@ public class PycrunchCombinedCoverage {
 
     public SingleFileCombinedCoverage GetLinesCovering(String filename) {
         return _files.get(filename);
+    }
+
+    public String get_marker_color_for(String absolute_path, Integer line_number) {
+        SingleFileCombinedCoverage singleFileCombinedCoverage = _files.get(absolute_path);
+        HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
+        for (String fqn: tests_at_line) {
+            String status = GetTestStatus(fqn);
+            if (status.equals("failed")) {
+                return "failed";
+            }
+            if (status.equals("queued")) {
+                return "queued";
+            }
+
+        }
+
+        return "success";
     }
 }

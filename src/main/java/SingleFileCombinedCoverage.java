@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class SingleFileCombinedCoverage {
-    public HashMap<Integer, HashSet<String>> _state = new HashMap<>();
+    public HashMap<Integer, HashSet<String>> _lines_hit_by_run = new HashMap<>();
 
     public static SingleFileCombinedCoverage from_json(JSONObject j) throws JSONException {
         JSONObject lines = j.getJSONObject("lines_with_entrypoints");
@@ -21,8 +21,14 @@ public class SingleFileCombinedCoverage {
                 String fqn = test_fqns.getString(x);
                 current_line_fqns.add(fqn);
             }
-            result._state.put(Integer.parseInt(line_number),current_line_fqns);
+            if (current_line_fqns.size() > 0) {
+                result._lines_hit_by_run.put(Integer.parseInt(line_number), current_line_fqns);
+            }
         }
         return result;
+    }
+
+    public HashSet<String> TestsAtLine(Integer line_number) {
+        return _lines_hit_by_run.getOrDefault(line_number, new HashSet<>());
     }
 }

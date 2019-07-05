@@ -1,6 +1,5 @@
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.ex.MarkupModelEx;
@@ -10,13 +9,13 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.PsiDocumentManagerImpl;
-import com.intellij.ui.JBColor;
 import com.intellij.util.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
 
 public class PycrunchHighlighterMarkersState {
     private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
@@ -25,7 +24,7 @@ public class PycrunchHighlighterMarkersState {
         MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
 
         int myLine = 0;
-        System.out.println(myLine);
+//        System.out.println(myLine);
 
         String absolute_path = path_from_document(project, document);
         ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
@@ -37,18 +36,23 @@ public class PycrunchHighlighterMarkersState {
             all_highlighters_per_current_file = _highlighters_per_file.get(absolute_path);
             all_highlighters_per_current_file.forEach(__ -> __.dispose());
         }
-        Set<Integer> lines_covered = connector.GetCoveredLineForFile(absolute_path);
-        String status = connector.get_result_status();
-        MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
-        RangeHighlighterEx highlighter;
-        lines_covered.forEach(__ -> addHighlighterForLine(__ - 1, status, markup, all_highlighters_per_current_file));
-        if (myLine >= 0) {
+        SingleFileCombinedCoverage lines_covered = connector.GetCoveredLinesForFile(absolute_path);
+        if (lines_covered != null) {
+
+
+            MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
+            RangeHighlighterEx highlighter;
+            HashMap<Integer, HashSet<String>> lines_hit_by_run = lines_covered._lines_hit_by_run;
+            if (lines_hit_by_run != null) {
+                lines_hit_by_run.keySet().forEach(__ -> addHighlighterForLine(__ - 1, connector.get_marker_color_for(absolute_path, __), markup, all_highlighters_per_current_file));
+            }
+            if (myLine >= 0) {
 //            addHighlighterForLine(myLine, markup);
 //            addHighlighterForLine(myLine+1, markup);
 //            addHighlighterForLine(myLine+2, markup);
-        } else {
-            highlighter = null;
-        }
+            } else {
+                highlighter = null;
+            }
 //        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
 //        try {
 //            connector.AttachToEngine(project);
@@ -57,6 +61,7 @@ public class PycrunchHighlighterMarkersState {
 //        }
 //        String txt= Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
 //        Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
+        }
     }
 
     @NotNull
@@ -84,7 +89,7 @@ public class PycrunchHighlighterMarkersState {
             attributes.setForegroundColor(textAttributes.getForegroundColor());
             highlighter.setTextAttributes(attributes);
             all_highlighters_per_current_file.add(highlighter);
-            markup.fireAfterAdded(highlighter);
+//            markup.fireAfterAdded(highlighter);
 
         }
     }

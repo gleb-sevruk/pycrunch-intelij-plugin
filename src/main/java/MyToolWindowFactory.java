@@ -10,9 +10,9 @@ public class MyToolWindowFactory implements ToolWindowFactory {
         MessageBus bus = project.getMessageBus();
         MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
 // todo connector.start() for automatic
-        MyToolWindow myToolWindow = new MyToolWindow(toolWindow, project, bus, connector);
+        PycrunchToolWindow pycrunchToolWindow = new PycrunchToolWindow(toolWindow, project, bus, connector);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(myToolWindow.getContent(), "", false);
+        Content content = contentFactory.createContent(pycrunchToolWindow.getContent(), "", false);
         toolWindow.getContentManager().addContent(content);
     }
 }
