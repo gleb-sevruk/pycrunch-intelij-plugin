@@ -13,11 +13,13 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
     private final Icon _imageGreen;
     private int _line;
     private String status;
+    private String _filename;
 
-    public PyCrunchGutterIconRenderer(int line, String status) {
+    public PyCrunchGutterIconRenderer(int line, String status, String filename) {
         super();
         this._line = line;
         this.status = status;
+        _filename = filename;
 
         URL resource = getClass().getResource("/circle-green.png");
         _imageGreen = new ImageIcon(resource);
@@ -57,7 +59,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         return _imageGreen;
     }
     public AnAction getClickAction() {
-        return null;
+        return new ShowCoveringTestsAction(_filename, _line);
     }
 
     @Nullable
@@ -67,6 +69,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 
     @Nullable
     public AnAction getRightButtonClickAction() {
+//        return new ShowCoveringTestsAction();
         return null;
     }
 

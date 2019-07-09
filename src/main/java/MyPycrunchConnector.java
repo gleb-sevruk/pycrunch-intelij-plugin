@@ -213,6 +213,7 @@ public class MyPycrunchConnector {
         return _combined_coverage.GetLinesCovering(absolute_path);
     }
 
+
     public TestRunResult get_result(){
         return _result;
     }
@@ -231,6 +232,19 @@ public class MyPycrunchConnector {
 
     public String get_marker_color_for(String absolute_path, Integer line_number) {
         return _combined_coverage.get_marker_color_for(absolute_path, line_number);
+    }
+
+    public PycrunchTestMetadata FindTestByFqn(String fqn) {
+        for (PycrunchTestMetadata testMetadata: _tests){
+            if (testMetadata.fqn.equals(fqn)) {
+                return testMetadata;
+            }
+        }
+        return null;
+    }
+
+    public String GetTestStatus(String fqn) {
+        return _combined_coverage.GetTestStatus(fqn);
     }
 
     private void didReceiveSocketEvent(Object... args) {
