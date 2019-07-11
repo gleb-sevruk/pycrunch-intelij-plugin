@@ -11,9 +11,9 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
     private final Icon _imageRed;
     private final Icon _imageIcon2;
     private final Icon _imageGreen;
-    private int _line;
+    public int _line;
     private String status;
-    private String _filename;
+    public String _filename;
 
     public PyCrunchGutterIconRenderer(int line, String status, String filename) {
         super();
@@ -59,7 +59,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         return _imageGreen;
     }
     public AnAction getClickAction() {
-        return new ShowCoveringTestsAction(_filename, _line);
+        return new ShowCoveringTestsAction(this);
     }
 
     @Nullable

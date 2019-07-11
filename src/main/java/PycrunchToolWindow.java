@@ -80,7 +80,6 @@ public class PycrunchToolWindow {
             public void beforeAction(String event) {
                 textArea1.setText(_connector.GetCapturedOutput("todo"));
                 fill_test_list();
-                update_all_highlighting();
 
             }
             @Override
@@ -90,6 +89,10 @@ public class PycrunchToolWindow {
             @Override
             public void engineDidDisconnect(String context){
                 label_engine_status.setText("Lost connection to PyCrunch Engine");
+            }
+            @Override
+            public void combinedCoverageDidUpdate(String context) {
+                update_all_highlighting();
             }
 
         });

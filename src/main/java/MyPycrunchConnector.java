@@ -26,7 +26,7 @@ import java.util.List;
 public class MyPycrunchConnector {
     private static int CounterOfSingletons = 0;
     // Sets the maximum allowed number of opened projects.
-    private static Project _project;
+    public  Project _project;
     private TestRunResult _result;
     private Set<Integer> _visited_lines;
     private MessageBus _bus;
@@ -55,12 +55,12 @@ public class MyPycrunchConnector {
     private void ApplyCombinedCoverage(JSONObject data) throws JSONException {
         _combined_coverage = PycrunchCombinedCoverage.from_json(data);
 
-        queueMessageBusEvent();
+        combinedCoverageDidUpdate();
 
     }
 
     public void AttachToEngine(Project project) throws Exception {
-        MyPycrunchConnector._project = project;
+        _project = project;
         _bus = project.getMessageBus();
         try {
             _socket = IO.socket(api_uri);
@@ -117,6 +117,12 @@ public class MyPycrunchConnector {
     private void queueMessageBusEvent() {
         EventQueue.invokeLater(() -> {
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).beforeAction("---");
+        });
+    }
+
+    private void combinedCoverageDidUpdate() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
         });
     }
 
