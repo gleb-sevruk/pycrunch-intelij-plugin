@@ -61,22 +61,10 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
             System.out.println("test by fqn is null !!!");
             return FINAL_CHOICE;
         }
+        NavigateToTest toTest = new NavigateToTest();
+        toTest.Go(testByFqn, _connector);
         // todo add line number in discovery metadata here!
-        VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(testByFqn.filename);
-//        PsiDocumentManagerImpl.getInstance(_connector._project).getPsiFile(fileByPath)
-        PsiDocumentManager documentManager = PsiDocumentManager.getInstance(_connector._project);
-        Document document = FileDocumentManager.getInstance().getDocument(fileByPath);
-        PyFile psiFile = (PyFile) documentManager.getPsiFile(document);
-        PsiElement psiElement = psiFile.findExportedName(testByFqn.name);
-        OpenFileDescriptor openFileDescriptor;
-        if (psiElement != null) {
-            openFileDescriptor = new OpenFileDescriptor(this._project, fileByPath, psiElement.getTextOffset());
-        }
-        else {
-            openFileDescriptor = new OpenFileDescriptor(this._project, fileByPath, _line, -1, true);
-        }
 
-        openFileDescriptor.navigate(true);
 
 //        FileDocumentManager.getInstance().getFile(_connector._project.)
 //        FileDocumentManager.getInstance().getDocument(fileByPath).get

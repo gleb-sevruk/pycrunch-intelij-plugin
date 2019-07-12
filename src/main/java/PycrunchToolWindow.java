@@ -10,7 +10,13 @@ import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class PycrunchToolWindow {
@@ -44,34 +50,66 @@ public class PycrunchToolWindow {
         connect_to_message_bus();
 
 
+        list1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (!SwingUtilities.isRightMouseButton(e)) {
+                    return;
+                }
+
+                List<PycrunchTestMetadata> selectedValuesList = list1.getSelectedValuesList();
+                if (selectedValuesList == null || selectedValuesList.size() <= 0) {
+                    System.out.println("null is selected instead of tests; returning...");
+                    return;
+                }
+                JPopupMenu menu = new JPopupMenu();
+                JMenuItem itemRemove = new JMenuItem("Navigate to test");
+                itemRemove.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        new NavigateToTest().Go(selectedValuesList.get(0), _connector);
+                    }
+                });
+                menu.add(itemRemove);
+                menu.show(list1, e.getPoint().x, e.getPoint().y);
+
+            }
+        });
     }
 
     private void attach_events() {
         refreshToolWindowButton.addActionListener(e -> ui_will_mount());
         runSelectedButton.addActionListener(e -> run_selected());
-        highlightFileButton.addActionListener(e -> update_all_highlighting());
+//        highlightFileButton.addActionListener(e -> update_all_highlighting());
     }
 
     private void update_all_highlighting() {
-        TestRunResult result = _connector.get_result();
-        if (result == null) {
+        HashMap<String, TestRunResult> results = _connector.get_results();
+        if (results.size() <= 0) {
             return;
         }
 
         PycrunchHighlighterMarkersState connector = ServiceManager.getService(PycrunchHighlighterMarkersState.class);
 
+        HashSet<String> files_to_redraw = new HashSet<>();
 
-        result.files_covered.values().forEach(__ -> {
-            VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__.filename);
+        for (TestRunResult result: results.values()) {
+            result.files_covered.values().forEach(__ -> {
+                files_to_redraw.add(__.filename);
+
+            });
+        }
+
+        files_to_redraw.forEach(__ -> {
+            VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
             Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
             if (cachedDocument != null) {
                 connector.invalidate_markers(cachedDocument, _project);
             } else {
-                System.out.println("cached document is null " + __.filename);
+                System.out.println("cached document is null " + __);
             }
-
-
         });
+
+
     }
 
     public void connect_to_message_bus() {
@@ -100,7 +138,7 @@ public class PycrunchToolWindow {
 
     public void run_selected() {
         List<PycrunchTestMetadata> selectedValue = list1.getSelectedValuesList();
-        if (selectedValue == null) {
+        if (selectedValue == null || selectedValue.size() <= 0) {
             return;
         }
 

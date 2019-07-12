@@ -37,7 +37,6 @@ public class ShowCoveringTestsAction extends AnAction implements AnAction.Transp
 //        System.out.println("AAA?!");
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
         Project project = e.getData(PlatformDataKeys.PROJECT);
-        JComponent component = editor.getComponent();
         HashSet<String> strings = _connector.GetCoveredLinesForFile(_gutterIcon._filename).TestsAtLine(_gutterIcon._line + 1);
         EditorGutterComponentEx gutterComponent = ((EditorEx)editor).getGutterComponentEx();
         Point centerPoint = gutterComponent.getCenterPoint(_gutterIcon);

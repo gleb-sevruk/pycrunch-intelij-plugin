@@ -27,7 +27,7 @@ public class MyPycrunchConnector {
     private static int CounterOfSingletons = 0;
     // Sets the maximum allowed number of opened projects.
     public  Project _project;
-    private TestRunResult _result;
+    private HashMap<String, TestRunResult> _results = new HashMap<>();
     private Set<Integer> _visited_lines;
     private MessageBus _bus;
     private String api_uri = "http://127.0.0.1:5000";
@@ -75,10 +75,11 @@ public class MyPycrunchConnector {
     }
 
     public String GetCapturedOutput(String fqn) {
-        if (_result == null) {
-            return "_result is null";
+        TestRunResult runResult = _results.getOrDefault(fqn, null);
+        if (runResult == null) {
+            return "Test `" +  fqn + "` has not run yet";
         }
-        return _result.captured_output;
+        return runResult.captured_output;
     }
 
     public void RunTests(List<PycrunchTestMetadata> tests) throws JSONException {
@@ -108,9 +109,9 @@ public class MyPycrunchConnector {
         JSONArray keys = all_runs.names();
 
         for (int i = 0; i < keys.length(); ++i) {
-            String key = keys.getString(i);
-            JSONObject value = all_runs.getJSONObject(key);
-            _result = TestRunResult.from_json(value);
+            String fqn = keys.getString(i);
+            JSONObject value = all_runs.getJSONObject(fqn);
+            _results.put(fqn, TestRunResult.from_json(value));
         }
         queueMessageBusEvent();
     }
@@ -220,21 +221,21 @@ public class MyPycrunchConnector {
     }
 
 
-    public TestRunResult get_result(){
-        return _result;
+    public HashMap<String, TestRunResult> get_results(){
+        return _results;
     }
 
     public MessageBus GetMessageBus() {
         return _bus;
     }
 
-    public String get_result_status() {
-        if (_result == null) {
-            return "unknown";
-        }
-
-        return _result.status;
-    }
+//    public String get_result_status() {
+//        if (_result == null) {
+//            return "unknown";
+//        }
+//
+//        return _result.status;
+//    }
 
     public String get_marker_color_for(String absolute_path, Integer line_number) {
         return _combined_coverage.get_marker_color_for(absolute_path, line_number);
