@@ -11,6 +11,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
     private final Icon _imageRed;
     private final Icon _imageIcon2;
     private final Icon _imageGreen;
+    private final Icon _imageProgress;
     public int _line;
     private String status;
     public String _filename;
@@ -25,6 +26,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         _imageGreen = new ImageIcon(resource);
         _imageIcon2 =new ImageIcon(getClass().getResource("/cherry-icon.png"));
         _imageRed = new ImageIcon(getClass().getResource("/circle-red.png"));
+        _imageProgress = new ImageIcon(getClass().getResource("/circle-progress.png"));
 
     }
 
@@ -54,6 +56,10 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 //        }
         if (status.equals("failed")) {
             return _imageRed;
+        }
+
+        if (status.equals("queued")) {
+            return _imageProgress;
         }
 
         return _imageGreen;

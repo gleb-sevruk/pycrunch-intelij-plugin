@@ -37,8 +37,7 @@ public class MyPycrunchConnector {
         MyPycrunchConnector.CounterOfSingletons++;
 
     }
-    private JSONObject _discovered_tests;
-    private ArrayList<PycrunchTestMetadata> _tests;
+    private HashMap<String, PycrunchTestMetadata> _tests = new HashMap<>();
     private Socket _socket;
 
     private Emitter.Listener onNewMessage = args -> didReceiveSocketEvent(args);
@@ -138,16 +137,15 @@ public class MyPycrunchConnector {
         });
     }
     private void ApplyTestDiscoveryResults(JSONObject data) throws JSONException {
-
-        _discovered_tests = data;
-        _tests = new ArrayList<>();
-        JSONArray tests = _discovered_tests.getJSONArray("tests");
+        JSONArray tests = data.getJSONArray("tests");
         for (int i=0; i < tests.length(); i++) {
             JSONObject x = tests.getJSONObject(i);
-            _tests.add(PycrunchTestMetadata.from_json(x));
+            PycrunchTestMetadata testMetadata = PycrunchTestMetadata.from_json(x);
+            _tests.put(testMetadata.fqn, testMetadata);
         }
 
         queueMessageBusEvent();
+        combinedCoverageDidUpdate();
     }
 
     private void post_discovery_command() throws IOException {
@@ -177,23 +175,12 @@ public class MyPycrunchConnector {
         }
         return sb.toString();
     }
-    public ArrayList<PycrunchTestMetadata> GetTests() {
+    public Collection<PycrunchTestMetadata> GetTests() {
         if (_tests == null) {
             return new ArrayList<PycrunchTestMetadata>();
         }
 
-        return _tests;
-    }
-    public String GetDiscoveredString() {
-        StringBuilder sb = new StringBuilder();
-        for (PycrunchTestMetadata t: _tests) {
-            sb.append(t.fqn);
-            sb.append(" - ");
-            sb.append(t.state);
-            sb.append('\n');
-        }
-
-        return sb.toString();
+        return _tests.values();
     }
 
     public boolean should_create_marker_for(PsiFile containingFile, int lineNum) {
@@ -238,22 +225,35 @@ public class MyPycrunchConnector {
 //    }
 
     public String get_marker_color_for(String absolute_path, Integer line_number) {
-        return _combined_coverage.get_marker_color_for(absolute_path, line_number);
+        SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage._files.get(absolute_path);
+        HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
+        for (String fqn: tests_at_line) {
+            String status = GetTestStatus(fqn);
+            if (status.equals("failed")) {
+                return "failed";
+            }
+            if (status.equals("queued")) {
+                return "queued";
+            }
+
+        }
+
+        return "success";
     }
+
 
     public PycrunchTestMetadata FindTestByFqn(String fqn) {
-        for (PycrunchTestMetadata testMetadata: _tests){
-            if (testMetadata.fqn.equals(fqn)) {
-                return testMetadata;
-            }
-        }
-        return null;
+        return _tests.getOrDefault(fqn, null);
     }
+
 
     public String GetTestStatus(String fqn) {
-        return _combined_coverage.GetTestStatus(fqn);
+        PycrunchTestMetadata found = _tests.getOrDefault(fqn, null);
+        if (found == null) {
+            return "no__test__found";
+        }
+        return found.state;
     }
-
     private void didReceiveSocketEvent(Object... args) {
         JSONObject data = (JSONObject) args[args.length - 1];
         String str = data.toString();
@@ -277,6 +277,7 @@ public class MyPycrunchConnector {
 //                username = data.getString("username");
 //                message = data.getString("message");
         } catch (JSONException e) {
+            System.out.println(e.toString());
 
         }
     }

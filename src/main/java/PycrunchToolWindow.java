@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.messages.MessageBus;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import javax.swing.*;
@@ -14,10 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class PycrunchToolWindow {
     private MyPycrunchConnector _connector;
@@ -35,6 +33,7 @@ public class PycrunchToolWindow {
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
+    private String _selectedTestFqn;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, MyPycrunchConnector connector) {
         _bus = bus;
@@ -50,7 +49,12 @@ public class PycrunchToolWindow {
         connect_to_message_bus();
 
 
-        list1.addMouseListener(new MouseAdapter() {
+        list1.addMouseListener(list_mouse_click_listener());
+    }
+
+    @NotNull
+    private MouseAdapter list_mouse_click_listener() {
+        return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (!SwingUtilities.isRightMouseButton(e)) {
@@ -73,7 +77,7 @@ public class PycrunchToolWindow {
                 menu.show(list1, e.getPoint().x, e.getPoint().y);
 
             }
-        });
+        };
     }
 
     private void attach_events() {
@@ -83,6 +87,7 @@ public class PycrunchToolWindow {
     }
 
     private void update_all_highlighting() {
+        long start = System.nanoTime();
         HashMap<String, TestRunResult> results = _connector.get_results();
         if (results.size() <= 0) {
             return;
@@ -105,11 +110,13 @@ public class PycrunchToolWindow {
             if (cachedDocument != null) {
                 connector.invalidate_markers(cachedDocument, _project);
             } else {
-                System.out.println("cached document is null " + __);
+//                System.out.println("cached document is null " + __);
             }
         });
 
-
+        long elapsedTime = System.nanoTime() - start;
+        long diffInMillis = elapsedTime/1000000;
+        System.out.println("redraw markers elapsed: " + diffInMillis + "ms");
     }
 
     public void connect_to_message_bus() {
@@ -118,6 +125,7 @@ public class PycrunchToolWindow {
             public void beforeAction(String event) {
                 textArea1.setText(_connector.GetCapturedOutput("todo"));
                 fill_test_list();
+//                update_all_highlighting();
 
             }
             @Override
@@ -157,11 +165,30 @@ public class PycrunchToolWindow {
     }
 
     private void fill_test_list() {
-        ArrayList<PycrunchTestMetadata> tests = _connector.GetTests();
-        ArrayList<String> ss = new ArrayList<>();
-        tests.forEach(__ -> ss.add(__.fqn));
+        preserveListSelection();
+        Collection<PycrunchTestMetadata> tests = _connector.GetTests();
 
-        list1.setListData(tests.toArray());
+        Object[] listData = tests.toArray();
+        list1.setListData(listData);
+        restoreSelectedTest(tests);
+    }
+
+    private void restoreSelectedTest(Collection<PycrunchTestMetadata> listData) {
+        if (_selectedTestFqn != null) {
+            for (PycrunchTestMetadata test: listData) {
+                if (test.fqn.equals(_selectedTestFqn))  {
+                    list1.setSelectedValue(test, true);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void preserveListSelection() {
+        Object selectedValue = list1.getSelectedValue();
+        if (selectedValue != null) {
+            _selectedTestFqn = ((PycrunchTestMetadata)selectedValue).fqn;
+        }
     }
 
     public JPanel getContent() {

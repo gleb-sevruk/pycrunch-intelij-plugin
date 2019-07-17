@@ -19,7 +19,6 @@ public class PycrunchDiscoveryDisplay extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
         MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
-        String ss =  connector.GetDiscoveredString();
-        Messages.showMessageDialog(project, "tests:\n" + ss, "Information", Messages.getInformationIcon());
+        Messages.showMessageDialog(project, "tests:\n LEGACY" , "Information", Messages.getInformationIcon());
     }
 }

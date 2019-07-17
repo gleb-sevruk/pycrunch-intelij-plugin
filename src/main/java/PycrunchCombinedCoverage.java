@@ -9,7 +9,7 @@ public class PycrunchCombinedCoverage {
 
     private HashMap<String, String> _aggregated_results = new HashMap<>();
 
-    private HashMap<String, SingleFileCombinedCoverage> _files = new HashMap<>();
+    public HashMap<String, SingleFileCombinedCoverage> _files = new HashMap<>();
 
     public static PycrunchCombinedCoverage from_json(JSONObject j) throws JSONException {
         PycrunchCombinedCoverage coverage = new PycrunchCombinedCoverage();
@@ -42,28 +42,11 @@ public class PycrunchCombinedCoverage {
         }
     }
 
-    public String GetTestStatus(String fqn) {
-        return _aggregated_results.getOrDefault(fqn, "no__test__found");
-    }
+
 
     public SingleFileCombinedCoverage GetLinesCovering(String filename) {
         return _files.get(filename);
     }
 
-    public String get_marker_color_for(String absolute_path, Integer line_number) {
-        SingleFileCombinedCoverage singleFileCombinedCoverage = _files.get(absolute_path);
-        HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
-        for (String fqn: tests_at_line) {
-            String status = GetTestStatus(fqn);
-            if (status.equals("failed")) {
-                return "failed";
-            }
-            if (status.equals("queued")) {
-                return "queued";
-            }
 
-        }
-
-        return "success";
-    }
 }

@@ -22,6 +22,7 @@ import java.util.HashSet;
 public class PycrunchTestGutterPopup extends BaseListPopupStep {
     private final ImageIcon _imageGreen;
     private final ImageIcon _imageRed;
+    private final Icon _imageProgress;
     private HashSet<String> strings;
     private MyPycrunchConnector _connector;
     private Project _project;
@@ -34,6 +35,7 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
         _project = project;
         _line = line;
         _imageGreen = new ImageIcon(getClass().getResource("/circle-green.png"));
+        _imageProgress = new ImageIcon(getClass().getResource("/circle-progress.png"));
         _imageRed = new ImageIcon(getClass().getResource("/circle-red.png"));
     }
 
@@ -49,7 +51,9 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
         if (status.equals("failed")) {
             return _imageRed;
         }
-
+        if (status.equals("queued")) {
+            return _imageProgress;
+        }
         return _imageGreen;
     }
 
