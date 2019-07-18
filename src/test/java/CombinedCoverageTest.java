@@ -9,13 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
 public class CombinedCoverageTest extends TestCase {
-    public void test_has_correct_aggregated_statuses() throws IOException, JSONException {
-        PycrunchCombinedCoverage target = createTarget();
-
-        assertEquals("success", target.GetTestStatus("tests_one:test_1"));
-        assertEquals("success", target.GetTestStatus("tests_one:test_6"));
-        assertEquals("failed", target.GetTestStatus("tests_two:test_failing"));
-    }
+//    public void test_has_correct_aggregated_statuses() throws IOException, JSONException {
+//        PycrunchCombinedCoverage target = createTarget();
+//
+//        assertEquals("success", target.GetTestStatus("tests_one:test_1"));
+//        assertEquals("success", target.GetTestStatus("tests_one:test_6"));
+//        assertEquals("failed", target.GetTestStatus("tests_two:test_failing"));
+//    }
 
     public void test_has_coverage() throws IOException, JSONException {
         PycrunchCombinedCoverage target = createTarget();
