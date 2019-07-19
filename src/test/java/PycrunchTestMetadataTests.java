@@ -1,7 +1,7 @@
+import com.gleb.pycrunch.PycrunchTestMetadata;
 import junit.framework.TestCase;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
 
 public class PycrunchTestMetadataTests extends TestCase {
     public void test_one() throws JSONException {

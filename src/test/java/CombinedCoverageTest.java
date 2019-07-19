@@ -1,3 +1,5 @@
+import com.gleb.pycrunch.PycrunchCombinedCoverage;
+import com.gleb.pycrunch.SingleFileCombinedCoverage;
 import junit.framework.TestCase;
 import org.json.JSONException;
 import org.json.JSONObject;

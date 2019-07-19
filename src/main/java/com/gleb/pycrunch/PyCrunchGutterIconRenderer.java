@@ -1,3 +1,5 @@
+package com.gleb.pycrunch;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.DumbAware;

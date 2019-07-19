@@ -1,3 +1,5 @@
+package com.gleb.pycrunch;
+
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.CodeInsightColors;

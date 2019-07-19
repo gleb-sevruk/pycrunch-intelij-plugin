@@ -1,3 +1,5 @@
+package com.gleb.pycrunch;
+
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
@@ -55,7 +57,6 @@ public class MyPycrunchConnector {
         _combined_coverage = PycrunchCombinedCoverage.from_json(data);
 
         combinedCoverageDidUpdate();
-
     }
 
     public void AttachToEngine(Project project) throws Exception {

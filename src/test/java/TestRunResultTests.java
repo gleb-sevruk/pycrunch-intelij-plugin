@@ -1,9 +1,8 @@
+import com.gleb.pycrunch.TestRunResult;
 import junit.framework.TestCase;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class TestRunResultTests  extends TestCase {
     public void test_parse_run_result() throws JSONException {

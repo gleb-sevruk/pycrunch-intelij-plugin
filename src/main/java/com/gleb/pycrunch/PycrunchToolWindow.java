@@ -1,3 +1,7 @@
+package com.gleb.pycrunch;
+
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -5,22 +9,25 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.JBColor;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.plaf.metal.MetalToggleButtonUI;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.List;
 
 public class PycrunchToolWindow {
     private MyPycrunchConnector _connector;
     private JButton refreshToolWindowButton;
-    private JButton hideToolWindowButton;
     private JLabel currentDate;
     private JLabel currentTime;
     private JLabel timeZone;
@@ -28,12 +35,18 @@ public class PycrunchToolWindow {
     private JList list1;
     private JButton runSelectedButton;
     private JTextArea textArea1;
-    private JButton highlightFileButton;
     private JLabel label_engine_status;
+    private JToolBar top_toolbar;
+    private JToggleButton togglePassedTests;
+    private JToggleButton toggleFailedTests;
+    private JToggleButton togglePendingTests;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
+    private boolean _showPassedTests;
+    private boolean _showFailedTests;
+    private boolean _showPendingTests;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, MyPycrunchConnector connector) {
         _bus = bus;
@@ -50,6 +63,9 @@ public class PycrunchToolWindow {
 
 
         list1.addMouseListener(list_mouse_click_listener());
+//        top_toolbar.setRollover(false);
+//        togglePassedTests.setBackground(JBColor.background());
+
     }
 
     @NotNull
@@ -161,16 +177,99 @@ public class PycrunchToolWindow {
     public void ui_will_mount() {
         // Get current date and time
         fill_test_list();
+        configure_buttons();
 
+    }
+
+    private void configure_buttons() {
+        togglePassedTests.setFocusable(false);
+        togglePassedTests.setUI(get_metal_toggle_ui());
+        togglePassedTests.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean state = togglePassedTests.isSelected();
+                if (state) {
+
+                    System.out.println("Selected passed tests!");
+                } else {
+                    System.out.println("Deselected passed tests");
+                }
+                _showPassedTests = state;
+                fill_test_list();
+            }
+        });
+
+        toggleFailedTests.setFocusable(false);
+        toggleFailedTests.setUI(get_metal_toggle_ui());
+        toggleFailedTests.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean state = toggleFailedTests.isSelected();
+                if (state) {
+                    System.out.println("Selected failed tests!");
+                } else {
+                    System.out.println("Deselected failed tests");
+                }
+                _showFailedTests = state;
+                fill_test_list();
+            }
+        });
+
+        togglePendingTests.setFocusable(false);
+        togglePendingTests.setUI(get_metal_toggle_ui());
+        togglePendingTests.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean state = togglePendingTests.isSelected();
+                if (state) {
+                    System.out.println("Selected pending tests!");
+                } else {
+                    System.out.println("Deselected pending tests");
+                }
+                _showPendingTests = state;
+
+                fill_test_list();
+
+            }
+        });
+    }
+
+    @NotNull
+    private MetalToggleButtonUI get_metal_toggle_ui() {
+        return new MetalToggleButtonUI() {
+            @Override
+            protected Color getSelectColor() {
+                return JBColor.GREEN.brighter();
+            }
+        };
     }
 
     private void fill_test_list() {
         preserveListSelection();
         Collection<PycrunchTestMetadata> tests = _connector.GetTests();
-
-        Object[] listData = tests.toArray();
-        list1.setListData(listData);
+        ArrayList<PycrunchTestMetadata> list = new ArrayList<>();
+        for (PycrunchTestMetadata test: tests) {
+            if (pass_list_filter(test)) {
+                list.add(test);
+            }
+        }
+        list1.setListData(list.toArray());
         restoreSelectedTest(tests);
+    }
+
+    private boolean pass_list_filter(PycrunchTestMetadata test) {
+        if (_showPassedTests && test.state.equals("success")){
+            return true;
+        }
+        if (_showFailedTests && test.state.equals("failed")) {
+            return true;
+        }
+
+        if (_showPendingTests && (test.state.equals("pending") || test.state.equals("queued"))) {
+            return true;
+        }
+
+        return false;
     }
 
     private void restoreSelectedTest(Collection<PycrunchTestMetadata> listData) {
@@ -205,4 +304,39 @@ public class PycrunchToolWindow {
             }
         }
     }
+
+    @NotNull
+    private MouseAdapter run_test_mouse_click_listener() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                run_selected();
+            }
+        };
+    }
+
+    private void createUIComponents() {
+
+//        Presentation presentation = new Presentation("hui");
+//        presentation.setIcon(new ImageIcon(getClass().getResource("/run.png")));
+//        actionButton1 = new ActionButton(new Kurlik(this), presentation, "PyCrunch", new Dimension(32,32));
+
+//        top_toolbar.add("test", actionButton1);
+
+
+    }
+    class Kurlik extends AnAction {
+        private PycrunchToolWindow _window;
+
+        Kurlik(PycrunchToolWindow window) {
+            _window = window;
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+            _window.run_selected();
+
+        }
+    }
+
 }

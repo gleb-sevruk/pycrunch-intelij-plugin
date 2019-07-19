@@ -1,3 +1,5 @@
+package com.gleb.pycrunch;
+
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;

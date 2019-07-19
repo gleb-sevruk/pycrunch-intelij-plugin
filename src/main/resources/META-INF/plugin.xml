@@ -16,7 +16,7 @@
     <project-components>
         <component>
             <!-- Interface and implementation classes are the same -->
-            <implementation-class>MyProjComponent</implementation-class>
+            <implementation-class>com.gleb.pycrunch.MyProjComponent</implementation-class>
 
             <!-- If the "workspace" option is set "true", the component
                  saves its state to the .iws file instead of the .ipr file.
@@ -30,26 +30,26 @@
         </component>
     </project-components>
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceInterface="MyCounter"
-                            serviceImplementation="MyCounter"/>
-        <applicationService serviceInterface="MyPycrunchConnector"
-                            serviceImplementation="MyPycrunchConnector"/>
+        <applicationService serviceInterface="com.gleb.pycrunch.MyCounter"
+                            serviceImplementation="com.gleb.pycrunch.MyCounter"/>
+        <applicationService serviceInterface="com.gleb.pycrunch.MyPycrunchConnector"
+                            serviceImplementation="com.gleb.pycrunch.MyPycrunchConnector"/>
 
-        <applicationService serviceInterface="PycrunchHighlighterMarkersState"
-                            serviceImplementation="PycrunchHighlighterMarkersState"/>
+        <applicationService serviceInterface="com.gleb.pycrunch.PycrunchHighlighterMarkersState"
+                            serviceImplementation="com.gleb.pycrunch.PycrunchHighlighterMarkersState"/>
 
-        <toolWindow id="PyCrunch" icon="/cherry-icon.png" anchor="right" factoryClass="MyToolWindowFactory"/>
+        <toolWindow id="PyCrunch" icon="/cherry-icon.png" anchor="right" factoryClass="com.gleb.pycrunch.MyToolWindowFactory"/>
 
-        <codeInsight.lineMarkerProvider language="Python" implementationClass="SimpleLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Python" implementationClass="com.gleb.pycrunch.SimpleLineMarkerProvider"/>
 
     </extensions>
 
     <actions>
         <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch">
             <add-to-group group-id="MainMenu" anchor="last"  />
-            <action id="PyChrunch.Textboxes" class="TextBoxes" text="Attach to PyCrunch-Engine" description="A test menu item" />
-            <action id="PyChrunch.Hightligthing" class="MyPyHighlighter" text="Highlight some lines" description="A test menu item" />
-            <action id="PyCrunch.DiscoveryDisplay" class="PycrunchDiscoveryDisplay" text="Show _Tests" description="A test menu item" />
+            <action id="PyChrunch.Textboxes" class="com.gleb.pycrunch.TextBoxes" text="Attach to PyCrunch-Engine" description="A test menu item" />
+            <action id="PyChrunch.Hightligthing" class="com.gleb.pycrunch.MyPyHighlighter" text="Highlight some lines" description="A test menu item" />
+            <action id="PyCrunch.DiscoveryDisplay" class="com.gleb.pycrunch.PycrunchDiscoveryDisplay" text="Show _Tests" description="A test menu item" />
         </group>
     </actions>
 </idea-plugin>

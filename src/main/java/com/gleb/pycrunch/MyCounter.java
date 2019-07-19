@@ -1,3 +1,5 @@
+package com.gleb.pycrunch;
+
 public class MyCounter {
     private int Count = 0;
     private static int CounterOfSingletons = 0;

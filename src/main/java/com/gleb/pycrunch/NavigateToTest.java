@@ -1,3 +1,5 @@
+package com.gleb.pycrunch;
+
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
@@ -12,7 +14,6 @@ import com.jetbrains.python.psi.PyFunction;
 public class NavigateToTest {
     public void Go(PycrunchTestMetadata testByFqn, MyPycrunchConnector _connector) {
 
-        // todo add line number in discovery metadata here!
         VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(testByFqn.filename);
 //        PsiDocumentManagerImpl.getInstance(_connector._project).getPsiFile(fileByPath)
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(_connector._project);

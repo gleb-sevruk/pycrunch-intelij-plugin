@@ -1,10 +1,9 @@
+package com.gleb.pycrunch;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 public class TestRunResult {
