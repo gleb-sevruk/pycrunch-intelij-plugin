@@ -105,7 +105,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="c3ede" class="javax.swing.JList" binding="list1" default-binding="true">
+              <component id="7a712" class="com.intellij.ui.components.JBList" binding="list1" default-binding="true">
                 <constraints/>
                 <properties>
                   <minimumSize width="0" height="100"/>

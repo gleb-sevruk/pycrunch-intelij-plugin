@@ -32,7 +32,7 @@ public class PycrunchToolWindow {
     private JLabel currentTime;
     private JLabel timeZone;
     private JPanel myToolWindowContent;
-    private JList list1;
+    private com.intellij.ui.components.JBList list1;
     private JButton runSelectedButton;
     private JTextArea textArea1;
     private JLabel label_engine_status;
