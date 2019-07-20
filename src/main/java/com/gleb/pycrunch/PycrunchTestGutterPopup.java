@@ -44,6 +44,11 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
         if (status.equals("queued")) {
             return _imageProgress;
         }
+
+        if (status.equals("pending")) {
+            return _imageProgress;
+        }
+
         return _imageGreen;
     }
 

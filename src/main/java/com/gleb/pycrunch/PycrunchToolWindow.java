@@ -1,16 +1,22 @@
 package com.gleb.pycrunch;
 
+import com.gleb.pycrunch.actions.ToggleTestPinnedState;
+import com.gleb.pycrunch.shared.EngineMode;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.JBMenuItem;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.util.messages.MessageBus;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
@@ -26,6 +32,7 @@ import java.util.*;
 import java.util.List;
 
 public class PycrunchToolWindow {
+    private EngineMode _engineMode;
     private MyPycrunchConnector _connector;
     private JButton refreshToolWindowButton;
     private JLabel currentDate;
@@ -40,6 +47,8 @@ public class PycrunchToolWindow {
     private JToggleButton togglePassedTests;
     private JToggleButton toggleFailedTests;
     private JToggleButton togglePendingTests;
+    private JButton settingsButton;
+    private JToggleButton togglePinnedTests;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
@@ -47,15 +56,17 @@ public class PycrunchToolWindow {
     private boolean _showPassedTests;
     private boolean _showFailedTests;
     private boolean _showPendingTests;
+    private boolean _showPinnedTests;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, MyPycrunchConnector connector) {
         _bus = bus;
         _project = project;
         _connector = connector;
+
         attach_events();
         this.ui_will_mount();
         list1.setLayoutOrientation(JList.VERTICAL);
-
+        _engineMode = new EngineMode(_connector);
 
 
         list1.addListSelectionListener(e -> selection_did_change(e));
@@ -66,6 +77,60 @@ public class PycrunchToolWindow {
 //        top_toolbar.setRollover(false);
 //        togglePassedTests.setBackground(JBColor.background());
 
+        settingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        settingsButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JBPopupMenu menu = create_engine_mode_popup();
+                menu.show(settingsButton, e.getPoint().x, e.getPoint().y);
+            }
+        });
+    }
+
+    private JBPopupMenu create_engine_mode_popup() {
+
+        JBPopupMenu menu = new JBPopupMenu();
+        JBRadioButton option1 = new JBRadioButton("Run tests automatically");
+        option1.setSelected(true);
+        option1.setMargin(JBUI.insets(10));
+        option1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                _engineMode.SetAutomaticMode();
+            }
+        });
+
+
+        JBRadioButton option2 = new JBRadioButton("Run all tests manually");
+        option2.setMargin(JBUI.insets(10));
+        option2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                _engineMode.SetManualMode();
+            }
+        });
+
+        JBRadioButton option3 = new JBRadioButton("Run pinned automatically, others manually");
+        option3.setMargin(JBUI.insets(10));
+        option3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                _engineMode.SetPinnedOnlyMode();
+            }
+        });
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(option1);
+        group.add(option2);
+        group.add(option3);
+
+        menu.add(option1);
+        menu.add(option2);
+        menu.add(option3);
+
+        return menu;
     }
 
     @NotNull
@@ -82,18 +147,46 @@ public class PycrunchToolWindow {
                     System.out.println("null is selected instead of tests; returning...");
                     return;
                 }
-                JPopupMenu menu = new JPopupMenu();
-                JMenuItem itemRemove = new JMenuItem("Navigate to test");
-                itemRemove.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        new NavigateToTest().Go(selectedValuesList.get(0), _connector);
-                    }
-                });
-                menu.add(itemRemove);
+                JBPopupMenu menu = create_test_list_popup(selectedValuesList);
                 menu.show(list1, e.getPoint().x, e.getPoint().y);
 
             }
         };
+    }
+
+    @NotNull
+    private JBPopupMenu create_test_list_popup(List<PycrunchTestMetadata> selectedValuesList) {
+        JBPopupMenu menu = new JBPopupMenu();
+        JBMenuItem navigateToTest = new JBMenuItem("Navigate to test");
+        navigateToTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new NavigateToTest().Go(selectedValuesList.get(0), _connector);
+            }
+        });
+
+
+        String ending = "";
+        if (selectedValuesList.size() > 1) {
+            ending = "s";
+        }
+        JBMenuItem pinTest = new JBMenuItem("Pin test" + ending);
+        pinTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new ToggleTestPinnedState().Run(selectedValuesList, _connector, true);
+            }
+        });
+        JBMenuItem unpinTest = new JBMenuItem("Unpin test" + ending);
+        unpinTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new ToggleTestPinnedState().Run(selectedValuesList, _connector, false);
+            }
+        });
+
+        menu.add(navigateToTest);
+        menu.add(pinTest);
+        menu.add(unpinTest);
+
+        return menu;
     }
 
     private void attach_events() {
@@ -232,6 +325,24 @@ public class PycrunchToolWindow {
 
             }
         });
+
+        togglePinnedTests.setFocusable(false);
+        togglePinnedTests.setUI(get_metal_toggle_ui());
+        togglePinnedTests.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean state = togglePinnedTests.isSelected();
+                if (state) {
+                    System.out.println("Selected pinned tests!");
+                } else {
+                    System.out.println("Deselected pinned tests");
+                }
+                _showPinnedTests = state;
+
+                fill_test_list();
+
+            }
+        });
     }
 
     @NotNull
@@ -258,6 +369,10 @@ public class PycrunchToolWindow {
     }
 
     private boolean pass_list_filter(PycrunchTestMetadata test) {
+        if (_showPinnedTests && test.pinned) {
+            return true;
+        }
+
         if (_showPassedTests && test.state.equals("success")){
             return true;
         }

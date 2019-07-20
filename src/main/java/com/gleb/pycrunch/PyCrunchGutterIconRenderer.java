@@ -63,6 +63,9 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         if (status.equals("queued")) {
             return _imageProgress;
         }
+        if (status.equals("pending")) {
+            return _imageProgress;
+        }
 
         return _imageGreen;
     }

@@ -7,6 +7,7 @@
     Enter 2 short description for your plugin here.<br>
     <em>most  s HTML tags may be used 2</em>
     ]]></description>
+    <idea-version since-build="171"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -38,9 +39,9 @@
         <applicationService serviceInterface="com.gleb.pycrunch.PycrunchHighlighterMarkersState"
                             serviceImplementation="com.gleb.pycrunch.PycrunchHighlighterMarkersState"/>
 
-        <toolWindow id="PyCrunch" icon="/cherry-icon.png" anchor="right" factoryClass="com.gleb.pycrunch.MyToolWindowFactory"/>
+        <toolWindow id="PyCrunchToolWindow" icon="/tool-window.png" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
 
-        <codeInsight.lineMarkerProvider language="Python" implementationClass="com.gleb.pycrunch.SimpleLineMarkerProvider"/>
+<!--        <codeInsight.lineMarkerProvider language="Python" implementationClass="com.gleb.pycrunch.SimpleLineMarkerProvider"/>-->
 
     </extensions>
 

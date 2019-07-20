@@ -8,6 +8,7 @@ intellij {
     version 'PY-LATEST-EAP-SNAPSHOT'
     type 'PY'
     downloadSources false
+    intellij.updateSinceUntilBuild false
 }
 group 'com.pycrunch'
 version '1.0-SNAPSHOT'

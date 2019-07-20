@@ -83,6 +83,36 @@
               <toolTipText value="Show Failed Tests"/>
             </properties>
           </component>
+          <component id="2b5c3" class="javax.swing.JToggleButton" binding="togglePinnedTests">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <icon value="pin.png"/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
+              <opaque value="false"/>
+              <preferredSize width="32" height="32"/>
+              <selected value="false"/>
+              <toolTipText value="Show Pinned Tests"/>
+            </properties>
+          </component>
+          <hspacer id="aef01">
+            <constraints/>
+          </hspacer>
+          <component id="7d990" class="javax.swing.JButton" binding="settingsButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <focusable value="false"/>
+              <icon value="cog.png"/>
+              <label value=""/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
+              <preferredSize width="32" height="32"/>
+              <text value=""/>
+              <toolTipText value="Settings"/>
+            </properties>
+          </component>
         </children>
       </toolbar>
       <splitpane id="f695a">
@@ -140,4 +170,9 @@
       </component>
     </children>
   </grid>
+  <buttonGroups>
+    <group name="buttonGroup1">
+      <member id="f3bb3"/>
+    </group>
+  </buttonGroups>
 </form>

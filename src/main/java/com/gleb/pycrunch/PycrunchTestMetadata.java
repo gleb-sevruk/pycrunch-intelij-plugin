@@ -9,6 +9,7 @@ public class PycrunchTestMetadata {
     public String module;
     public String state;
     public String name;
+    public boolean pinned;
 
     public static PycrunchTestMetadata from_json(JSONObject json) throws JSONException {
         PycrunchTestMetadata metadata = new PycrunchTestMetadata();
@@ -17,6 +18,7 @@ public class PycrunchTestMetadata {
         metadata.module = json.getString("module");
         metadata.state = json.getString("state");
         metadata.name = json.getString("name");
+        metadata.pinned = json.getBoolean("pinned");
         return metadata;
     }
 
@@ -27,10 +29,16 @@ public class PycrunchTestMetadata {
         o.put("module", module);
         o.put("state", state);
         o.put("name", name);
+        o.put("pinned", pinned);
         return o;
     }
     @Override
-    public String toString() {
-        return this.state + " - " + this.fqn;
+    public String toString()
+    {
+        String pinned_prefix = "";
+        if (pinned) {
+            pinned_prefix = "[pinned] ";
+        }
+        return pinned_prefix + this.state + " - " + this.fqn;
     }
 }

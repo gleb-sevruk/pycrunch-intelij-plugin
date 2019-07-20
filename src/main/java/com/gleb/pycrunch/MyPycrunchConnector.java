@@ -230,12 +230,18 @@ public class MyPycrunchConnector {
         HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
         for (String fqn: tests_at_line) {
             String status = GetTestStatus(fqn);
+            // todo: this is piece of bullshit. need correct status icons
+//            if (status.equals("pending")) {
+//                return "pending";
+//            }
             if (status.equals("failed")) {
                 return "failed";
             }
             if (status.equals("queued")) {
                 return "queued";
             }
+
+
 
         }
 
@@ -280,6 +286,63 @@ public class MyPycrunchConnector {
         } catch (JSONException e) {
             System.out.println(e.toString());
 
+        }
+    }
+
+    public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
+        ArrayList<String> list = new ArrayList<>();
+        for (PycrunchTestMetadata test: tests) {
+            list.add(test.fqn);
+        }
+
+        String action = "pin";
+        post_toggle_pin_command(action, list);
+
+    }
+
+    public void unpin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
+        ArrayList<String> list = new ArrayList<>();
+        for (PycrunchTestMetadata test: tests) {
+            list.add(test.fqn);
+        }
+
+        String action = "unpin";
+        post_toggle_pin_command(action, list);
+
+    }
+
+    private void post_toggle_pin_command(String action, ArrayList<String> fqns) throws JSONException {
+        String d =  api_uri + "/" + action + "-tests";
+        HttpPost post = new HttpPost(d);
+        JSONObject final_payload = new JSONObject();
+
+        JSONArray payload = new JSONArray(fqns);
+        final_payload.put("fqns", payload);
+        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
+        HttpClient client = HttpClients.createDefault();
+        try {
+            HttpResponse response = client.execute(post);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void update_mode(String mode) {
+        String d =  api_uri + "/engine-mode";
+        HttpPost post = new HttpPost(d);
+        JSONObject final_payload = new JSONObject();
+
+        try {
+            final_payload.put("mode", mode);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
+        HttpClient client = HttpClients.createDefault();
+        try {
+            HttpResponse response = client.execute(post);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
