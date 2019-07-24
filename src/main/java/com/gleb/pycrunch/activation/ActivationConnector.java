@@ -14,6 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+// Cached until expiration
+// Check on startup
+
 public class ActivationConnector {
     public static String api_url = "http://127.0.0.1:8000";
 
