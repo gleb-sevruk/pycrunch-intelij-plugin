@@ -3,6 +3,9 @@ package com.gleb.pycrunch;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.gleb.pycrunch.activation.ActivationConnector;
+import com.gleb.pycrunch.activation.MyStateService;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.messages.MessageBus;
@@ -27,6 +30,7 @@ import java.util.List;
 
 public class MyPycrunchConnector {
     private static int CounterOfSingletons = 0;
+    private final MyStateService _persistentState;
     // Sets the maximum allowed number of opened projects.
     public  Project _project;
     private HashMap<String, TestRunResult> _results = new HashMap<>();
@@ -37,8 +41,11 @@ public class MyPycrunchConnector {
 
     public MyPycrunchConnector() {
         MyPycrunchConnector.CounterOfSingletons++;
-
+        _persistentState = ServiceManager.getService(MyStateService.class);
+        System.out.println("load Email - " + _persistentState.Email);
+        System.out.println("load Pass - " + _persistentState.Password);
     }
+
     private HashMap<String, PycrunchTestMetadata> _tests = new HashMap<>();
     private Socket _socket;
 
@@ -344,5 +351,13 @@ public class MyPycrunchConnector {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void tryActivate(String email, String password) {
+        _persistentState.Email = email;
+        _persistentState.Password = password;
+        ActivationConnector activationConnector = new ActivationConnector();
+        boolean activated = activationConnector.activate(email, password);
+        System.out.println("activated:  " + activated);
     }
 }
