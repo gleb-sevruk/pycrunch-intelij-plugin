@@ -19,8 +19,9 @@ import java.nio.charset.StandardCharsets;
 
 public class ActivationConnector {
     public static String api_url = "http://127.0.0.1:8000";
+    public String licence_file = null;
 
-    public boolean activate(String email, String password) {
+    public ActivationInfo activate(String email, String password) {
         String endpoint = api_url + "/api/activation-status";
         HttpPost post = new HttpPost(endpoint);
         JSONObject final_payload = new JSONObject();
@@ -37,14 +38,17 @@ public class ActivationConnector {
             HttpResponse response = client.execute(post);
             String result = convertStreamToString(response.getEntity().getContent());
             JSONObject j = new JSONObject(result);
-            boolean licence_valid = j.getBoolean("licence_valid");
-            return licence_valid;
+//            boolean licence_valid = j.getBoolean("licence_valid");
+            String data = j.getString("data");
+            String sig = j.getString("sig");
+            ActivationInfo activationInfo = new ActivationInfo(data, sig);
+            return activationInfo;
         } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     public static String convertStreamToString(InputStream is) throws IOException {

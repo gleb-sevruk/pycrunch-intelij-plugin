@@ -10,4 +10,6 @@ public interface PycrunchBusNotifier {
     void engineDidConnect(String context);
     void engineDidDisconnect(String context);
     void combinedCoverageDidUpdate(String context);
+    void licenceActivated();
+    void licenceInvalid();
 }

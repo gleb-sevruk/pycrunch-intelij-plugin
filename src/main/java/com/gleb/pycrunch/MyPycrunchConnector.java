@@ -4,6 +4,8 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 import com.gleb.pycrunch.activation.ActivationConnector;
+import com.gleb.pycrunch.activation.ActivationInfo;
+import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
@@ -42,6 +44,7 @@ public class MyPycrunchConnector {
     public MyPycrunchConnector() {
         MyPycrunchConnector.CounterOfSingletons++;
         _persistentState = ServiceManager.getService(MyStateService.class);
+
         System.out.println("load Email - " + _persistentState.Email);
         System.out.println("load Pass - " + _persistentState.Password);
     }
@@ -69,6 +72,8 @@ public class MyPycrunchConnector {
     public void AttachToEngine(Project project) throws Exception {
         _project = project;
         _bus = project.getMessageBus();
+
+        invalidateLicenseStateAndNotifyUI();
         try {
             _socket = IO.socket(api_uri);
             _socket.on("event", onNewMessage)
@@ -114,7 +119,10 @@ public class MyPycrunchConnector {
         JSONObject cov = data.getJSONObject("coverage");
         JSONObject all_runs = cov.getJSONObject("all_runs");
         JSONArray keys = all_runs.names();
-
+        if (keys == null) {
+            System.out.println("cannot ApplyTestRunResults, keys are null");
+            return;
+        }
         for (int i = 0; i < keys.length(); ++i) {
             String fqn = keys.getString(i);
             JSONObject value = all_runs.getJSONObject(fqn);
@@ -144,6 +152,19 @@ public class MyPycrunchConnector {
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidDisconnect("---");
         });
     }
+
+    private void licenceActivated() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).licenceActivated();
+        });
+    }
+
+    private void licenceInvalid() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).licenceInvalid();
+        });
+    }
+
     private void ApplyTestDiscoveryResults(JSONObject data) throws JSONException {
         JSONArray tests = data.getJSONArray("tests");
         for (int i=0; i < tests.length(); i++) {
@@ -357,7 +378,23 @@ public class MyPycrunchConnector {
         _persistentState.Email = email;
         _persistentState.Password = password;
         ActivationConnector activationConnector = new ActivationConnector();
-        boolean activated = activationConnector.activate(email, password);
-        System.out.println("activated:  " + activated);
+        ActivationInfo activated = activationConnector.activate(email, password);
+        System.out.println("sig ok:  " + activated.verify_sig());
+        _persistentState.ActivationData = activated.file;
+        _persistentState.Sig = activated.sig;
+        invalidateLicenseStateAndNotifyUI();
+
     }
+
+    private void invalidateLicenseStateAndNotifyUI() {
+        ActivationValidation activationValidation = new ActivationValidation();
+        boolean valid_licence = activationValidation.is_valid_licence(_persistentState);
+        if (valid_licence) {
+            licenceActivated();
+        } else {
+            licenceInvalid();
+        }
+    }
+
+
 }

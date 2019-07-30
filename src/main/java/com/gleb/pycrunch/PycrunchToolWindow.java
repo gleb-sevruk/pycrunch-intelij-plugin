@@ -267,6 +267,16 @@ public class PycrunchToolWindow {
                 update_all_highlighting();
             }
 
+            @Override
+            public void licenceInvalid() {
+                activateButton.setText("Invalid licence!");
+            }
+
+            @Override
+            public void licenceActivated() {
+                activateButton.setText("Activated!");
+
+            }
         });
     }
 

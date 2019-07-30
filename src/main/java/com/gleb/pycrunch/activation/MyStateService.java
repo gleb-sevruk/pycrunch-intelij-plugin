@@ -9,6 +9,8 @@ public class MyStateService implements PersistentStateComponent<MyStateService> 
     public boolean SHOW_TAIL_CALLS_IN_GUTTER = true;
     public String Email = "nothing";
     public String Password = "nothing";
+    public String ActivationData = null;
+    public String Sig = null;
 
     @Override
     public MyStateService getState() {
