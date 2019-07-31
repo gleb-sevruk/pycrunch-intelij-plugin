@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ActivationConnector {
     public static String api_url = "http://127.0.0.1:8000";
+    public static String site_url = "http://127.0.0.1:8081";
     public String licence_file = null;
 
     public ActivationInfo activate(String email, String password) {
@@ -36,12 +37,23 @@ public class ActivationConnector {
         HttpClient client = HttpClients.createDefault();
         try {
             HttpResponse response = client.execute(post);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                return null;
+            }
             String result = convertStreamToString(response.getEntity().getContent());
             JSONObject j = new JSONObject(result);
 //            boolean licence_valid = j.getBoolean("licence_valid");
-            String data = j.getString("data");
-            String sig = j.getString("sig");
-            ActivationInfo activationInfo = new ActivationInfo(data, sig);
+            String data = null;
+            if (j.has("data")) {
+                data = j.getString("data");
+            }
+            String sig = null;
+            if (j.has("data")) {
+                sig = j.getString("sig");
+            }
+            String exp = j.getString("exp");
+            String exp_sig = j.getString("exp_sig");
+            ActivationInfo activationInfo = new ActivationInfo(data, sig, exp, exp_sig);
             return activationInfo;
         } catch (IOException e) {
             e.printStackTrace();

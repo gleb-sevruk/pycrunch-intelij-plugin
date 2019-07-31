@@ -374,19 +374,9 @@ public class MyPycrunchConnector {
         }
     }
 
-    public void tryActivate(String email, String password) {
-        _persistentState.Email = email;
-        _persistentState.Password = password;
-        ActivationConnector activationConnector = new ActivationConnector();
-        ActivationInfo activated = activationConnector.activate(email, password);
-        System.out.println("sig ok:  " + activated.verify_sig());
-        _persistentState.ActivationData = activated.file;
-        _persistentState.Sig = activated.sig;
-        invalidateLicenseStateAndNotifyUI();
 
-    }
 
-    private void invalidateLicenseStateAndNotifyUI() {
+    public boolean invalidateLicenseStateAndNotifyUI() {
         ActivationValidation activationValidation = new ActivationValidation();
         boolean valid_licence = activationValidation.is_valid_licence(_persistentState);
         if (valid_licence) {
@@ -394,7 +384,16 @@ public class MyPycrunchConnector {
         } else {
             licenceInvalid();
         }
+
+        return valid_licence;
     }
 
 
+    public void remove_license() {
+        _persistentState.ActivationData = null;
+        _persistentState.Sig = null;
+        _persistentState.Exp = null;
+        _persistentState.ExpSig = null;
+        invalidateLicenseStateAndNotifyUI();
+    }
 }

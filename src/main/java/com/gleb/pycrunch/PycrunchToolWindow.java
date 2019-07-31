@@ -1,6 +1,7 @@
 package com.gleb.pycrunch;
 
 import com.gleb.pycrunch.actions.ToggleTestPinnedState;
+import com.gleb.pycrunch.activation.ActivationForm;
 import com.gleb.pycrunch.activation.SampleDialogWrapper;
 import com.gleb.pycrunch.shared.EngineMode;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -51,6 +52,7 @@ public class PycrunchToolWindow {
     private JButton settingsButton;
     private JToggleButton togglePinnedTests;
     private JButton activateButton;
+    private JSplitPane _splitPane;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
@@ -64,7 +66,8 @@ public class PycrunchToolWindow {
         _bus = bus;
         _project = project;
         _connector = connector;
-
+        top_toolbar.setVisible(false);
+        _splitPane.setVisible(false);
         attach_events();
         this.ui_will_mount();
         list1.setLayoutOrientation(JList.VERTICAL);
@@ -73,7 +76,7 @@ public class PycrunchToolWindow {
 
         list1.addListSelectionListener(e -> selection_did_change(e));
         connect_to_message_bus();
-
+        _connector.invalidateLicenseStateAndNotifyUI();
 
         list1.addMouseListener(list_mouse_click_listener());
 //        top_toolbar.setRollover(false);
@@ -95,15 +98,11 @@ public class PycrunchToolWindow {
         activateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SampleDialogWrapper wrap = new SampleDialogWrapper();
+                ActivationForm wrap = new ActivationForm(_project);
 
                 boolean pressed_ok = wrap.showAndGet();
                 if (pressed_ok) {
-                    String email = wrap._emailTextBox.getText();
-                    String password = wrap._passwordTextBox.getText();
-                    System.out.println("OK!!, email: " + email);
-                    System.out.println("OK!!, pass: " + password);
-                    _connector.tryActivate(email, password);
+                    System.out.println("Activation in another form");
                 }
             }
         });
@@ -269,13 +268,18 @@ public class PycrunchToolWindow {
 
             @Override
             public void licenceInvalid() {
-                activateButton.setText("Invalid licence!");
+                top_toolbar.setVisible(false);
+                _splitPane.setVisible(false);
+                label_engine_status.setVisible(false);
+                activateButton.setVisible(true);
             }
 
             @Override
             public void licenceActivated() {
-                activateButton.setText("Activated!");
-
+                top_toolbar.setVisible(true);
+                _splitPane.setVisible(true);
+                label_engine_status.setVisible(true);
+                activateButton.setVisible(false);
             }
         });
     }

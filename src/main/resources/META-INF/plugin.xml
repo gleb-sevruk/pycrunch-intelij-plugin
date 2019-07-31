@@ -24,7 +24,7 @@
                  Note that the <option> element is used only if the component
                  implements the JDOMExternalizable interface. Otherwise, the
                  use of the <option> element takes no effect.  -->
-            <option name="workspace" value="true" />
+            <option name="winvalidateLicenseStateAndNotifyUIorkspace" value="true" />
 
             <!-- If the "loadForDefaultProject" tag is present, the project component is instantiated also for the default project. -->
             <loadForDefaultProject/>
@@ -40,7 +40,7 @@
         <applicationService serviceInterface="com.gleb.pycrunch.PycrunchHighlighterMarkersState"
                             serviceImplementation="com.gleb.pycrunch.PycrunchHighlighterMarkersState"/>
 
-        <toolWindow id="PyCrunchToolWindow" icon="/tool-window.png" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
+        <toolWindow id="PyCrunch" icon="/tool-window.png" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
 
 <!--        <codeInsight.lineMarkerProvider language="Python" implementationClass="com.gleb.pycrunch.SimpleLineMarkerProvider"/>-->
 
@@ -52,6 +52,7 @@
             <action id="PyChrunch.Textboxes" class="com.gleb.pycrunch.TextBoxes" text="Attach to PyCrunch-Engine" description="A test menu item" />
             <action id="PyChrunch.Hightligthing" class="com.gleb.pycrunch.MyPyHighlighter" text="Highlight some lines" description="A test menu item" />
             <action id="PyCrunch.DiscoveryDisplay" class="com.gleb.pycrunch.PycrunchDiscoveryDisplay" text="Show _Tests" description="A test menu item" />
+            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />
         </group>
     </actions>
 </idea-plugin>

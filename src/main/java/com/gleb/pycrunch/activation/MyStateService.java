@@ -11,6 +11,8 @@ public class MyStateService implements PersistentStateComponent<MyStateService> 
     public String Password = "nothing";
     public String ActivationData = null;
     public String Sig = null;
+    public String Exp = null;
+    public String ExpSig = null;
 
     @Override
     public MyStateService getState() {

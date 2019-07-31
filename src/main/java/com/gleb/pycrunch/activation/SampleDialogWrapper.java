@@ -10,6 +10,11 @@ public class SampleDialogWrapper extends DialogWrapper {
 
     public JTextField _emailTextBox;
     public JPasswordField _passwordTextBox;
+    // https://www.jetbrains.org/intellij/sdk/docs/user_interface_components/dialog_wrapper.html
+    //The DialogWrapper class is often used together with UI Designer forms.
+// In this case, you bind a UI Designer form to your class extending DialogWrapper,
+// bind the top-level panel of the form
+// to a field and return that field from the createCenterPanel() method.
 
     public SampleDialogWrapper() {
         super(true); // use current window as parent
@@ -34,7 +39,6 @@ public class SampleDialogWrapper extends DialogWrapper {
         _passwordTextBox = new JPasswordField();
 
         // Submit
-
 
 
         panel.add(user_label);
