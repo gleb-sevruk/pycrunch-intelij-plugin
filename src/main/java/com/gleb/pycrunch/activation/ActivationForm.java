@@ -1,6 +1,6 @@
 package com.gleb.pycrunch.activation;
 
-import com.gleb.pycrunch.MyPycrunchConnector;
+import com.gleb.pycrunch.PycrunchConnector;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
@@ -8,7 +8,6 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.MessageType;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +25,7 @@ import java.util.Locale;
 
 public class ActivationForm extends DialogWrapper {
     private final MessageBus _bus;
-    private final MyPycrunchConnector _connector;
+    private final PycrunchConnector _connector;
     public JPasswordField _password;
     private JPanel centerPanel;
     public JTextField _email;
@@ -41,7 +40,7 @@ public class ActivationForm extends DialogWrapper {
     public ActivationForm(@Nullable Project project) {
         super(project);
         _bus = project.getMessageBus();
-        _connector = ServiceManager.getService(MyPycrunchConnector.class);
+        _connector = ServiceManager.getService(PycrunchConnector.class);
         _persistentState = ServiceManager.getService(MyStateService.class);
 
         this._project = project;

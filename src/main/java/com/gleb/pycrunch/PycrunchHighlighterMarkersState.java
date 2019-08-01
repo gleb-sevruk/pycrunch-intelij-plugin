@@ -23,7 +23,7 @@ public class PycrunchHighlighterMarkersState {
     private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
 
     public void invalidate_markers(Document document, Project project) {
-        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
+        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
 
         int myLine = 0;
 //        System.out.println(myLine);
@@ -55,7 +55,7 @@ public class PycrunchHighlighterMarkersState {
             } else {
                 highlighter = null;
             }
-//        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
+//        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
 //        try {
 //            connector.AttachToEngine(project);
 //        } catch (Exception e) {

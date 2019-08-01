@@ -3,8 +3,8 @@ package com.gleb.pycrunch;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
-import com.gleb.pycrunch.activation.ActivationConnector;
-import com.gleb.pycrunch.activation.ActivationInfo;
+import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
+import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
 import com.intellij.openapi.components.ServiceManager;
@@ -30,19 +30,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
-public class MyPycrunchConnector {
+public class PycrunchConnector {
     private static int CounterOfSingletons = 0;
     private final MyStateService _persistentState;
     // Sets the maximum allowed number of opened projects.
     public  Project _project;
     private HashMap<String, TestRunResult> _results = new HashMap<>();
-    private Set<Integer> _visited_lines;
     private MessageBus _bus;
     private String api_uri = "http://127.0.0.1:5000";
     private PycrunchCombinedCoverage _combined_coverage;
 
-    public MyPycrunchConnector() {
-        MyPycrunchConnector.CounterOfSingletons++;
+    public PycrunchConnector() {
+        PycrunchConnector.CounterOfSingletons++;
         _persistentState = ServiceManager.getService(MyStateService.class);
 
         System.out.println("load Email - " + _persistentState.Email);
@@ -166,15 +165,28 @@ public class MyPycrunchConnector {
     }
 
     private void ApplyTestDiscoveryResults(JSONObject data) throws JSONException {
+        HashSet<String> actual_tests = new HashSet<>();
+
         JSONArray tests = data.getJSONArray("tests");
         for (int i=0; i < tests.length(); i++) {
             JSONObject x = tests.getJSONObject(i);
             PycrunchTestMetadata testMetadata = PycrunchTestMetadata.from_json(x);
+            actual_tests.add(testMetadata.fqn);
             _tests.put(testMetadata.fqn, testMetadata);
+        }
+        for (String fqn : new HashSet<String>(_tests.keySet())) {
+            if (!actual_tests.contains(fqn)) {
+                discard_outdated_test(fqn);
+            }
         }
 
         queueMessageBusEvent();
         combinedCoverageDidUpdate();
+    }
+
+    private void discard_outdated_test(String fqn) {
+        _tests.remove(fqn);
+        _results.remove(fqn);
     }
 
     private void post_discovery_command() throws IOException {
@@ -212,21 +224,6 @@ public class MyPycrunchConnector {
         return _tests.values();
     }
 
-    public boolean should_create_marker_for(PsiFile containingFile, int lineNum) {
-        if (_visited_lines == null) {
-            _visited_lines = new HashSet<>();
-        }
-
-        if (_visited_lines.contains(lineNum)){
-            return false;
-        }
-        _visited_lines.add(lineNum);
-        return true;
-    }
-
-    public void clear_markers_cache() {
-        _visited_lines = new HashSet<>();
-    }
 
     public SingleFileCombinedCoverage GetCoveredLinesForFile(String absolute_path) {
         if (_combined_coverage == null) {
@@ -309,8 +306,6 @@ public class MyPycrunchConnector {
 
                 ApplyCombinedCoverage(data);
             }
-//                username = data.getString("username");
-//                message = data.getString("message");
         } catch (JSONException e) {
             System.out.println(e.toString());
 
@@ -318,63 +313,16 @@ public class MyPycrunchConnector {
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
-        ArrayList<String> list = new ArrayList<>();
-        for (PycrunchTestMetadata test: tests) {
-            list.add(test.fqn);
-        }
-
-        String action = "pin";
-        post_toggle_pin_command(action, list);
-
+       new TogglePinnedTestsAction(api_uri).pin_tests(tests);
     }
 
     public void unpin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
-        ArrayList<String> list = new ArrayList<>();
-        for (PycrunchTestMetadata test: tests) {
-            list.add(test.fqn);
-        }
-
-        String action = "unpin";
-        post_toggle_pin_command(action, list);
-
-    }
-
-    private void post_toggle_pin_command(String action, ArrayList<String> fqns) throws JSONException {
-        String d =  api_uri + "/" + action + "-tests";
-        HttpPost post = new HttpPost(d);
-        JSONObject final_payload = new JSONObject();
-
-        JSONArray payload = new JSONArray(fqns);
-        final_payload.put("fqns", payload);
-        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
-        HttpClient client = HttpClients.createDefault();
-        try {
-            HttpResponse response = client.execute(post);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new TogglePinnedTestsAction(api_uri).unpin_tests(tests);
     }
 
     public void update_mode(String mode) {
-        String d =  api_uri + "/engine-mode";
-        HttpPost post = new HttpPost(d);
-        JSONObject final_payload = new JSONObject();
-
-        try {
-            final_payload.put("mode", mode);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
-        HttpClient client = HttpClients.createDefault();
-        try {
-            HttpResponse response = client.execute(post);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new UpdateModeAction().run(mode, api_uri);
     }
-
-
 
     public boolean invalidateLicenseStateAndNotifyUI() {
         ActivationValidation activationValidation = new ActivationValidation();

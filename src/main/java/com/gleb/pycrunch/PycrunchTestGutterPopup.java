@@ -14,11 +14,11 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
     private final ImageIcon _imageRed;
     private final Icon _imageProgress;
     private HashSet<String> strings;
-    private MyPycrunchConnector _connector;
+    private PycrunchConnector _connector;
     private Project _project;
     private int _line;
 
-    public PycrunchTestGutterPopup(HashSet<String> strings, MyPycrunchConnector connector, Project project, int line) {
+    public PycrunchTestGutterPopup(HashSet<String> strings, PycrunchConnector connector, Project project, int line) {
         super("Tests covering this line:", strings.toArray());
         this.strings = strings;
         _connector = connector;

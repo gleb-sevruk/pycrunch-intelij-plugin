@@ -2,7 +2,6 @@ package com.gleb.pycrunch;
 
 import com.gleb.pycrunch.actions.ToggleTestPinnedState;
 import com.gleb.pycrunch.activation.ActivationForm;
-import com.gleb.pycrunch.activation.SampleDialogWrapper;
 import com.gleb.pycrunch.shared.EngineMode;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,7 +34,7 @@ import java.util.List;
 
 public class PycrunchToolWindow {
     private EngineMode _engineMode;
-    private MyPycrunchConnector _connector;
+    private PycrunchConnector _connector;
     private JButton refreshToolWindowButton;
     private JLabel currentDate;
     private JLabel currentTime;
@@ -62,7 +61,7 @@ public class PycrunchToolWindow {
     private boolean _showPendingTests;
     private boolean _showPinnedTests;
 
-    public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, MyPycrunchConnector connector) {
+    public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
         _project = project;
         _connector = connector;
@@ -154,6 +153,16 @@ public class PycrunchToolWindow {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
+                        List<PycrunchTestMetadata> selectedValuesList = list1.getSelectedValuesList();
+                        if (selectedValuesList != null && selectedValuesList.size() > 0) {
+                            new NavigateToTest().Go(selectedValuesList.get(0), _connector);
+
+                        }
+
+                    }
+                }
                 if (!SwingUtilities.isRightMouseButton(e)) {
                     return;
                 }

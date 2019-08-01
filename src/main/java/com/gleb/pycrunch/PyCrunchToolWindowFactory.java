@@ -10,7 +10,7 @@ public class PyCrunchToolWindowFactory implements ToolWindowFactory {
     // Create the tool window content.
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         MessageBus bus = project.getMessageBus();
-        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
+        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
         toolWindow.setAutoHide(false);
         PycrunchToolWindow pycrunchToolWindow = new PycrunchToolWindow(toolWindow, project, bus, connector);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();

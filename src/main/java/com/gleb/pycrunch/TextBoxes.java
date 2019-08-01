@@ -19,7 +19,7 @@ public class TextBoxes extends AnAction {
 
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
-        MyPycrunchConnector connector = ServiceManager.getService(MyPycrunchConnector.class);
+        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
         try {
             connector.AttachToEngine(project);
         } catch (Exception e) {

@@ -12,7 +12,7 @@ import com.jetbrains.python.psi.PyFile;
 import com.jetbrains.python.psi.PyFunction;
 
 public class NavigateToTest {
-    public void Go(PycrunchTestMetadata testByFqn, MyPycrunchConnector _connector) {
+    public void Go(PycrunchTestMetadata testByFqn, PycrunchConnector _connector) {
 
         VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(testByFqn.filename);
 //        PsiDocumentManagerImpl.getInstance(_connector._project).getPsiFile(fileByPath)

@@ -1,6 +1,6 @@
 package com.gleb.pycrunch.shared;
 
-import com.gleb.pycrunch.MyPycrunchConnector;
+import com.gleb.pycrunch.PycrunchConnector;
 
 public class EngineMode {
     public String mode_run_all_automatically = "auto";
@@ -8,9 +8,9 @@ public class EngineMode {
     public String mode_pinned_automatically = "pinned";
 
     public String _mode = mode_run_all_automatically;
-    private MyPycrunchConnector _connector;
+    private PycrunchConnector _connector;
 
-    public EngineMode(MyPycrunchConnector connector) {
+    public EngineMode(PycrunchConnector connector) {
         _connector = connector;
     }
 

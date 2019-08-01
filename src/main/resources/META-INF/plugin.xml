@@ -34,15 +34,14 @@
         <applicationService serviceImplementation="com.gleb.pycrunch.activation.MyStateService"/>
         <applicationService serviceInterface="com.gleb.pycrunch.MyCounter"
                             serviceImplementation="com.gleb.pycrunch.MyCounter"/>
-        <applicationService serviceInterface="com.gleb.pycrunch.MyPycrunchConnector"
-                            serviceImplementation="com.gleb.pycrunch.MyPycrunchConnector"/>
+        <applicationService serviceInterface="com.gleb.pycrunch.PycrunchConnector"
+                            serviceImplementation="com.gleb.pycrunch.PycrunchConnector"/>
 
         <applicationService serviceInterface="com.gleb.pycrunch.PycrunchHighlighterMarkersState"
                             serviceImplementation="com.gleb.pycrunch.PycrunchHighlighterMarkersState"/>
 
         <toolWindow id="PyCrunch" icon="/tool-window.png" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
 
-<!--        <codeInsight.lineMarkerProvider language="Python" implementationClass="com.gleb.pycrunch.SimpleLineMarkerProvider"/>-->
 
     </extensions>
 
