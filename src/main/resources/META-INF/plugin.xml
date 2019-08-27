@@ -32,6 +32,8 @@
     </project-components>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.gleb.pycrunch.activation.MyStateService"/>
+        <applicationService serviceImplementation="com.gleb.pycrunch.shared.PycrunchWindowStateService"/>
+
         <applicationService serviceInterface="com.gleb.pycrunch.MyCounter"
                             serviceImplementation="com.gleb.pycrunch.MyCounter"/>
         <applicationService serviceInterface="com.gleb.pycrunch.PycrunchConnector"

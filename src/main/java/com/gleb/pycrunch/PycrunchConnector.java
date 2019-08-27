@@ -29,13 +29,16 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PycrunchConnector {
     private static int CounterOfSingletons = 0;
     private final MyStateService _persistentState;
     // Sets the maximum allowed number of opened projects.
     public  Project _project;
-    private HashMap<String, TestRunResult> _results = new HashMap<>();
+    private ConcurrentHashMap<String, TestRunResult> _results = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, PycrunchTestMetadata> _tests = new ConcurrentHashMap<>();
+
     private MessageBus _bus;
     private String api_uri = "http://127.0.0.1:5000";
     private PycrunchCombinedCoverage _combined_coverage;
@@ -48,7 +51,6 @@ public class PycrunchConnector {
         System.out.println("load Pass - " + _persistentState.Password);
     }
 
-    private HashMap<String, PycrunchTestMetadata> _tests = new HashMap<>();
     private Socket _socket;
 
     private Emitter.Listener onNewMessage = args -> didReceiveSocketEvent(args);
@@ -234,7 +236,7 @@ public class PycrunchConnector {
     }
 
 
-    public HashMap<String, TestRunResult> get_results(){
+    public ConcurrentHashMap<String, TestRunResult> get_results(){
         return _results;
     }
 

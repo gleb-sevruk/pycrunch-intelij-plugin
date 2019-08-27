@@ -18,8 +18,8 @@ import java.nio.charset.StandardCharsets;
 // Check on startup
 
 public class ActivationConnector {
-    public static String api_url = "http://127.0.0.1:8000";
-    public static String site_url = "http://127.0.0.1:8081";
+    public static String api_url = "https://api.pycrunch.com";
+    public static String site_url = "https://pycrunch.com";
     public String licence_file = null;
 
     public ActivationInfo activate(String email, String password) {

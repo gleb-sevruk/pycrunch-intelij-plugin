@@ -3,6 +3,7 @@ package com.gleb.pycrunch;
 import com.gleb.pycrunch.actions.ToggleTestPinnedState;
 import com.gleb.pycrunch.activation.ActivationForm;
 import com.gleb.pycrunch.shared.EngineMode;
+import com.gleb.pycrunch.shared.PycrunchWindowStateService;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
@@ -31,8 +32,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PycrunchToolWindow {
+    private PycrunchWindowStateService _uiState;
     private EngineMode _engineMode;
     private PycrunchConnector _connector;
     private JButton refreshToolWindowButton;
@@ -56,15 +59,13 @@ public class PycrunchToolWindow {
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
-    private boolean _showPassedTests;
-    private boolean _showFailedTests;
-    private boolean _showPendingTests;
-    private boolean _showPinnedTests;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
         _project = project;
         _connector = connector;
+        _uiState = ServiceManager.getService(PycrunchWindowStateService.class);
+
         top_toolbar.setVisible(false);
         _splitPane.setVisible(false);
         attach_events();
@@ -222,7 +223,7 @@ public class PycrunchToolWindow {
 
     private void update_all_highlighting() {
         long start = System.nanoTime();
-        HashMap<String, TestRunResult> results = _connector.get_results();
+        ConcurrentHashMap<String, TestRunResult> results = _connector.get_results();
         if (results.size() <= 0) {
             return;
         }
@@ -327,10 +328,11 @@ public class PycrunchToolWindow {
                 } else {
                     System.out.println("Deselected passed tests");
                 }
-                _showPassedTests = state;
+                _uiState._showPassedTests = state;
                 fill_test_list();
             }
         });
+        togglePassedTests.setSelected(_uiState._showPassedTests);
 
         toggleFailedTests.setFocusable(false);
         toggleFailedTests.setUI(get_metal_toggle_ui());
@@ -343,10 +345,11 @@ public class PycrunchToolWindow {
                 } else {
                     System.out.println("Deselected failed tests");
                 }
-                _showFailedTests = state;
+                _uiState._showFailedTests = state;
                 fill_test_list();
             }
         });
+        toggleFailedTests.setSelected(_uiState._showFailedTests);
 
         togglePendingTests.setFocusable(false);
         togglePendingTests.setUI(get_metal_toggle_ui());
@@ -359,12 +362,13 @@ public class PycrunchToolWindow {
                 } else {
                     System.out.println("Deselected pending tests");
                 }
-                _showPendingTests = state;
+                _uiState._showPendingTests = state;
 
                 fill_test_list();
 
             }
         });
+        togglePendingTests.setSelected(_uiState._showPendingTests);
 
         togglePinnedTests.setFocusable(false);
         togglePinnedTests.setUI(get_metal_toggle_ui());
@@ -377,12 +381,13 @@ public class PycrunchToolWindow {
                 } else {
                     System.out.println("Deselected pinned tests");
                 }
-                _showPinnedTests = state;
+                _uiState._showPinnedTests = state;
 
                 fill_test_list();
 
             }
         });
+        togglePinnedTests.setSelected(_uiState._showPinnedTests);
     }
 
     @NotNull
@@ -409,18 +414,18 @@ public class PycrunchToolWindow {
     }
 
     private boolean pass_list_filter(PycrunchTestMetadata test) {
-        if (_showPinnedTests && test.pinned) {
+        if (_uiState._showPinnedTests && test.pinned) {
             return true;
         }
 
-        if (_showPassedTests && test.state.equals("success")){
+        if (_uiState._showPassedTests && test.state.equals("success")){
             return true;
         }
-        if (_showFailedTests && test.state.equals("failed")) {
+        if (_uiState._showFailedTests && test.state.equals("failed")) {
             return true;
         }
 
-        if (_showPendingTests && (test.state.equals("pending") || test.state.equals("queued"))) {
+        if (_uiState._showPendingTests && (test.state.equals("pending") || test.state.equals("queued"))) {
             return true;
         }
 
