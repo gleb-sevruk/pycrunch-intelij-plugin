@@ -37,8 +37,8 @@ public class PycrunchTestMetadata {
     {
         String pinned_prefix = "";
         if (pinned) {
-            pinned_prefix = "[pinned] ";
+            pinned_prefix = "[!] ";
         }
-        return pinned_prefix + this.state + " - " + this.fqn;
+        return pinned_prefix  + this.fqn;
     }
 }

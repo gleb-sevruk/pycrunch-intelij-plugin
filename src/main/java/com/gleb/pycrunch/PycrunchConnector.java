@@ -222,8 +222,8 @@ public class PycrunchConnector {
         if (_tests == null) {
             return new ArrayList<PycrunchTestMetadata>();
         }
-
-        return _tests.values();
+        Map<String, PycrunchTestMetadata> map = new TreeMap<>(_tests);
+        return map.values();
     }
 
 

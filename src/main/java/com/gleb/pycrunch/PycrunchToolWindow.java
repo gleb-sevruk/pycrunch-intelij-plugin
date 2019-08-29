@@ -15,10 +15,13 @@ import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ListSpeedSearch;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
+import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,17 +75,15 @@ public class PycrunchToolWindow {
 
         top_toolbar.setVisible(false);
         _splitPane.setVisible(false);
-        attach_events();
-        this.ui_will_mount();
-        list1.setLayoutOrientation(JList.VERTICAL);
         _engineMode = new EngineMode(_connector);
 
+        attach_events();
+        this.ui_will_mount();
 
-        list1.addListSelectionListener(e -> selection_did_change(e));
+
         connect_to_message_bus();
         _connector.invalidateLicenseStateAndNotifyUI();
 
-        list1.addMouseListener(list_mouse_click_listener());
 //        top_toolbar.setRollover(false);
 //        togglePassedTests.setBackground(JBColor.background());
 
@@ -238,7 +240,6 @@ public class PycrunchToolWindow {
         refreshToolWindowButton.addActionListener(e -> ui_will_mount());
         runSelectedButton.addActionListener(e -> run_selected());
 
-        _listSpeedSearch = new ListSpeedSearch(list1);
 //        highlightFileButton.addActionListener(e -> update_all_highlighting());
     }
 
@@ -334,7 +335,49 @@ public class PycrunchToolWindow {
         fill_test_list();
         configure_buttons();
         applyWordWrap();
+        configure_test_list();
 
+    }
+
+    private void configure_test_list() {
+        list1.setLayoutOrientation(JList.VERTICAL);
+        list1.addListSelectionListener(e -> selection_did_change(e));
+        list1.addMouseListener(list_mouse_click_listener());
+        _listSpeedSearch = new ListSpeedSearch(list1);
+
+        list1.setCellRenderer(new ColoredListCellRenderer<PycrunchTestMetadata>() {
+            @Override
+            protected void customizeCellRenderer(@NotNull JList<? extends PycrunchTestMetadata> list, PycrunchTestMetadata value, int index,
+                                                 boolean selected, boolean hasFocus) {
+
+                ImageIcon icon = icon_from_test_state(value);
+                setIcon(icon);
+                append(value.toString());
+                SpeedSearchUtil.applySpeedSearchHighlighting(list1, this, false, selected);
+//                if (!_listSpeedSearch.isPopupActive()){
+//                }
+//                else {
+//
+//
+//                }
+
+            }
+
+            @NotNull
+            private ImageIcon icon_from_test_state(PycrunchTestMetadata value) {
+                URL resource = getClass().getResource("/list_pending.png");
+                if (value.state.equals("success")) {
+                    resource = getClass().getResource("/list_success.png");
+                }
+                if (value.state.equals("failed")) {
+                    resource = getClass().getResource("/list_failed.png");
+                }
+                if (value.state.equals("queued")) {
+                    resource = getClass().getResource("/list_queued.png");
+                }
+                return new ImageIcon(resource);
+            }
+        });
     }
 
     private void configure_buttons() {
