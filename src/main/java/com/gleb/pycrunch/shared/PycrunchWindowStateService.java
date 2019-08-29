@@ -12,6 +12,7 @@ public class PycrunchWindowStateService implements PersistentStateComponent<Pycr
     public boolean _showFailedTests = true;
     public boolean _showPendingTests = true;
     public boolean _showPinnedTests = true;
+    public boolean _wrapOutput = false;
 
     @Override
     public PycrunchWindowStateService getState() {

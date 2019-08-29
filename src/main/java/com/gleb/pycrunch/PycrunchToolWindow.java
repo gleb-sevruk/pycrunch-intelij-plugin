@@ -16,6 +16,8 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.ListSpeedSearch;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBUI;
@@ -59,6 +61,7 @@ public class PycrunchToolWindow {
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
+    private ListSpeedSearch _listSpeedSearch;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
@@ -137,6 +140,16 @@ public class PycrunchToolWindow {
             }
         });
 
+        JBCheckBox wrap_output_checkbox = new JBCheckBox("Wrap test output");
+        wrap_output_checkbox.setSelected(_uiState._wrapOutput);
+        wrap_output_checkbox.setMargin(JBUI.insets(10));
+        wrap_output_checkbox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                _uiState._wrapOutput = !_uiState._wrapOutput;
+                applyWordWrap();
+            }
+        });
+
         ButtonGroup group = new ButtonGroup();
         group.add(option1);
         group.add(option2);
@@ -146,7 +159,13 @@ public class PycrunchToolWindow {
         menu.add(option2);
         menu.add(option3);
 
+        menu.add(wrap_output_checkbox);
+
         return menu;
+    }
+
+    private void applyWordWrap() {
+        textArea1.setLineWrap(_uiState._wrapOutput);
     }
 
     @NotNull
@@ -218,6 +237,8 @@ public class PycrunchToolWindow {
     private void attach_events() {
         refreshToolWindowButton.addActionListener(e -> ui_will_mount());
         runSelectedButton.addActionListener(e -> run_selected());
+
+        _listSpeedSearch = new ListSpeedSearch(list1);
 //        highlightFileButton.addActionListener(e -> update_all_highlighting());
     }
 
@@ -312,6 +333,7 @@ public class PycrunchToolWindow {
         // Get current date and time
         fill_test_list();
         configure_buttons();
+        applyWordWrap();
 
     }
 
