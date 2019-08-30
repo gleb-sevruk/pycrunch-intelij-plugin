@@ -1,9 +1,11 @@
 package com.gleb.pycrunch;
 
+import org.apache.commons.lang.SystemUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 
 public class PycrunchCombinedCoverage {
@@ -46,6 +48,9 @@ public class PycrunchCombinedCoverage {
 
 
     public SingleFileCombinedCoverage GetLinesCovering(String filename) {
+        if (SystemUtils.IS_OS_WINDOWS) {
+          filename = filename.replace("/", File.separator);
+        }
         return _files.get(filename);
     }
 

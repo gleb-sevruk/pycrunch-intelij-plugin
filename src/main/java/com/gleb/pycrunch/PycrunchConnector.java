@@ -82,7 +82,9 @@ public class PycrunchConnector {
                     .on(Socket.EVENT_CONNECT, onSocketConnect);
 
             _socket.connect();
-        } catch (URISyntaxException e) {}
+        } catch (URISyntaxException e) {
+            System.out.println("error" + e.toString());
+        }
 
         post_discovery_command();
     }
@@ -253,7 +255,7 @@ public class PycrunchConnector {
 //    }
 
     public String get_marker_color_for(String absolute_path, Integer line_number) {
-        SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage._files.get(absolute_path);
+        SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage.GetLinesCovering(absolute_path);
         HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
         for (String fqn: tests_at_line) {
             String status = GetTestStatus(fqn);

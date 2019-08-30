@@ -64,6 +64,9 @@ public class PycrunchHighlighterMarkersState {
 //        String txt= Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
 //        Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
         }
+        else {
+            System.out.println("maybe path cannot be resolved: " + absolute_path);
+        }
     }
 
     @NotNull

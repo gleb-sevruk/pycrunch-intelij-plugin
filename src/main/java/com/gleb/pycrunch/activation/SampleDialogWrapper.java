@@ -1,7 +1,7 @@
 package com.gleb.pycrunch.activation;
 
 import com.intellij.openapi.ui.DialogWrapper;
-import jdk.internal.jline.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
