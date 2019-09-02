@@ -263,11 +263,15 @@ public class PycrunchToolWindow {
 
         files_to_redraw.forEach(__ -> {
             VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
-            Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
-            if (cachedDocument != null) {
-                connector.invalidate_markers(cachedDocument, _project);
+            if (fileByPath != null) {
+                Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
+                if (cachedDocument != null) {
+                    connector.invalidate_markers(cachedDocument, _project);
+                } else {
+                    System.out.println("cached document is null " + __);
+                }
             } else {
-//                System.out.println("cached document is null " + __);
+                System.out.println("!! updating highlighting -> fileByPath is null " + __);
             }
         });
 
