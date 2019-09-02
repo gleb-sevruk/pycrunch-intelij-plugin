@@ -7,8 +7,6 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 public class MyStateService implements PersistentStateComponent<MyStateService> {
     public boolean INCLUDE_ALL_FIELDS_IN_COMPLETIONS = false;
     public boolean SHOW_TAIL_CALLS_IN_GUTTER = true;
-    public String Email = "nothing";
-    public String Password = "nothing";
     public String ActivationData = null;
     public String Sig = null;
     public String Exp = null;

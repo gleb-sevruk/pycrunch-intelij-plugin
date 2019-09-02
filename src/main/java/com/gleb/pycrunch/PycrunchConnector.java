@@ -7,6 +7,7 @@ import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
 import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
+import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -46,9 +47,6 @@ public class PycrunchConnector {
     public PycrunchConnector() {
         PycrunchConnector.CounterOfSingletons++;
         _persistentState = ServiceManager.getService(MyStateService.class);
-
-        System.out.println("load Email - " + _persistentState.Email);
-        System.out.println("load Pass - " + _persistentState.Password);
     }
 
     private Socket _socket;
@@ -330,7 +328,9 @@ public class PycrunchConnector {
 
     public boolean invalidateLicenseStateAndNotifyUI() {
         ActivationValidation activationValidation = new ActivationValidation();
+        activationValidation.try_renew(_project, _persistentState);
         boolean valid_licence = activationValidation.is_valid_licence(_persistentState);
+
         if (valid_licence) {
             licenceActivated();
         } else {
@@ -346,6 +346,7 @@ public class PycrunchConnector {
         _persistentState.Sig = null;
         _persistentState.Exp = null;
         _persistentState.ExpSig = null;
+        MyPasswordStore.clearCredentials();
         invalidateLicenseStateAndNotifyUI();
     }
 }

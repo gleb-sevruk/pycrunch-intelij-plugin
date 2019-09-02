@@ -1,9 +1,9 @@
 package com.gleb.pycrunch.activation;
 
 import com.gleb.pycrunch.PycrunchConnector;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationGroup;
+import com.gleb.pycrunch.shared.IdeNotifications;
+import com.gleb.pycrunch.shared.MyPasswordStore;
+import com.intellij.credentialStore.Credentials;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
@@ -31,9 +31,6 @@ public class ActivationForm extends DialogWrapper {
     public JTextField _email;
     private JLabel label_status;
     private JLabel label_go_to_site;
-    public static final NotificationGroup GROUP_DISPLAY_ID_INFO =
-            new NotificationGroup("Pycrunch",
-                    NotificationDisplayType.BALLOON, true);
     private Project _project;
     private MyStateService _persistentState;
 
@@ -52,6 +49,17 @@ public class ActivationForm extends DialogWrapper {
             }
         });;
         setTitle("Pycrunch Activation");
+        prefillUsername();
+    }
+
+    private void prefillUsername() {
+        Credentials credentials = MyPasswordStore.getAccountCredentials();
+        if (credentials == null) {
+            return;
+        }
+
+        _email.setText(credentials.getUserName());
+        _password.setText(credentials.getPasswordAsString());
     }
 
     private void open_pycrunch_site() {
@@ -71,10 +79,13 @@ public class ActivationForm extends DialogWrapper {
         System.out.println("dermo!");
         String email = _email.getText();
         String password = _password.getText();
-        _persistentState.Email = email;
-        _persistentState.Password = password;
+        MyPasswordStore.saveCredentials(email, password);
         ActivationConnector activationConnector = new ActivationConnector();
         ActivationInfo activated = activationConnector.activate(email, password);
+        if (activated == null) {
+            label_status.setText("Invalid email or password");
+
+        }
         _persistentState.ActivationData = activated.file;
         _persistentState.Sig = activated.sig;
 
@@ -91,8 +102,7 @@ public class ActivationForm extends DialogWrapper {
         boolean licence_valid = _connector.invalidateLicenseStateAndNotifyUI();
         if (licence_valid) {
             String license_details = info.get_details(_persistentState);
-            Notification orel = GROUP_DISPLAY_ID_INFO.createNotification("Pycrunch", "Licence for Pycrunch is now active!", license_details, NotificationType.INFORMATION);
-            orel.notify(_project);
+            IdeNotifications.notify( _project,"Licence for Pycrunch is now active!", license_details, NotificationType.INFORMATION);
             this.close(0);
         } else {
             String details = "Generic licence error";
