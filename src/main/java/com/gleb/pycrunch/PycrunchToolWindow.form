@@ -135,12 +135,33 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="7a712" class="com.intellij.ui.components.JBList" binding="list1" default-binding="true">
+              <splitpane id="76fe1">
                 <constraints/>
                 <properties>
-                  <minimumSize width="0" height="100"/>
+                  <background color="-1"/>
+                  <dividerLocation value="50"/>
+                  <orientation value="0"/>
                 </properties>
-              </component>
+                <border type="none"/>
+                <children>
+                  <component id="7a712" class="com.intellij.ui.components.JBList" binding="list1" default-binding="true">
+                    <constraints>
+                      <splitpane position="left"/>
+                    </constraints>
+                    <properties>
+                      <minimumSize width="0" height="100"/>
+                    </properties>
+                  </component>
+                  <component id="f0384" class="com.intellij.ui.treeStructure.Tree" binding="_testTree">
+                    <constraints>
+                      <splitpane position="right"/>
+                    </constraints>
+                    <properties>
+                      <rootVisible value="false"/>
+                    </properties>
+                  </component>
+                </children>
+              </splitpane>
             </children>
           </scrollpane>
           <scrollpane id="9bef3">

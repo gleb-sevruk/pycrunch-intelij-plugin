@@ -4,6 +4,8 @@ import com.gleb.pycrunch.actions.ToggleTestPinnedState;
 import com.gleb.pycrunch.activation.ActivationForm;
 import com.gleb.pycrunch.shared.EngineMode;
 import com.gleb.pycrunch.shared.PycrunchWindowStateService;
+import com.gleb.pycrunch.ui.PycrunchDefaultTestTree;
+import com.gleb.pycrunch.ui.PycrunchTreeState;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
@@ -15,13 +17,11 @@ import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.ColoredListCellRenderer;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.ListSpeedSearch;
-import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,10 @@ import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,18 +64,21 @@ public class PycrunchToolWindow {
     private JToggleButton togglePinnedTests;
     private JButton activateButton;
     private JSplitPane _splitPane;
+    private Tree _testTree;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
     private ListSpeedSearch _listSpeedSearch;
+    private TreeSpeedSearch _treeSpeedSearch;
+    private PycrunchTreeState _treeState;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
         _project = project;
         _connector = connector;
         _uiState = ServiceManager.getService(PycrunchWindowStateService.class);
-
+        _treeState = new PycrunchTreeState();
         top_toolbar.setVisible(false);
         _splitPane.setVisible(false);
         _engineMode = new EngineMode(_connector);
@@ -340,6 +346,7 @@ public class PycrunchToolWindow {
         configure_buttons();
         applyWordWrap();
         configure_test_list();
+        configure_test_tree();
 
     }
 
@@ -366,6 +373,73 @@ public class PycrunchToolWindow {
 //                }
 
             }
+
+            @NotNull
+            private ImageIcon icon_from_test_state(PycrunchTestMetadata value) {
+                URL resource = getClass().getResource("/list_pending.png");
+                if (value.state.equals("success")) {
+                    resource = getClass().getResource("/list_success.png");
+                }
+                if (value.state.equals("failed")) {
+                    resource = getClass().getResource("/list_failed.png");
+                }
+                if (value.state.equals("queued")) {
+                    resource = getClass().getResource("/list_queued.png");
+                }
+                return new ImageIcon(resource);
+            }
+        });
+    }
+
+    private void configure_test_tree() {
+//        list1.addListSelectionListener(e -> selection_did_change(e));
+//        list1.addMouseListener(list_mouse_click_listener());
+        _treeSpeedSearch = new TreeSpeedSearch(_testTree);
+        TreeWillExpandListener treeWillExpandListener = new TreeWillExpandListener() {
+            public void treeWillCollapse(TreeExpansionEvent treeExpansionEvent)
+                    throws ExpandVetoException {
+
+                TreePath path = treeExpansionEvent.getPath();
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+                //Print the name of the node if toString() was implemented
+                String data = node.getUserObject().toString();
+                System.out.println("WillCollapse: " + data);
+                _treeState.nodeWillCollapse(data);
+            }
+
+            public void treeWillExpand(TreeExpansionEvent treeExpansionEvent) throws ExpandVetoException {
+
+                TreePath path = treeExpansionEvent.getPath();
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+                //print the name of the node if toString was implemented
+                String data = node.getUserObject().toString();
+                System.out.println("WillExpand: " + data);
+                _treeState.nodeWillExpand(data);
+
+            }
+        };
+
+        _testTree.addTreeWillExpandListener(treeWillExpandListener);
+        _testTree.setCellRenderer(new ColoredTreeCellRenderer() {
+            @Override
+            public void customizeCellRenderer(@NotNull JTree jTree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+
+                if (value instanceof DefaultMutableTreeNode) {
+
+                    DefaultMutableTreeNode tree_node = (DefaultMutableTreeNode) value;
+                    Object userObject = tree_node.getUserObject();
+                    if (userObject instanceof PycrunchTestMetadata) {
+
+                        ImageIcon icon = icon_from_test_state((PycrunchTestMetadata) userObject);
+                        setIcon(icon);
+                    }
+                }
+                append(value.toString());
+                SpeedSearchUtil.applySpeedSearchHighlighting(_testTree, this, false, selected);
+            }
+
 
             @NotNull
             private ImageIcon icon_from_test_state(PycrunchTestMetadata value) {
@@ -478,8 +552,33 @@ public class PycrunchToolWindow {
                 list.add(test);
             }
         }
-        list1.setListData(list.toArray());
+        Object[] listData = list.toArray();
+        fill_tree(list);
+
+        list1.setListData(listData);
         restoreSelectedTest(tests);
+    }
+
+    private void fill_tree(ArrayList<PycrunchTestMetadata> listData) {
+//        preserve_selection
+//        preserve_expand state
+
+        PycrunchDefaultTestTree tree = new PycrunchDefaultTestTree(listData);
+        DefaultMutableTreeNode root = tree.getRoot();
+        DefaultTreeModel treeModel = new DefaultTreeModel(root);
+        _testTree.setModel(treeModel);
+        restore_tree_expand_state(root);
+//        _testTree.setRootVisible(false);
+    }
+
+    private void restore_tree_expand_state(DefaultMutableTreeNode root) {
+        Enumeration<TreeNode> enumeration = root.breadthFirstEnumeration();
+        while(enumeration.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration.nextElement();
+            if (_treeState.isNodeExpanded(node.getUserObject().toString())) {
+                _testTree.expandPath(new TreePath(node.getPath()));
+            }
+        }
     }
 
     private boolean pass_list_filter(PycrunchTestMetadata test) {
