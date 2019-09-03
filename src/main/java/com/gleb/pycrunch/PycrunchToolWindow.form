@@ -12,8 +12,9 @@
     <children>
       <toolbar id="fda91" binding="top_toolbar">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="1" use-parent-layout="false">
-            <preferred-size width="272" height="32"/>
+          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="1" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="272" height="40"/>
+            <maximum-size width="-1" height="40"/>
           </grid>
         </constraints>
         <properties>
@@ -98,6 +99,38 @@
               <toolTipText value="Show Pinned Tests"/>
             </properties>
           </component>
+          <hspacer id="ca0bc">
+            <constraints/>
+          </hspacer>
+          <component id="2c6e1" class="javax.swing.JButton" binding="_expandAllButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="true"/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
+              <opaque value="true"/>
+              <preferredSize width="32" height="32"/>
+              <rolloverEnabled value="true"/>
+              <selected value="false"/>
+              <text value=""/>
+              <toolTipText value="Expand All"/>
+            </properties>
+          </component>
+          <component id="7b351" class="javax.swing.JButton" binding="_collapseAllButton">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
+              <opaque value="false"/>
+              <preferredSize width="32" height="32"/>
+              <rolloverEnabled value="true"/>
+              <selected value="false"/>
+              <text value=""/>
+              <toolTipText value="Collapse All"/>
+            </properties>
+          </component>
           <hspacer id="aef01">
             <constraints/>
           </hspacer>
@@ -126,6 +159,7 @@
         <properties>
           <background color="-1"/>
           <continuousLayout value="true"/>
+          <dividerLocation value="60"/>
           <dividerSize value="5"/>
           <orientation value="0"/>
         </properties>

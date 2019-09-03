@@ -6,6 +6,7 @@ import com.gleb.pycrunch.shared.EngineMode;
 import com.gleb.pycrunch.shared.PycrunchWindowStateService;
 import com.gleb.pycrunch.ui.PycrunchDefaultTestTree;
 import com.gleb.pycrunch.ui.PycrunchTreeState;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -20,10 +21,12 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.Icons;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
+import com.intellij.icons.AllIcons.General;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -62,6 +65,8 @@ public class PycrunchToolWindow {
     private JButton activateButton;
     private JSplitPane _splitPane;
     private Tree _testTree;
+    private JButton _expandAllButton;
+    private JButton _collapseAllButton;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
@@ -230,7 +235,6 @@ public class PycrunchToolWindow {
                             selectedValuesList.add((PycrunchTestMetadata) userObject);
                         }
                     });
-
                 }
             }
         }
@@ -275,8 +279,33 @@ public class PycrunchToolWindow {
     private void attach_events() {
         refreshToolWindowButton.addActionListener(e -> ui_will_mount());
         runSelectedButton.addActionListener(e -> run_selected());
-
+        _expandAllButton .addActionListener(e-> expandAll());
+        _collapseAllButton .addActionListener(e-> collapseAll());
 //        highlightFileButton.addActionListener(e -> update_all_highlighting());
+    }
+
+    private void collapseAll() {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) _testTree.getModel().getRoot();
+        if (root == null) {
+            return;
+        }
+        Collections.list(root.children()).forEach(__ -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) __;
+            _treeState.nodeWillCollapse((String) node.getUserObject());
+            _testTree.collapsePath(new TreePath(node.getPath()));
+        });
+    }
+
+    private void expandAll() {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) _testTree.getModel().getRoot();
+        if (root == null) {
+            return;
+        }
+        Collections.list(root.children()).forEach(__ -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) __;
+            _treeState.nodeWillExpand((String) node.getUserObject());
+            _testTree.expandPath(new TreePath(node.getPath()));
+        });
     }
 
     private void update_all_highlighting() {
@@ -372,6 +401,7 @@ public class PycrunchToolWindow {
 
     public void ui_will_mount() {
         // Get current date and time
+
         fill_test_list();
         configure_buttons();
         applyWordWrap();
@@ -420,32 +450,40 @@ public class PycrunchToolWindow {
                     Object userObject = tree_node.getUserObject();
                     if (userObject instanceof PycrunchTestMetadata) {
 
-                        ImageIcon icon = icon_from_test_state((PycrunchTestMetadata) userObject);
+                        ImageIcon icon = icon_from_state(((PycrunchTestMetadata) userObject).state);
+                        setIcon(icon);
+                    } else {
+                        // module node
+                        String moduleStatus = _connector.GetModuleStatus((String) userObject);
+                        ImageIcon icon = icon_from_state(moduleStatus);
                         setIcon(icon);
                     }
                 }
+
                 append(value.toString());
                 SpeedSearchUtil.applySpeedSearchHighlighting(_testTree, this, false, selected);
             }
 
 
             @NotNull
-            private ImageIcon icon_from_test_state(PycrunchTestMetadata value) {
+            private ImageIcon icon_from_state(String state) {
                 URL resource = getClass().getResource("/list_pending.png");
-                if (value.state.equals("success")) {
-                    resource = getClass().getResource("/list_success.png");
-                }
-                if (value.state.equals("failed")) {
-                    resource = getClass().getResource("/list_failed.png");
-                }
-                if (value.state.equals("queued")) {
-                    resource = getClass().getResource("/list_queued.png");
+                if (state != null) {
+                    if (state.equals("success")) {
+                        resource = getClass().getResource("/list_success.png");
+                    }
+                    if (state.equals("failed")) {
+                        resource = getClass().getResource("/list_failed.png");
+                    }
+                    if (state.equals("queued")) {
+                        resource = getClass().getResource("/list_queued.png");
+                    }
                 }
                 return new ImageIcon(resource);
             }
         });
     }
-
+    // top bar icons - toggle passed/failed/pinned
     private void configure_buttons() {
         togglePassedTests.setFocusable(false);
         togglePassedTests.setUI(get_metal_toggle_ui());
@@ -519,6 +557,10 @@ public class PycrunchToolWindow {
             }
         });
         togglePinnedTests.setSelected(_uiState._showPinnedTests);
+
+        _expandAllButton.setIcon(AllIcons.Actions.Expandall);
+        _collapseAllButton.setIcon(AllIcons.Actions.Collapseall);
+
     }
 
     @NotNull
@@ -533,7 +575,7 @@ public class PycrunchToolWindow {
 
     private void fill_test_list() {
         preserveTreeSelection();
-        Collection<PycrunchTestMetadata> tests = _connector.GetTests();
+        Collection<PycrunchTestMetadata> tests = _connector.GetTestsSorted();
         ArrayList<PycrunchTestMetadata> list = new ArrayList<>();
         for (PycrunchTestMetadata test: tests) {
             if (pass_list_filter(test)) {

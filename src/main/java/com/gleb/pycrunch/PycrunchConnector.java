@@ -218,7 +218,38 @@ public class PycrunchConnector {
         }
         return sb.toString();
     }
-    public Collection<PycrunchTestMetadata> GetTests() {
+    public String GetModuleStatus(String module_name) {
+        String last_known_status = null;
+        for (PycrunchTestMetadata test : _tests.values()) {
+            if (!test.module.equals(module_name)) {
+                continue;
+            }
+
+            if (test.state.equals("queued")) {
+                last_known_status = "queued";
+                break;
+            }
+
+
+            if (test.state.equals("failed")) {
+                last_known_status = "failed";
+                break;
+            }
+
+            if (test.state.equals("pending")) {
+                last_known_status = "pending";
+            }
+
+            if (test.state.equals("success")) {
+                last_known_status = "success";
+            }
+
+        }
+
+        return last_known_status;
+    }
+
+    public Collection<PycrunchTestMetadata> GetTestsSorted() {
         if (_tests == null) {
             return new ArrayList<PycrunchTestMetadata>();
         }
