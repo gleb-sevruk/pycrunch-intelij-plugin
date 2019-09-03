@@ -6,8 +6,6 @@ import com.gleb.pycrunch.shared.EngineMode;
 import com.gleb.pycrunch.shared.PycrunchWindowStateService;
 import com.gleb.pycrunch.ui.PycrunchDefaultTestTree;
 import com.gleb.pycrunch.ui.PycrunchTreeState;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -28,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
@@ -52,7 +50,6 @@ public class PycrunchToolWindow {
     private JLabel currentTime;
     private JLabel timeZone;
     private JPanel myToolWindowContent;
-    private com.intellij.ui.components.JBList list1;
     private JButton runSelectedButton;
     private JTextArea textArea1;
     private JLabel label_engine_status;
@@ -177,34 +174,67 @@ public class PycrunchToolWindow {
     }
 
     @NotNull
-    private MouseAdapter list_mouse_click_listener() {
+    private MouseAdapter tree_mouse_click_listener() {
         return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        List<PycrunchTestMetadata> selectedValuesList = list1.getSelectedValuesList();
-                        if (selectedValuesList != null && selectedValuesList.size() > 0) {
-                            new NavigateToTest().Go(selectedValuesList.get(0), _connector);
-
+                        Object lastSelectedPathComponent = _testTree.getLastSelectedPathComponent();
+                        if ( lastSelectedPathComponent != null) {
+                            DefaultMutableTreeNode selected_node = (DefaultMutableTreeNode) lastSelectedPathComponent;
+                            Object userObject = selected_node.getUserObject();
+                            if (userObject instanceof PycrunchTestMetadata) {
+                                PycrunchTestMetadata selectedValue1 = (PycrunchTestMetadata) userObject;
+                                new NavigateToTest().Go(selectedValue1, _connector);
+                            }
                         }
+
 
                     }
                 }
                 if (!SwingUtilities.isRightMouseButton(e)) {
                     return;
                 }
+                List<PycrunchTestMetadata> selectedValuesList = get_selected_tests_from_tree();
 
-                List<PycrunchTestMetadata> selectedValuesList = list1.getSelectedValuesList();
-                if (selectedValuesList == null || selectedValuesList.size() <= 0) {
+                if (selectedValuesList.size() <= 0) {
                     System.out.println("null is selected instead of tests; returning...");
                     return;
                 }
                 JBPopupMenu menu = create_test_list_popup(selectedValuesList);
-                menu.show(list1, e.getPoint().x, e.getPoint().y);
+                menu.show(_testTree, e.getPoint().x, e.getPoint().y);
 
             }
         };
+    }
+
+    @NotNull
+    private List<PycrunchTestMetadata> get_selected_tests_from_tree() {
+        TreePath[] paths = _testTree.getSelectionPaths();
+
+        List<PycrunchTestMetadata> selectedValuesList = new ArrayList<>();
+
+        for (TreePath path : paths) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+            System.out.println("You've selected: " + node);
+            if (node.getUserObject() instanceof PycrunchTestMetadata) {
+                selectedValuesList.add((PycrunchTestMetadata) node.getUserObject());
+            } else {
+//                has children
+                if (node.getChildCount() > 0) {
+                    Collections.list(node.children()).forEach(__ -> {
+                        Object userObject = ((DefaultMutableTreeNode) __).getUserObject();
+                        if (userObject instanceof PycrunchTestMetadata) {
+                            selectedValuesList.add((PycrunchTestMetadata) userObject);
+                        }
+                    });
+
+                }
+            }
+        }
+        return selectedValuesList;
     }
 
     @NotNull
@@ -327,7 +357,7 @@ public class PycrunchToolWindow {
     }
 
     public void run_selected() {
-        List<PycrunchTestMetadata> selectedValue = list1.getSelectedValuesList();
+        List<PycrunchTestMetadata> selectedValue = get_selected_tests_from_tree();
         if (selectedValue == null || selectedValue.size() <= 0) {
             return;
         }
@@ -345,55 +375,13 @@ public class PycrunchToolWindow {
         fill_test_list();
         configure_buttons();
         applyWordWrap();
-        configure_test_list();
         configure_test_tree();
 
     }
 
-    private void configure_test_list() {
-        list1.setLayoutOrientation(JList.VERTICAL);
-        list1.addListSelectionListener(e -> selection_did_change(e));
-        list1.addMouseListener(list_mouse_click_listener());
-        _listSpeedSearch = new ListSpeedSearch(list1);
-
-        list1.setCellRenderer(new ColoredListCellRenderer<PycrunchTestMetadata>() {
-            @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends PycrunchTestMetadata> list, PycrunchTestMetadata value, int index,
-                                                 boolean selected, boolean hasFocus) {
-
-                ImageIcon icon = icon_from_test_state(value);
-                setIcon(icon);
-                append(value.toString());
-                SpeedSearchUtil.applySpeedSearchHighlighting(list1, this, false, selected);
-//                if (!_listSpeedSearch.isPopupActive()){
-//                }
-//                else {
-//
-//
-//                }
-
-            }
-
-            @NotNull
-            private ImageIcon icon_from_test_state(PycrunchTestMetadata value) {
-                URL resource = getClass().getResource("/list_pending.png");
-                if (value.state.equals("success")) {
-                    resource = getClass().getResource("/list_success.png");
-                }
-                if (value.state.equals("failed")) {
-                    resource = getClass().getResource("/list_failed.png");
-                }
-                if (value.state.equals("queued")) {
-                    resource = getClass().getResource("/list_queued.png");
-                }
-                return new ImageIcon(resource);
-            }
-        });
-    }
-
     private void configure_test_tree() {
-//        list1.addListSelectionListener(e -> selection_did_change(e));
-//        list1.addMouseListener(list_mouse_click_listener());
+        _testTree.addTreeSelectionListener(e -> tree_selection_did_change(e));
+        _testTree.addMouseListener(tree_mouse_click_listener());
         _treeSpeedSearch = new TreeSpeedSearch(_testTree);
         TreeWillExpandListener treeWillExpandListener = new TreeWillExpandListener() {
             public void treeWillCollapse(TreeExpansionEvent treeExpansionEvent)
@@ -544,7 +532,7 @@ public class PycrunchToolWindow {
     }
 
     private void fill_test_list() {
-        preserveListSelection();
+        preserveTreeSelection();
         Collection<PycrunchTestMetadata> tests = _connector.GetTests();
         ArrayList<PycrunchTestMetadata> list = new ArrayList<>();
         for (PycrunchTestMetadata test: tests) {
@@ -552,24 +540,17 @@ public class PycrunchToolWindow {
                 list.add(test);
             }
         }
-        Object[] listData = list.toArray();
-        fill_tree(list);
-
-        list1.setListData(listData);
-        restoreSelectedTest(tests);
-    }
-
-    private void fill_tree(ArrayList<PycrunchTestMetadata> listData) {
-//        preserve_selection
-//        preserve_expand state
-
-        PycrunchDefaultTestTree tree = new PycrunchDefaultTestTree(listData);
+        PycrunchDefaultTestTree tree = new PycrunchDefaultTestTree(list);
         DefaultMutableTreeNode root = tree.getRoot();
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         _testTree.setModel(treeModel);
-        restore_tree_expand_state(root);
+
 //        _testTree.setRootVisible(false);
+        restore_tree_expand_state(root);
+        restoreTreeSelection();
+
     }
+
 
     private void restore_tree_expand_state(DefaultMutableTreeNode root) {
         Enumeration<TreeNode> enumeration = root.breadthFirstEnumeration();
@@ -600,21 +581,41 @@ public class PycrunchToolWindow {
         return false;
     }
 
-    private void restoreSelectedTest(Collection<PycrunchTestMetadata> listData) {
-        if (_selectedTestFqn != null) {
-            for (PycrunchTestMetadata test: listData) {
-                if (test.fqn.equals(_selectedTestFqn))  {
-                    list1.setSelectedValue(test, true);
-                    break;
-                }
+    private void preserveTreeSelection() {
+        Object selectedValue = _testTree.getLastSelectedPathComponent();
+        if (selectedValue != null) {
+            DefaultMutableTreeNode t = (DefaultMutableTreeNode) selectedValue;
+            Object userObject = t.getUserObject();
+            if (userObject instanceof PycrunchTestMetadata) {
+                _selectedTestFqn = ((PycrunchTestMetadata) userObject).fqn;
+            } else {
+                _selectedTestFqn = (String) userObject;
             }
         }
     }
 
-    private void preserveListSelection() {
-        Object selectedValue = list1.getSelectedValue();
-        if (selectedValue != null) {
-            _selectedTestFqn = ((PycrunchTestMetadata)selectedValue).fqn;
+    private void restoreTreeSelection() {
+        Object root = _testTree.getModel().getRoot();
+        if (root == null) {
+            return;
+        }
+        if (_selectedTestFqn == null) {
+            return;
+        }
+        Enumeration<TreeNode> enumeration = ((DefaultMutableTreeNode)root).breadthFirstEnumeration();
+        while(enumeration.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) enumeration.nextElement();
+
+            Object userObject = node.getUserObject();
+            if (!(userObject instanceof PycrunchTestMetadata)) {
+                continue;
+            }
+
+            PycrunchTestMetadata testMetadata = (PycrunchTestMetadata) userObject;
+            if (_selectedTestFqn.equals(testMetadata.fqn)) {
+                _testTree.setSelectionPath(new TreePath(node.getPath()));
+                break;
+            }
         }
     }
 
@@ -622,49 +623,21 @@ public class PycrunchToolWindow {
         return myToolWindowContent;
     }
 
-    private void selection_did_change(ListSelectionEvent e) {
-        if (!e.getValueIsAdjusting()) {
-            Object selectedValue = list1.getSelectedValue();
-            PycrunchTestMetadata selectedValue1 = null;
-            if (selectedValue instanceof PycrunchTestMetadata) {
-                selectedValue1 = (PycrunchTestMetadata) selectedValue;
+    private void tree_selection_did_change(TreeSelectionEvent e) {
+        Object lastSelectedPathComponent = _testTree.getLastSelectedPathComponent();
+        if ( lastSelectedPathComponent != null) {
+            DefaultMutableTreeNode selected_node = (DefaultMutableTreeNode) lastSelectedPathComponent;
+            Object userObject = selected_node.getUserObject();
+            if (userObject instanceof PycrunchTestMetadata) {
+                PycrunchTestMetadata selectedValue1 = (PycrunchTestMetadata) userObject;
                 textArea1.setText(_connector.GetCapturedOutput(selectedValue1.fqn));
             }
         }
-    }
 
-    @NotNull
-    private MouseAdapter run_test_mouse_click_listener() {
-        return new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                run_selected();
-            }
-        };
     }
 
     private void createUIComponents() {
 
-//        Presentation presentation = new Presentation("hui");
-//        presentation.setIcon(new ImageIcon(getClass().getResource("/run.png")));
-//        actionButton1 = new ActionButton(new Kurlik(this), presentation, "PyCrunch", new Dimension(32,32));
-
-//        top_toolbar.add("test", actionButton1);
-
-
-    }
-    class Kurlik extends AnAction {
-        private PycrunchToolWindow _window;
-
-        Kurlik(PycrunchToolWindow window) {
-            _window = window;
-        }
-
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-            _window.run_selected();
-
-        }
     }
 
 }
