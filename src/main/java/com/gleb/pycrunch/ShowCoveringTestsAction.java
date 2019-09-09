@@ -18,11 +18,13 @@ import java.util.HashSet;
 public class ShowCoveringTestsAction extends AnAction implements AnAction.TransparentUpdate, DumbAware {
     private final PycrunchConnector _connector;
     private Object myInitialBreakpoint;
+    private final Project _project;
     private PyCrunchGutterIconRenderer _gutterIcon;
 
-    public ShowCoveringTestsAction(PyCrunchGutterIconRenderer gutterIcon) {
+    public ShowCoveringTestsAction(Project project, PyCrunchGutterIconRenderer gutterIcon) {
+        _project = project;
         _gutterIcon = gutterIcon;
-        _connector = ServiceManager.getService(PycrunchConnector.class);
+        _connector = ServiceManager.getService(_project, PycrunchConnector.class);
 
     }
 

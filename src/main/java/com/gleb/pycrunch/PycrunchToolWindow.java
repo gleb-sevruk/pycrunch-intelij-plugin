@@ -76,7 +76,7 @@ public class PycrunchToolWindow {
         _bus = bus;
         _project = project;
         _connector = connector;
-        _uiState = ServiceManager.getService(PycrunchWindowStateService.class);
+        _uiState = ServiceManager.getService(_project, PycrunchWindowStateService.class);
         _treeState = new PycrunchTreeState();
         top_toolbar.setVisible(false);
         _splitPane.setVisible(false);
@@ -312,7 +312,7 @@ public class PycrunchToolWindow {
             return;
         }
 
-        PycrunchHighlighterMarkersState connector = ServiceManager.getService(PycrunchHighlighterMarkersState.class);
+        PycrunchHighlighterMarkersState connector = ServiceManager.getService(_project, PycrunchHighlighterMarkersState.class);
 
         HashSet<String> files_to_redraw = new HashSet<>();
 

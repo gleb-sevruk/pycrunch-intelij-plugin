@@ -19,10 +19,10 @@ public class MyPyHighlighter extends  AnAction {
     }
 
     public void actionPerformed(AnActionEvent event) {
-        PycrunchHighlighterMarkersState connector = ServiceManager.getService(PycrunchHighlighterMarkersState.class);
+        Project project = event.getData(PlatformDataKeys.PROJECT);
+        PycrunchHighlighterMarkersState connector = ServiceManager.getService(project, PycrunchHighlighterMarkersState.class);
 
         Editor editor = event.getData(PlatformDataKeys.EDITOR);
-        Project project = event.getData(PlatformDataKeys.PROJECT);
         connector.invalidate_markers(editor.getDocument(), project);
     }
 

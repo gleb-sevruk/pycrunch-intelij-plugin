@@ -25,7 +25,7 @@ public class ConnectToPycrunchEngineAction extends AnAction {
         Project project = event.getData(PlatformDataKeys.PROJECT);
 //        ProjectManager.getInstance().addProjectManagerListener(project, new ProjectManagerListener() {
 //        });
-        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
+        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
         try {
             connector.AttachToEngine(project);
         } catch (Exception e) {

@@ -7,9 +7,11 @@ import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
 import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
+import com.gleb.pycrunch.shared.GlobalKeys;
 import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.messages.MessageBus;
 import org.apache.http.HttpEntity;
@@ -41,7 +43,8 @@ public class PycrunchConnector {
     private ConcurrentHashMap<String, PycrunchTestMetadata> _tests = new ConcurrentHashMap<>();
 
     private MessageBus _bus;
-    private String api_uri = "http://127.0.0.1:5000";
+    private String api_uri = "http://127.0.0.1";
+    private int _port;
     private PycrunchCombinedCoverage _combined_coverage;
 
     public PycrunchConnector() {
@@ -71,10 +74,16 @@ public class PycrunchConnector {
     public void AttachToEngine(Project project) throws Exception {
         _project = project;
         _bus = project.getMessageBus();
+        Object pycrunch_port = project.getUserData(GlobalKeys.PORT_KEY);
+        if (pycrunch_port == null) {
+            System.out.println();
+            return;
+        }
+        _port = (int) pycrunch_port;
 
         invalidateLicenseStateAndNotifyUI();
         try {
-            _socket = IO.socket(api_uri);
+            _socket = IO.socket(full_api_url());
             _socket.on("event", onNewMessage)
                     .on(Socket.EVENT_DISCONNECT, onSocketClose)
                     .on(Socket.EVENT_CONNECT, onSocketConnect);
@@ -95,8 +104,11 @@ public class PycrunchConnector {
         return runResult.captured_output;
     }
 
+    private String full_api_url() {
+        return api_uri + ':' + _port;
+    }
     public void RunTests(List<PycrunchTestMetadata> tests) throws JSONException {
-        String d =  api_uri + "/run-tests";
+        String d =  full_api_url() + "/run-tests";
         HttpPost post = new HttpPost(d);
         JSONObject final_payload = new JSONObject();
 
@@ -145,7 +157,7 @@ public class PycrunchConnector {
 
     private void engineWillConnect() {
         EventQueue.invokeLater(() -> {
-            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidConnect("---");
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidConnect(full_api_url());
         });
     }
     private void engineWillDisconnect() {
@@ -193,7 +205,7 @@ public class PycrunchConnector {
 
     private void post_discovery_command() throws IOException {
         HttpClient httpclient = HttpClients.createDefault();
-        String d =  api_uri + "/discover?folder=%2FUsers%2Fgleb%2Fcode%2Fbc%2Fbriteapps-admin";
+        String d =  full_api_url() + "/discover?folder=%2FUsers%2Fgleb%2Fcode%2Fbc%2Fbriteapps-admin";
         HttpGet httppost = new HttpGet(d);
 
         HttpResponse response = httpclient.execute(httppost);
@@ -346,15 +358,15 @@ public class PycrunchConnector {
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
-       new TogglePinnedTestsAction(api_uri).pin_tests(tests);
+       new TogglePinnedTestsAction(full_api_url()).pin_tests(tests);
     }
 
     public void unpin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
-        new TogglePinnedTestsAction(api_uri).unpin_tests(tests);
+        new TogglePinnedTestsAction(full_api_url()).unpin_tests(tests);
     }
 
     public void update_mode(String mode) {
-        new UpdateModeAction().run(mode, api_uri);
+        new UpdateModeAction().run(mode, full_api_url());
     }
 
     public boolean invalidateLicenseStateAndNotifyUI() {

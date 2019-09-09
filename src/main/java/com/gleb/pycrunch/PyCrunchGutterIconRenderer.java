@@ -3,6 +3,7 @@ package com.gleb.pycrunch;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,13 +18,14 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
     public int _line;
     private String status;
     public String _filename;
+    private Project _project;
 
-    public PyCrunchGutterIconRenderer(int line, String status, String filename) {
+    public PyCrunchGutterIconRenderer(int line, String status, String filename, Project project) {
         super();
         this._line = line;
         this.status = status;
         _filename = filename;
-
+        _project = project;
         URL resource = getClass().getResource("/circle-green.png");
         _imageGreen = new ImageIcon(resource);
         _imageIcon2 =new ImageIcon(getClass().getResource("/cherry-icon.png"));
@@ -70,7 +72,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         return _imageGreen;
     }
     public AnAction getClickAction() {
-        return new ShowCoveringTestsAction(this);
+        return new ShowCoveringTestsAction(_project, this);
     }
 
     @Nullable

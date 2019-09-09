@@ -37,7 +37,7 @@ public class ActivationForm extends DialogWrapper {
     public ActivationForm(@Nullable Project project) {
         super(project);
         _bus = project.getMessageBus();
-        _connector = ServiceManager.getService(PycrunchConnector.class);
+        _connector = ServiceManager.getService(project, PycrunchConnector.class);
         _persistentState = ServiceManager.getService(MyStateService.class);
 
         this._project = project;

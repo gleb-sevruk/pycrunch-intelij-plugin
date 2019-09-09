@@ -23,7 +23,7 @@ public class PycrunchHighlighterMarkersState {
     private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
 
     public void invalidate_markers(Document document, Project project) {
-        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
+        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
 
         int myLine = 0;
 //        System.out.println(myLine);
@@ -46,7 +46,16 @@ public class PycrunchHighlighterMarkersState {
             RangeHighlighterEx highlighter;
             HashMap<Integer, HashSet<String>> lines_hit_by_run = lines_covered._lines_hit_by_run;
             if (lines_hit_by_run != null) {
-                lines_hit_by_run.keySet().forEach(__ -> addHighlighterForLine(__ - 1, connector.get_marker_color_for(absolute_path, __), markup, all_highlighters_per_current_file, absolute_path));
+                lines_hit_by_run.keySet()
+                        .forEach(
+                                __ -> addHighlighterForLine(
+                                        __ - 1,
+                                        connector.get_marker_color_for(absolute_path, __),
+                                        markup,
+                                        all_highlighters_per_current_file,
+                                        absolute_path,
+                                        project)
+                        );
             }
             if (myLine >= 0) {
 //            addHighlighterForLine(myLine, markup);
@@ -75,11 +84,11 @@ public class PycrunchHighlighterMarkersState {
         return psiFile.getVirtualFile().getPath();
     }
 
-    private void addHighlighterForLine(int myLine, String status, MarkupModelEx markup, ArrayList<RangeHighlighterEx> all_highlighters_per_current_file, String absolute_path) {
+    private void addHighlighterForLine(int myLine, String status, MarkupModelEx markup, ArrayList<RangeHighlighterEx> all_highlighters_per_current_file, String absolute_path, Project project) {
         RangeHighlighterEx highlighter;
         highlighter = markup.addPersistentLineHighlighter(myLine, 5001, (TextAttributes)null);
         if (highlighter != null) {
-            highlighter.setGutterIconRenderer(new PyCrunchGutterIconRenderer(myLine, status, absolute_path));
+            highlighter.setGutterIconRenderer(new PyCrunchGutterIconRenderer(myLine, status, absolute_path, project));
             TextAttributes textAttributes = (TextAttributes) ObjectUtils.notNull(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(CodeInsightColors.BOOKMARKS_ATTRIBUTES), new TextAttributes());
 //            Color stripeColor = (Color)ObjectUtils.notNull(textAttributes.getErrorStripeColor(), new JBColor(0, 14408667));
 //            highlighter.setErrorStripeMarkColor(stripeColor);
