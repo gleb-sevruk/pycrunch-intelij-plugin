@@ -328,7 +328,12 @@ public class PycrunchToolWindow {
         files_to_redraw.forEach(__ -> {
             VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
             if (fileByPath != null) {
-                update_highlighting_in_single_file(connector, fileByPath);
+                Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
+                if (cachedDocument != null) {
+                    connector.invalidate_markers(cachedDocument, _project);
+                } else {
+                    System.out.println("cached document is null " + __);
+                }
             } else {
                 System.out.println("!! updating highlighting -> fileByPath is null " + __);
             }

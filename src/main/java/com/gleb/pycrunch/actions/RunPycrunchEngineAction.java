@@ -2,10 +2,7 @@ package com.gleb.pycrunch.actions;
 
 import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.shared.GlobalKeys;
-import com.intellij.execution.ExecutionManager;
-import com.intellij.execution.Executor;
-import com.intellij.execution.RunManager;
-import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.*;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.ConfigurationFromContext;
 import com.intellij.execution.actions.RunConfigurationProducer;
@@ -14,6 +11,7 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ExecutionEnvironmentBuilder;
 import com.intellij.execution.runners.ExecutionUtil;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -31,73 +29,110 @@ import org.jetbrains.annotations.SystemIndependent;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class RunPycrunchEngineAction extends AnAction {
     private static int counter = 0;
     private final int id;
-    private Map<Project, RunnerAndConfigurationSettings> _map;
+    private ConcurrentHashMap<Project, RunnerAndConfigurationSettings> _map;
 
     public RunPycrunchEngineAction() {
-        super("_Run PyCrunch Engine");
+        super("_Run/Restart PyCrunch Engine");
         counter++;
         id = counter;
         if (_map == null) {
-            _map = new Hashtable<>();
+            _map = new ConcurrentHashMap<>();
         }
     }
 
     public void actionPerformed(AnActionEvent event) {
+        cleanup_disposed_projects();
+        Project project = event.getData(PlatformDataKeys.PROJECT);
+        build_configuration_and_run_engine(project);
+        connect_to_engine(project);
+    }
+
+    private void connect_to_engine(Project project) {
+        ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
+
+        exec.schedule(new Runnable() {
+            public void run() {
+                PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+                try {
+                    connector.AttachToEngine(project);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 1, TimeUnit.SECONDS);
+
+
+    }
+
+    private void build_configuration_and_run_engine(Project project) {
+        RunnerAndConfigurationSettings settings = _map.get(project);
+        if (settings == null) {
+            settings = create_run_configuration_for_project(project);
+            _map.put(project, settings);
+        }
+        Executor runExecutorInstance = DefaultRunExecutor.getRunExecutorInstance();
+        @NotNull Executor[] registeredExecutors = ExecutorRegistry.getInstance().getRegisteredExecutors();
+//        ExecutionManager.getInstance(project).restartRunProfile().build());
+
+        ExecutionUtil.runConfiguration(settings, runExecutorInstance);
+    }
+
+    private void cleanup_disposed_projects() {
         for (Project p : _map.keySet()) {
             if (p.isDisposed()) {
                 _map.remove(p);
             }
         }
-        Project project = event.getData(PlatformDataKeys.PROJECT);
-        RunnerAndConfigurationSettings settings = _map.get(project);
+    }
+
+    @NotNull
+    private RunnerAndConfigurationSettings create_run_configuration_for_project(Project project) {
+        RunnerAndConfigurationSettings settings;
+        RunManager runManager = RunManager.getInstance(project);
         PythonConfigurationType.PythonConfigurationFactory factory = PythonConfigurationType.getInstance().getFactory();
-        if (settings == null) {
-            RunManager runManager = RunManager.getInstance(project);
-            settings = runManager.createConfiguration("pycrunch-engine - auto", factory);
+        settings = runManager.createConfiguration("pycrunch-engine - auto", factory);
 //        runManager.addConfiguration(xxx);
 //        runManager.
 //        runManager.makeStable(xxx);
 //        List<RunConfiguration> allConfigurationsList = runManager.getAllConfigurationsList();
-            PythonRunConfigurationParams parameters = (PythonRunConfigurationParams) settings.getConfiguration();
-            String basePath = project.getBasePath();
-            AbstractPythonRunConfigurationParams baseParams = parameters.getBaseParams();
-            baseParams.setWorkingDirectory(basePath);
-            parameters.setScriptName("pycrunch.main");
+        PythonRunConfigurationParams parameters = (PythonRunConfigurationParams) settings.getConfiguration();
+        String basePath = project.getBasePath();
+        AbstractPythonRunConfigurationParams baseParams = parameters.getBaseParams();
+        baseParams.setWorkingDirectory(basePath);
+        parameters.setScriptName("pycrunch.main");
 
 
+        int port = find_available_port();
 
-            int port = 7777;
-            ServerSocket s = null;
-            try {
-                s = new ServerSocket(0);
-                port = s.getLocalPort();
-                s.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        project.putUserData(GlobalKeys.PORT_KEY, port);
 
-            project.putUserData(GlobalKeys.PORT_KEY, port);
+        parameters.setScriptParameters("--port=" + port);
 
-            parameters.setScriptParameters("--port=" + port);
-
-            // should be working dir!
+        // should be working dir!
 //        String folderName = xxx.getFolderName();
 //        System.out.println(folderName);
-            parameters.setModuleMode(true);
-            _map.put(project, settings);
-        }
-        Executor runExecutorInstance = DefaultRunExecutor.getRunExecutorInstance();
+        parameters.setModuleMode(true);
+        return settings;
+    }
 
-        ExecutionUtil.runConfiguration(settings, runExecutorInstance);
-//        ExecutionUtil.runConfiguration(xxx, runExecutorInstance);
-//        runManager.addConfiguration(xxx);
-//        PythonRunner pythonRunner = new PythonRunner();
-//        String txt= Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
-//        Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
+    private int find_available_port() {
+        int port = 7777;
+        ServerSocket s = null;
+        try {
+            s = new ServerSocket(0);
+            port = s.getLocalPort();
+            s.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return port;
     }
 
     public void actionPerformed222(@NotNull AnActionEvent e) {

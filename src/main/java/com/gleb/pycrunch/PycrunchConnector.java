@@ -64,6 +64,11 @@ public class PycrunchConnector {
 
     private void socketDidConnect(Object... args) {
         engineWillConnect();
+        try {
+            post_discovery_command();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     private void ApplyCombinedCoverage(JSONObject data) throws JSONException {
         _combined_coverage = PycrunchCombinedCoverage.from_json(data);
@@ -74,15 +79,19 @@ public class PycrunchConnector {
     public void AttachToEngine(Project project) throws Exception {
         _project = project;
         _bus = project.getMessageBus();
+        invalidateLicenseStateAndNotifyUI();
         Object pycrunch_port = project.getUserData(GlobalKeys.PORT_KEY);
         if (pycrunch_port == null) {
-            System.out.println();
+            System.out.println("No port specified");
             return;
         }
         _port = (int) pycrunch_port;
 
-        invalidateLicenseStateAndNotifyUI();
         try {
+            if (_socket != null) {
+                _socket.off();
+                _socket.disconnect();
+            }
             _socket = IO.socket(full_api_url());
             _socket.on("event", onNewMessage)
                     .on(Socket.EVENT_DISCONNECT, onSocketClose)
@@ -93,7 +102,7 @@ public class PycrunchConnector {
             System.out.println("error" + e.toString());
         }
 
-        post_discovery_command();
+//        post_discovery_command();
     }
 
     public String GetCapturedOutput(String fqn) {

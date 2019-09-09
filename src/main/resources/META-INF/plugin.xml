@@ -52,10 +52,9 @@
     <actions>
         <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch">
             <add-to-group group-id="MainMenu" anchor="last"  />
-            <action id="PyChrunch.Textboxes" class="com.gleb.pycrunch.actions.ConnectToPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
             <action id="PyChrunch.RunEngine" class="com.gleb.pycrunch.actions.RunPycrunchEngineAction" text="Run Engine" description="Create and run Pycrunch engine within current project" />
-            <action id="PyChrunch.Hightligthing" class="com.gleb.pycrunch.MyPyHighlighter" text="Highlight some lines" description="A test menu item" />
-            <action id="PyCrunch.DiscoveryDisplay" class="com.gleb.pycrunch.PycrunchDiscoveryDisplay" text="Show _Tests" description="A test menu item" />
+            <separator/>
+            <action id="PyChrunch.ConnectToCustomPycrunchEngineAction" class="com.gleb.pycrunch.actions.ConnectToCustomPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
             <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />
         </group>
     </actions>
