@@ -21,12 +21,10 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.Icons;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
-import com.intellij.icons.AllIcons.General;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -39,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
@@ -49,9 +49,6 @@ public class PycrunchToolWindow {
     private EngineMode _engineMode;
     private PycrunchConnector _connector;
     private JButton refreshToolWindowButton;
-    private JLabel currentDate;
-    private JLabel currentTime;
-    private JLabel timeZone;
     private JPanel myToolWindowContent;
     private JButton runSelectedButton;
     private JTextArea textArea1;
@@ -406,7 +403,24 @@ public class PycrunchToolWindow {
         configure_buttons();
         applyWordWrap();
         configure_test_tree();
+        configure_split_pane();
 
+    }
+
+
+    private void configure_split_pane() {
+        _splitPane.setDividerLocation(_uiState._splitPanePosition);
+
+        _splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
+                new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent pce) {
+                        System.out.println(pce.toString());
+                        _uiState._splitPanePosition = (int)pce.getNewValue();
+
+
+                    }
+                });
     }
 
     private void configure_test_tree() {
