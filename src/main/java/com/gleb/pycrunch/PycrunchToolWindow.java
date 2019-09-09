@@ -10,6 +10,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
@@ -326,12 +328,7 @@ public class PycrunchToolWindow {
         files_to_redraw.forEach(__ -> {
             VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
             if (fileByPath != null) {
-                Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
-                if (cachedDocument != null) {
-                    connector.invalidate_markers(cachedDocument, _project);
-                } else {
-                    System.out.println("cached document is null " + __);
-                }
+                update_highlighting_in_single_file(connector, fileByPath);
             } else {
                 System.out.println("!! updating highlighting -> fileByPath is null " + __);
             }
@@ -342,7 +339,33 @@ public class PycrunchToolWindow {
         System.out.println("redraw markers elapsed: " + diffInMillis + "ms");
     }
 
+    private void update_highlighting_in_single_file(PycrunchHighlighterMarkersState connector, VirtualFile fileByPath) {
+        Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
+        if (cachedDocument != null) {
+            connector.invalidate_markers(cachedDocument, _project);
+        } else {
+            System.out.println("cached document is null " + fileByPath.getPath());
+        }
+    }
+
     public void connect_to_message_bus() {
+        connect_pycrunch_bus();
+        connect_intellij_events_bus();
+    }
+
+    private void connect_intellij_events_bus() {
+        _bus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                EventQueue.invokeLater(() -> {
+                    PycrunchHighlighterMarkersState highlighterMarkersState = ServiceManager.getService(_project, PycrunchHighlighterMarkersState.class);
+                    update_highlighting_in_single_file(highlighterMarkersState, file);
+                });
+            }
+        });
+    }
+
+    private void connect_pycrunch_bus() {
         _bus.connect().subscribe(PycrunchBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchBusNotifier() {
             @Override
             public void beforeAction(String event) {

@@ -297,6 +297,10 @@ public class PycrunchConnector {
 
     public String get_marker_color_for(String absolute_path, Integer line_number) {
         SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage.GetLinesCovering(absolute_path);
+        if (singleFileCombinedCoverage == null) {
+            System.out.println("get_marker_color_for " + absolute_path + " returned null");
+            return "queued";
+        }
         HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
         for (String fqn: tests_at_line) {
             String status = GetTestStatus(fqn);
