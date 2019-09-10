@@ -367,6 +367,7 @@ public class PycrunchToolWindow {
                     update_highlighting_in_single_file(highlighterMarkersState, file);
                 });
             }
+
         });
     }
 

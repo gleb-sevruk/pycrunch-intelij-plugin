@@ -1,6 +1,7 @@
 package com.gleb.pycrunch.actions;
 
 import com.gleb.pycrunch.PycrunchConnector;
+import com.gleb.pycrunch.PycrunchHighlighterMarkersState;
 import com.gleb.pycrunch.shared.GlobalKeys;
 import com.intellij.execution.*;
 import com.intellij.execution.actions.ConfigurationContext;
@@ -50,8 +51,14 @@ public class RunPycrunchEngineAction extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         cleanup_disposed_projects();
         Project project = event.getData(PlatformDataKeys.PROJECT);
+        cleanup_all_markers(project);
         build_configuration_and_run_engine(project);
         connect_to_engine(project);
+    }
+
+    private void cleanup_all_markers(Project project) {
+        PycrunchHighlighterMarkersState connector = ServiceManager.getService(project, PycrunchHighlighterMarkersState.class);
+        connector.cleanup_everything(project);
     }
 
     private void connect_to_engine(Project project) {

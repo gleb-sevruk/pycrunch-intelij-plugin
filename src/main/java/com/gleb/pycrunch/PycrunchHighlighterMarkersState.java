@@ -1,5 +1,6 @@
 package com.gleb.pycrunch;
 
+import com.gleb.pycrunch.shared.GlobalKeys;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
@@ -9,10 +10,10 @@ import com.intellij.openapi.editor.ex.RangeHighlighterEx;
 import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.PsiDocumentManagerImpl;
 import com.intellij.util.ObjectUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,22 +23,42 @@ import java.util.Hashtable;
 public class PycrunchHighlighterMarkersState {
     private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
 
+    public void cleanup_everything(Project project) {
+        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+        _highlighters_per_file.forEach(
+                (s, markers) -> markers.forEach(__ -> __.dispose()));
+        _highlighters_per_file = new Hashtable<>();
+    }
+
     public void invalidate_markers(Document document, Project project) {
         PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
 
         int myLine = 0;
 //        System.out.println(myLine);
 
-        String absolute_path = path_from_document(project, document);
-        ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
+        VirtualFile virtualFile = file_from_document(project, document);
 
+        String absolute_path = virtualFile.getPath();
+        ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
         if (!_highlighters_per_file.containsKey(absolute_path)) {
             all_highlighters_per_current_file = new ArrayList<>();
             _highlighters_per_file.put(absolute_path, all_highlighters_per_current_file);
+
         } else {
             all_highlighters_per_current_file = _highlighters_per_file.get(absolute_path);
             all_highlighters_per_current_file.forEach(__ -> __.dispose());
+            all_highlighters_per_current_file.removeIf(__ -> true);
         }
+
+        cleanup_stale_or_renamed_markers(virtualFile, absolute_path);
+
+        System.out.println("new user data value: " + absolute_path);
+//        This is for tracking file renames.
+//        Virtual Document will contain old filename in metadata even when file already renamed on disk
+
+        virtualFile.putUserData(GlobalKeys.DOCUMENT_PATH_KEY, absolute_path);
+
+
         SingleFileCombinedCoverage lines_covered = connector.GetCoveredLinesForFile(absolute_path);
         if (lines_covered != null) {
 
@@ -78,10 +99,31 @@ public class PycrunchHighlighterMarkersState {
         }
     }
 
-    @NotNull
-    private String path_from_document(Project project, Document document) {
+    private void cleanup_stale_or_renamed_markers(VirtualFile virtualFile, String new_path) {
+        Object userData = virtualFile.getUserData(GlobalKeys.DOCUMENT_PATH_KEY);
+        String previous_filename = (String) userData;
+        if (previous_filename == null) {
+            return;
+        }
+
+        System.out.println("user data not null, prev value:" + previous_filename);
+
+        if (previous_filename.equals(new_path)) {
+            // not renamed
+            return;
+        }
+        // file was renamed, clean up old markers, otherwise they will stack in gutter in multiple columns
+        if (_highlighters_per_file.containsKey(previous_filename)) {
+            ArrayList<RangeHighlighterEx> markers = _highlighters_per_file.get(previous_filename);
+            markers.forEach(__ -> __.dispose());
+            _highlighters_per_file.remove(previous_filename);
+        }
+
+    }
+
+    private VirtualFile file_from_document(Project project, Document document) {
         PsiFile psiFile = PsiDocumentManagerImpl.getInstance(project).getPsiFile(document);
-        return psiFile.getVirtualFile().getPath();
+        return psiFile.getVirtualFile();
     }
 
     private void addHighlighterForLine(int myLine, String status, MarkupModelEx markup, ArrayList<RangeHighlighterEx> all_highlighters_per_current_file, String absolute_path, Project project) {

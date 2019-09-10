@@ -35,7 +35,7 @@ public class ConnectToCustomPycrunchEngineAction extends AnAction {
         Project project = event.getData(PlatformDataKeys.PROJECT);
 //        ProjectManager.getInstance().addProjectManagerListener(project, new ProjectManagerListener() {
 //        });
-        String txt= Messages.showInputDialog(project, "Custom port when engine is running?", "Connect to PyCrunch Engine", Messages.getQuestionIcon());
+        String txt= Messages.showInputDialog(project, "Custom port when engine is running?", "Connect to PyCrunch Engine", Messages.getQuestionIcon(), "5000", null);
         Integer port = tryParse(txt);
         if (port == null) {
             Messages.showMessageDialog(project, "Invalid port entered, " + txt + "!", "PyCrunch ", Messages.getInformationIcon());
