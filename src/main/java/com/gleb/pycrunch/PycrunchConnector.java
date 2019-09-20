@@ -66,7 +66,7 @@ public class PycrunchConnector {
         engineWillConnect();
         try {
             post_discovery_command();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -116,25 +116,17 @@ public class PycrunchConnector {
     private String full_api_url() {
         return api_uri + ':' + _port;
     }
+
     public void RunTests(List<PycrunchTestMetadata> tests) throws JSONException {
-        String d =  full_api_url() + "/run-tests";
-        HttpPost post = new HttpPost(d);
-        JSONObject final_payload = new JSONObject();
+        JSONObject obj = new JSONObject();
+        obj.put("action", "run-tests");
 
         JSONArray payload = new JSONArray();
         for (PycrunchTestMetadata __ : tests) {
             payload.put(__.to_json());
         }
-        final_payload.put("tests", payload);
-        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
-        HttpClient httpclient = HttpClients.createDefault();
-        HttpClient client = HttpClients.createDefault();
-        try {
-            HttpResponse response = client.execute(post);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        obj.put("tests", payload);
+        this._socket.emit("my event", obj);
     }
 
     private void ApplyTestRunResults(JSONObject data) throws JSONException {
@@ -212,22 +204,10 @@ public class PycrunchConnector {
         _results.remove(fqn);
     }
 
-    private void post_discovery_command() throws IOException {
-        HttpClient httpclient = HttpClients.createDefault();
-        String d =  full_api_url() + "/discover?folder=%2FUsers%2Fgleb%2Fcode%2Fbc%2Fbriteapps-admin";
-        HttpGet httppost = new HttpGet(d);
-
-        HttpResponse response = httpclient.execute(httppost);
-        HttpEntity entity = response.getEntity();
-
-        if (entity != null) {
-            try (InputStream inputStream = entity.getContent()) {
-                String theString = convertStreamToString(inputStream);
-            }
-            catch (Exception e) {
-
-            }
-        }
+    private void post_discovery_command() throws IOException, JSONException {
+        JSONObject obj = new JSONObject();
+        obj.put("action", "discovery");
+        this._socket.emit("my event", obj);
     }
 
 
@@ -371,15 +351,19 @@ public class PycrunchConnector {
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
-       new TogglePinnedTestsAction(full_api_url()).pin_tests(tests);
+       new TogglePinnedTestsAction(this._socket).pin_tests(tests);
     }
 
     public void unpin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
-        new TogglePinnedTestsAction(full_api_url()).unpin_tests(tests);
+        new TogglePinnedTestsAction(this._socket).unpin_tests(tests);
     }
 
     public void update_mode(String mode) {
-        new UpdateModeAction().run(mode, full_api_url());
+        try {
+            new UpdateModeAction(this._socket).run(mode);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean invalidateLicenseStateAndNotifyUI() {
@@ -400,8 +384,9 @@ public class PycrunchConnector {
     public void remove_license() {
         _persistentState.ActivationData = null;
         _persistentState.Sig = null;
-        _persistentState.Exp = null;
-        _persistentState.ExpSig = null;
+//        this will allow trial to be persistent across accounts
+//        _persistentState.Exp = null;
+//        _persistentState.ExpSig = null;
         MyPasswordStore.clearCredentials();
         invalidateLicenseStateAndNotifyUI();
     }

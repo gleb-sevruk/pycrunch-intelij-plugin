@@ -216,6 +216,9 @@ public class PycrunchToolWindow {
     @NotNull
     private List<PycrunchTestMetadata> get_selected_tests_from_tree() {
         TreePath[] paths = _testTree.getSelectionPaths();
+        if (paths == null) {
+            return new ArrayList<>();
+        }
 
         List<PycrunchTestMetadata> selectedValuesList = new ArrayList<>();
 
@@ -611,7 +614,7 @@ public class PycrunchToolWindow {
         return new MetalToggleButtonUI() {
             @Override
             protected Color getSelectColor() {
-                return JBColor.GREEN.brighter();
+                return JBColor.background().darker();
             }
         };
     }

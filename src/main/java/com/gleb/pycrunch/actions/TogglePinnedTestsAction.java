@@ -1,5 +1,6 @@
 package com.gleb.pycrunch.actions;
 
+import com.github.nkzawa.socketio.client.Socket;
 import com.gleb.pycrunch.PycrunchTestMetadata;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -16,10 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TogglePinnedTestsAction {
-    private String _api_uri;
+    private final Socket _socket;
 
-    public TogglePinnedTestsAction(String api_uri) {
-        _api_uri = api_uri;
+    public TogglePinnedTestsAction(Socket _socket) {
+        this._socket = _socket;
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
@@ -45,18 +46,12 @@ public class TogglePinnedTestsAction {
     }
 
     private void post_toggle_pin_command(String action, ArrayList<String> fqns) throws JSONException {
-        String d =  _api_uri + "/" + action + "-tests";
-        HttpPost post = new HttpPost(d);
-        JSONObject final_payload = new JSONObject();
+        String command_name = action + "-tests";
 
+        JSONObject final_payload = new JSONObject();
         JSONArray payload = new JSONArray(fqns);
+        final_payload.put("action", command_name);
         final_payload.put("fqns", payload);
-        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
-        HttpClient client = HttpClients.createDefault();
-        try {
-            HttpResponse response = client.execute(post);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this._socket.emit("my event", final_payload);
     }
 }

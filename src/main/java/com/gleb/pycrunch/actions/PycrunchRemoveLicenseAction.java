@@ -16,7 +16,7 @@ public class PycrunchRemoveLicenseAction extends AnAction {
 
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
-        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
+        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
         int dialog_result = Messages.showOkCancelDialog(project, "Are you sure you want to revoke license? \nYou will need to sign in again to use Pycrunch", "Remove Pycrunch License", "Remove license", "Cancel", Messages.getWarningIcon());
         System.out.println("dialog result: " + dialog_result);
         if (dialog_result == Messages.YES) {

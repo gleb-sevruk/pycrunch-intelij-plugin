@@ -9,7 +9,7 @@ public class MyPasswordStore {
     private final static String key = "api_account";
 
     public static void saveCredentials(String username, String password) {
-        CredentialAttributes credentialAttributes = createCredentialAttributes(key); // see previous sample
+        CredentialAttributes credentialAttributes = createCredentialAttributes(key);
         Credentials credentials = new Credentials(username, password);
         PasswordSafe.getInstance().set(credentialAttributes, credentials);
     }
@@ -19,7 +19,6 @@ public class MyPasswordStore {
 
         Credentials credentials = PasswordSafe.getInstance().get(credentialAttributes);
         return credentials;
-// or get password only
     }
 
     private static CredentialAttributes createCredentialAttributes(String key) {
@@ -27,7 +26,7 @@ public class MyPasswordStore {
     }
 
     public static void clearCredentials() {
-        CredentialAttributes credentialAttributes = createCredentialAttributes(key); // see previous sample
+        CredentialAttributes credentialAttributes = createCredentialAttributes(key);
         PasswordSafe.getInstance().set(credentialAttributes, null);
     }
 }

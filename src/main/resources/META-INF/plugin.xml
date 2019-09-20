@@ -1,11 +1,18 @@
 <idea-plugin>
-    <id>com.pycrunch.my_gradle_plugin</id>
+    <id>com.pycrunch.intellijconnector</id>
     <name>PyCrunch Engine Connector</name>
-    <vendor email="sevruk.gleb@gmail.com" url="http://www.nothing.here">PyCrunch</vendor>
+    <vendor email="support@pycrunch.com" url="https://pycrunch.com">PyCrunch</vendor>
 
     <description><![CDATA[
-    Enter 2 short description for your plugin here.<br>
-    <em>most  s HTML tags may be used 2</em>
+    PyCrunch is an automatic test runner for Python
+    <ul>
+    <li>Shows coverage inline with your code</li>
+    <li>See which lines are hit by tests</li>
+    <li>Instant feedback about failing tests and affected lines</li>
+    <li>Captures output for each test separately, allowing better diagnostics per test</li>
+    <li>Easy navigation between code and tests</li>
+    <li>Support for Django</li>
+</ul>
     ]]></description>
     <idea-version since-build="171"/>
 
