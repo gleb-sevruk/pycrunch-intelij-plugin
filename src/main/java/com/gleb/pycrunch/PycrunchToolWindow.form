@@ -21,6 +21,7 @@
         <properties>
           <borderPainted value="false"/>
           <floatable value="false"/>
+          <opaque value="false"/>
           <rollover value="true"/>
         </properties>
         <clientProperties>
