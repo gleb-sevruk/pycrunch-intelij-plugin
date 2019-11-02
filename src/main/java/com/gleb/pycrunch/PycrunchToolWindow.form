@@ -46,12 +46,9 @@
               <toolTipText value="Run Selected Tests"/>
             </properties>
           </component>
-          <component id="5fceb" class="javax.swing.JButton" binding="refreshToolWindowButton">
+          <hspacer id="710c5">
             <constraints/>
-            <properties>
-              <text value="Refresh"/>
-            </properties>
-          </component>
+          </hspacer>
           <component id="c9567" class="javax.swing.JToggleButton" binding="togglePassedTests">
             <constraints/>
             <properties>

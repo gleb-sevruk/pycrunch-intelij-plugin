@@ -50,7 +50,6 @@ public class PycrunchToolWindow {
     private PycrunchWindowStateService _uiState;
     private EngineMode _engineMode;
     private PycrunchConnector _connector;
-    private JButton refreshToolWindowButton;
     private JPanel myToolWindowContent;
     private JButton runSelectedButton;
     private JTextArea textArea1;
@@ -279,7 +278,6 @@ public class PycrunchToolWindow {
     }
 
     private void attach_events() {
-        refreshToolWindowButton.addActionListener(e -> ui_will_mount());
         runSelectedButton.addActionListener(e -> run_selected());
         _expandAllButton .addActionListener(e-> expandAll());
         _collapseAllButton .addActionListener(e-> collapseAll());
