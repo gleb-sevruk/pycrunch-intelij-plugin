@@ -368,16 +368,21 @@ public class PycrunchConnector {
 
     public boolean invalidateLicenseStateAndNotifyUI() {
         ActivationValidation activationValidation = new ActivationValidation();
-        activationValidation.try_renew(_project, _persistentState);
-        boolean valid_licence = activationValidation.is_valid_licence(_persistentState);
+        activationValidation.ping_user_id(_persistentState);
+        licenceActivated();
+        return true;
 
-        if (valid_licence) {
-            licenceActivated();
-        } else {
-            licenceInvalid();
-        }
-
-        return valid_licence;
+//        ActivationValidation activationValidation = new ActivationValidation();
+//        activationValidation.try_renew(_project, _persistentState);
+//        boolean valid_licence = activationValidation.is_valid_licence(_persistentState);
+//
+//        if (valid_licence) {
+//            licenceActivated();
+//        } else {
+//            licenceInvalid();
+//        }
+//
+//        return valid_licence;
     }
 
 

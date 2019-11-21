@@ -120,7 +120,10 @@ Official Site:
             <action id="PyChrunch.RunEngine" class="com.gleb.pycrunch.actions.RunPycrunchEngineAction" text="Run Engine" description="Create and run Pycrunch engine within current project" />
             <separator/>
             <action id="PyChrunch.ConnectToCustomPycrunchEngineAction" class="com.gleb.pycrunch.actions.ConnectToCustomPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
-            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />
+<!--            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />-->
+            <separator/>
+            <action id="PyCrunch.DocumentationAction" class="com.gleb.pycrunch.actions.PycrunchOpenDocumentationAction" text="Documentation" description="Open documentation link" />
+            <action id="PyCrunch.FreeInfo" class="com.gleb.pycrunch.actions.PycrunchFreePeriodInfoAction" text="Free Edition" description="Free edition information" />
         </group>
     </actions>
 </idea-plugin>

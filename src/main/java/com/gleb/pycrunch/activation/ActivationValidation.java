@@ -5,14 +5,35 @@ import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.credentialStore.Credentials;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClients;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.UUID;
 
 public class ActivationValidation {
+    public void ping_user_id(MyStateService state) {
+        if (state.UserId == null) {
+            state.UserId = UUID.randomUUID().toString();
+        }
+
+        new ActivationConnector().PingAlive(state);
+
+    }
+
+
     public boolean is_valid_licence(MyStateService state) {
         ActivationInfo activationInfo = new ActivationInfo(state.ActivationData, state.Sig, state.Exp, state.ExpSig);
         if (!activationInfo.has_license()) {

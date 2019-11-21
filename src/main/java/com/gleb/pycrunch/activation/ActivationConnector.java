@@ -73,4 +73,26 @@ public class ActivationConnector {
         return sb.toString();
     }
 
+    public void PingAlive(MyStateService state) {
+        String endpoint = ActivationConnector.api_url + "/api/ping-alive";
+        HttpPost post = new HttpPost(endpoint);
+        JSONObject final_payload = new JSONObject();
+
+        try {
+            final_payload.put("user_id", state.UserId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        post.setEntity(new StringEntity(final_payload.toString(), ContentType.APPLICATION_JSON));
+        HttpClient client = HttpClients.createDefault();
+        try {
+            HttpResponse response = client.execute(post);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                return;
+            }
+            String result = convertStreamToString(response.getEntity().getContent());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
