@@ -78,6 +78,7 @@ Official Site:
          on how to target different products -->
 <!--    &lt;!&ndash; uncomment to enable plugin in all products-->
     <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.python</depends>
 <!--    &ndash;&gt;-->
     <project-components>
         <component>
@@ -109,7 +110,7 @@ Official Site:
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchWindowStateService"/>
 
 
-        <toolWindow id="PyCrunch" icon="/tool-window.png" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
+        <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
 
 
     </extensions>
