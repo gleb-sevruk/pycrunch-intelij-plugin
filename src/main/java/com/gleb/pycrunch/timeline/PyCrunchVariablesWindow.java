@@ -56,8 +56,8 @@ public class PyCrunchVariablesWindow {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    System.out.println("Mouse clicked " + e);
-                    EditorTextField editor = new EditorTextField(_variableValueText.getText(), _project, new JsonFileType());
+//                    System.out.println("Mouse clicked " + e);
+                    ScrollableJBTextEditor editor = new ScrollableJBTextEditor(_variableValueText.getText(), _project, new JsonFileType());
                     Font font = EditorColorsManager.getInstance().getGlobalScheme().getFont(EditorFontType.PLAIN);
 //                    font = new Font(font.getFontName(), font.getStyle(), font.getSize());
                     editor.setFont(font);
