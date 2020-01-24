@@ -11,17 +11,7 @@ import com.gleb.pycrunch.shared.GlobalKeys;
 import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
-import com.intellij.psi.PsiFile;
 import com.intellij.util.messages.MessageBus;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -394,5 +384,15 @@ public class PycrunchConnector {
 //        _persistentState.ExpSig = null;
         MyPasswordStore.clearCredentials();
         invalidateLicenseStateAndNotifyUI();
+    }
+
+    public JSONArray GetVariablesState(String fqn) {
+        System.out.println("invoking GetVariablesState" );
+
+        TestRunResult pycrunchTestMetadata = _results.get(fqn);
+        if (pycrunchTestMetadata != null) {
+            return pycrunchTestMetadata.variables_state;
+        }
+        return new JSONArray();
     }
 }

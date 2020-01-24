@@ -403,6 +403,12 @@ public class PycrunchToolWindow {
             }
 
             @Override
+            public void did_select_test(PycrunchTestMetadata userObject) {
+                System.out.println("FAKE! did_select_test" );
+
+            }
+
+            @Override
             public void licenceActivated() {
                 top_toolbar.setVisible(true);
                 _splitPane.setVisible(true);
@@ -717,6 +723,10 @@ public class PycrunchToolWindow {
             if (userObject instanceof PycrunchTestMetadata) {
                 PycrunchTestMetadata selectedValue1 = (PycrunchTestMetadata) userObject;
                 textArea1.setText(_connector.GetCapturedOutput(selectedValue1.fqn));
+                System.out.println("invoking did_select_test" );
+                ((PycrunchBusNotifier)
+                            this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC))
+                            .did_select_test(selectedValue1);
             }
         }
 

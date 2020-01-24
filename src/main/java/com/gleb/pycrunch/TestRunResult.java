@@ -10,10 +10,13 @@ public class TestRunResult {
     public String captured_output;
     public Hashtable<String, TestRunResultFileCoverage> files_covered;
     public String status;
+    public JSONArray variables_state;
 
     public static TestRunResult from_json(JSONObject json) throws JSONException {
         TestRunResult result = new TestRunResult();
         result.captured_output = json.getString("captured_output");
+        result.variables_state = json.getJSONArray("variables_state");
+
         result.status = json.getString("status");
         result.files_covered = new Hashtable<>();
         JSONArray files = json.getJSONArray("files");

@@ -12,4 +12,6 @@ public interface PycrunchBusNotifier {
     void combinedCoverageDidUpdate(String context);
     void licenceActivated();
     void licenceInvalid();
+
+    void did_select_test(PycrunchTestMetadata userObject);
 }
