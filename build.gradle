@@ -30,5 +30,5 @@ dependencies {
 //}
 patchPluginXml {
     changeNotes """
-      Plugin is now free to use without activation."""
+      Added ability to trace variables during execution using trace function."""
 }

@@ -26,6 +26,16 @@ Say hello to the real TDD - no longer need to run your tests manually. Let the e
 <br>
 <br>
 
+<b>Variables Tracing</b> - inspect state of application without debugger:
+<br>
+<img src="https://pycrunch-dist.s3.eu-central-1.amazonaws.com/assets/python_variable_tracing.png" width="876" height="423">
+<br>
+<a href="https://pycrunch.com/docs/variables-tracing">Documentation about variables tracing</a>
+<br>
+
+<br>
+<br>
+
 Exact <b>location</b> of test failure:
 <br>
 <img src="https://pycrunch-dist.s3.eu-central-1.amazonaws.com/assets/failing_test_path.png" width="650" height="276">
