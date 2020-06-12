@@ -187,6 +187,12 @@ public class PyCrunchVariablesWindow {
             @Override
             public void engineDidDisconnect(String context){
             }
+
+            @Override
+            public void engineWillTryToReconnect(String context) {
+//                nothing to do here. This should be different bus, but no time to implement
+            }
+
             @Override
             public void combinedCoverageDidUpdate(String context) {
 
@@ -195,6 +201,21 @@ public class PyCrunchVariablesWindow {
             @Override
             public void licenceInvalid() {
 
+            }
+
+            @Override
+            public void engineDidLoadMode(String unused) {
+
+            }
+
+            @Override
+            public void engineDidLoadVersion(int version_major, int version_minor) {
+                // unused here
+            }
+
+            @Override
+            public void engineDidFailToReconnect(String dummy) {
+                // unused here
             }
 
             @Override

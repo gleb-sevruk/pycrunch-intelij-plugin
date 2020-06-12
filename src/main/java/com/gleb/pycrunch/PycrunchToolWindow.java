@@ -69,6 +69,8 @@ public class PycrunchToolWindow {
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
+    private String _version_string;
+
     private ListSpeedSearch _listSpeedSearch;
     private TreeSpeedSearch _treeSpeedSearch;
     private PycrunchTreeState _treeState;
@@ -120,29 +122,31 @@ public class PycrunchToolWindow {
     }
 
     private JBPopupMenu create_engine_mode_popup() {
-
+        String currentMode = _engineMode._mode;
         JBPopupMenu menu = new JBPopupMenu();
-        JBRadioButton option1 = new JBRadioButton("Run tests automatically");
-        option1.setSelected(true);
-        option1.setMargin(JBUI.insets(10));
-        option1.addActionListener(new ActionListener() {
+        JBRadioButton option_auto = new JBRadioButton("Run tests automatically");
+        option_auto.setSelected(currentMode.equals(_engineMode.mode_run_all_automatically));
+        option_auto.setMargin(JBUI.insets(10));
+        option_auto.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 _engineMode.SetAutomaticMode();
             }
         });
 
 
-        JBRadioButton option2 = new JBRadioButton("Run all tests manually");
-        option2.setMargin(JBUI.insets(10));
-        option2.addActionListener(new ActionListener() {
+        JBRadioButton option_manual = new JBRadioButton("Run all tests manually");
+        option_manual.setSelected(currentMode.equals(_engineMode.mode_manual));
+        option_manual.setMargin(JBUI.insets(10));
+        option_manual.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 _engineMode.SetManualMode();
             }
         });
 
-        JBRadioButton option3 = new JBRadioButton("Run pinned automatically, others manually");
-        option3.setMargin(JBUI.insets(10));
-        option3.addActionListener(new ActionListener() {
+        JBRadioButton option_pinned_only = new JBRadioButton("Run pinned automatically, others manually");
+        option_pinned_only.setSelected(currentMode.equals(_engineMode.mode_pinned_automatically));
+        option_pinned_only.setMargin(JBUI.insets(10));
+        option_pinned_only.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 _engineMode.SetPinnedOnlyMode();
             }
@@ -159,13 +163,13 @@ public class PycrunchToolWindow {
         });
 
         ButtonGroup group = new ButtonGroup();
-        group.add(option1);
-        group.add(option2);
-        group.add(option3);
+        group.add(option_auto);
+        group.add(option_manual);
+        group.add(option_pinned_only);
 
-        menu.add(option1);
-        menu.add(option2);
-        menu.add(option3);
+        menu.add(option_auto);
+        menu.add(option_manual);
+        menu.add(option_pinned_only);
 
         menu.add(wrap_output_checkbox);
 
@@ -371,7 +375,10 @@ public class PycrunchToolWindow {
 
         });
     }
+    private void setStatus(String text) {
+        label_engine_status.setText(text);
 
+    }
     private void connect_pycrunch_bus() {
         _bus.connect().subscribe(PycrunchBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchBusNotifier() {
             @Override
@@ -383,11 +390,11 @@ public class PycrunchToolWindow {
             }
             @Override
             public void engineDidConnect(String apiRoot) {
-                label_engine_status.setText("Connected to " + apiRoot);
+                setStatus("Connected to " + apiRoot);
             }
             @Override
             public void engineDidDisconnect(String context){
-                label_engine_status.setText("Lost connection to PyCrunch Engine");
+                setStatus("Lost connection to PyCrunch Engine");
             }
             @Override
             public void combinedCoverageDidUpdate(String context) {
@@ -406,6 +413,28 @@ public class PycrunchToolWindow {
             public void did_select_test(PycrunchTestMetadata userObject) {
                 System.out.println("FAKE! did_select_test" );
 
+            }
+
+            @Override
+            public void engineDidLoadMode(String new_mode){
+                _engineMode.WillChangeTo(new_mode);
+            }
+
+            @Override
+            public void engineWillTryToReconnect(String unused) {
+                setStatus("Connection lost. Trying to reconnect to the engine...");
+            }
+
+            @Override
+            public void engineDidLoadVersion(int version_major, int version_minor) {
+                _version_string = String.format("v%s.%d", String.valueOf(version_major), version_minor);
+                setStatus(label_engine_status.getText() + " (" + _version_string + ")");
+
+            }
+
+            @Override
+            public void engineDidFailToReconnect(String dummy) {
+                setStatus("Failed to reconnect. Please start the engine again.");
             }
 
             @Override
@@ -529,6 +558,7 @@ public class PycrunchToolWindow {
                         resource = getClass().getResource("/list_queued.png");
                     }
                 }
+
                 return new ImageIcon(resource);
             }
         });

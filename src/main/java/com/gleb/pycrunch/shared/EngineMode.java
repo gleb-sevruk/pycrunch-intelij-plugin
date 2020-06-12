@@ -15,17 +15,25 @@ public class EngineMode {
     }
 
     public void SetAutomaticMode() {
-        _mode = mode_run_all_automatically;
-        _connector.update_mode(_mode);
+        WillChangeTo(mode_run_all_automatically);
+        sendModeUpdateToEngine();
     }
 
     public void SetManualMode() {
-        _mode = mode_manual;
+        WillChangeTo(mode_manual);
+        sendModeUpdateToEngine();
+    }
+
+    private void sendModeUpdateToEngine() {
         _connector.update_mode(_mode);
     }
 
     public void SetPinnedOnlyMode() {
-        _mode = mode_pinned_automatically;
-        _connector.update_mode(_mode);
+        WillChangeTo(mode_pinned_automatically);
+        sendModeUpdateToEngine();
+    }
+
+    public void WillChangeTo(String new_mode) {
+        _mode = new_mode;
     }
 }

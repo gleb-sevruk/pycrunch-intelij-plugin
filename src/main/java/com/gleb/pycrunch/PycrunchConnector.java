@@ -47,10 +47,22 @@ public class PycrunchConnector {
     private Emitter.Listener onNewMessage = args -> didReceiveSocketEvent(args);
     private Emitter.Listener onSocketClose = args -> socketDidDisconnect(args);
     private Emitter.Listener onSocketConnect = args -> socketDidConnect(args);
+    private Emitter.Listener onSocketReconnection = args -> socketWillTryToReconnect(args);
+    private Emitter.Listener onSocketFailToReconnect = args -> socketDidFailToReconnect(args);
 
     private void socketDidDisconnect(Object... args) {
         engineWillDisconnect();
     }
+
+    private void socketWillTryToReconnect(Object... args) {
+        engineWillTryToReconnect();
+    }
+
+    private void socketDidFailToReconnect(Object... args) {
+        System.out.println("socketDidFailToReconnect");
+        engineDidFailToReconnect();
+    }
+
 
     private void socketDidConnect(Object... args) {
         engineWillConnect();
@@ -65,6 +77,36 @@ public class PycrunchConnector {
 
         combinedCoverageDidUpdate();
     }
+
+    private void engineDidLoadMode(String new_mode) {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidLoadMode(new_mode);
+        });
+    }
+
+    private void engineDidLoadVersion(int version_major, int version_minor) {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidLoadVersion(version_major, version_minor);
+        });
+    }
+
+    private void ApplyInitialConnectionProps(JSONObject data)throws JSONException {
+        JSONObject version = data.getJSONObject("version");
+        if (version == null) {
+            // pre-v1
+            return;
+        }
+        int version_major = version.getInt("major");
+        int version_minor = version.getInt("minor");
+
+
+        String mode = data.getString("engine_mode");
+
+        this.engineDidLoadMode(mode);
+        this.engineDidLoadVersion(version_major, version_minor);
+    }
+
+
 
     public void AttachToEngine(Project project) throws Exception {
         _project = project;
@@ -82,10 +124,19 @@ public class PycrunchConnector {
                 _socket.off();
                 _socket.disconnect();
             }
-            _socket = IO.socket(full_api_url());
+            IO.Options options = new IO.Options();
+            options.reconnection = true;
+            options.forceNew = true;
+            options.reconnectionAttempts = 30;
+
+            _socket = IO.socket(full_api_url(), options);
             _socket.on("event", onNewMessage)
                     .on(Socket.EVENT_DISCONNECT, onSocketClose)
-                    .on(Socket.EVENT_CONNECT, onSocketConnect);
+                    .on(Socket.EVENT_CONNECT, onSocketConnect)
+                    .on(Socket.EVENT_RECONNECT, onSocketConnect)
+                    .on(Socket.EVENT_RECONNECTING, onSocketReconnection)
+                    .on(Socket.EVENT_RECONNECT_FAILED, onSocketFailToReconnect)
+            ;
 
             _socket.connect();
         } catch (URISyntaxException e) {
@@ -151,6 +202,19 @@ public class PycrunchConnector {
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidConnect(full_api_url());
         });
     }
+
+    private void engineWillTryToReconnect() {
+        EventQueue.invokeLater(() -> {
+            this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineWillTryToReconnect("---");
+        });
+    }
+    private void engineDidFailToReconnect() {
+        EventQueue.invokeLater(() -> {
+            this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineDidFailToReconnect("---");
+        });
+    }
+
+
     private void engineWillDisconnect() {
         EventQueue.invokeLater(() -> {
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidDisconnect("---");
@@ -322,17 +386,20 @@ public class PycrunchConnector {
 
         try {
             String evt = data.getString("event_type");
-            if (evt.equals("discovery_did_become_available")) {
+            switch (evt) {
+                case "connected":
+                    ApplyInitialConnectionProps(data);
+                    break;
+                case "discovery_did_become_available":
+                    ApplyTestDiscoveryResults(data);
+                    break;
+                case "test_run_completed":
+                    ApplyTestRunResults(data);
+                    break;
+                case "combined_coverage_updated":
+                    ApplyCombinedCoverage(data);
+                    break;
 
-                ApplyTestDiscoveryResults(data);
-            }
-            if (evt.equals("test_run_completed")) {
-
-                ApplyTestRunResults(data);
-            }
-            if (evt.equals("combined_coverage_updated")) {
-
-                ApplyCombinedCoverage(data);
             }
         } catch (JSONException e) {
             System.out.println(e.toString());
