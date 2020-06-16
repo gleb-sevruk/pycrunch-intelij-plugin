@@ -454,8 +454,6 @@ public class PycrunchConnector {
     }
 
     public JSONArray GetVariablesState(String fqn) {
-        System.out.println("invoking GetVariablesState" );
-
         TestRunResult pycrunchTestMetadata = _results.get(fqn);
         if (pycrunchTestMetadata != null) {
             return pycrunchTestMetadata.variables_state;

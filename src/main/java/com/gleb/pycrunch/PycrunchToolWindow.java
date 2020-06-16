@@ -411,7 +411,7 @@ public class PycrunchToolWindow {
 
             @Override
             public void did_select_test(PycrunchTestMetadata userObject) {
-                System.out.println("FAKE! did_select_test" );
+//                System.out.println("FAKE! did_select_test" );
 
             }
 
@@ -512,7 +512,6 @@ public class PycrunchToolWindow {
 
                 //print the name of the node if toString was implemented
                 String data = node.getUserObject().toString();
-                System.out.println("WillExpand: " + data);
                 _treeState.nodeWillExpand(data);
 
             }
@@ -753,7 +752,7 @@ public class PycrunchToolWindow {
             if (userObject instanceof PycrunchTestMetadata) {
                 PycrunchTestMetadata selectedValue1 = (PycrunchTestMetadata) userObject;
                 textArea1.setText(_connector.GetCapturedOutput(selectedValue1.fqn));
-                System.out.println("invoking did_select_test" );
+//                System.out.println("invoking did_select_test" );
                 ((PycrunchBusNotifier)
                             this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC))
                             .did_select_test(selectedValue1);

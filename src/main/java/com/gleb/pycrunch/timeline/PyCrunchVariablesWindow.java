@@ -168,7 +168,7 @@ public class PyCrunchVariablesWindow {
         double x = Math.round(ts * 1000) / 1000.0;
 
 //        String txt = df.format(ts);
-        _labelEventTime.setText(x + " ms");
+        _labelEventTime.setText(x + " s");
     }
 
     public JPanel getContent() {
@@ -220,7 +220,6 @@ public class PyCrunchVariablesWindow {
 
             @Override
             public void did_select_test(PycrunchTestMetadata userObject) {
-                System.out.println("Got to did_select_test" );
                 _selectedTest = userObject;
                 JSONArray jsonArray = _connector.GetVariablesState(userObject.fqn);
                 try {

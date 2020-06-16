@@ -52,7 +52,7 @@ public class PycrunchHighlighterMarkersState {
 
         cleanup_stale_or_renamed_markers(virtualFile, absolute_path);
 
-        System.out.println("new user data value: " + absolute_path);
+//        System.out.println("new user data value: " + absolute_path);
 //        This is for tracking file renames.
 //        Virtual Document will contain old filename in metadata even when file already renamed on disk
 
@@ -106,7 +106,7 @@ public class PycrunchHighlighterMarkersState {
             return;
         }
 
-        System.out.println("user data not null, prev value:" + previous_filename);
+//        System.out.println("user data not null, prev value:" + previous_filename);
 
         if (previous_filename.equals(new_path)) {
             // not renamed

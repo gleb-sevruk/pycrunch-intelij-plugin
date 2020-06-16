@@ -17,6 +17,6 @@ public class PycrunchFreePeriodInfoAction extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
         Messages.showMessageDialog(project,
-                "This version is free to use. \nThere are plans to make this product commercial in future.", "Pycrunch License", Messages.getInformationIcon());
+                "This version is free to use. \nIf you found this product useful, consider making a donation on the website.", "Pycrunch License", Messages.getInformationIcon());
     }
 }
