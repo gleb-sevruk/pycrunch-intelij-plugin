@@ -65,9 +65,6 @@ public class PycrunchToolWindow {
     private Tree _testTree;
     private JButton _expandAllButton;
     private JButton _collapseAllButton;
-    private JLabel _lblWatchdogText;
-    private JPanel panelWatchdog;
-    private JButton _btnTerminate;
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
@@ -286,7 +283,6 @@ public class PycrunchToolWindow {
 
     private void attach_events() {
         runSelectedButton.addActionListener(e -> run_selected());
-        _btnTerminate.addActionListener(e -> terminate_run());
         _expandAllButton .addActionListener(e-> expandAll());
         _collapseAllButton .addActionListener(e-> collapseAll());
 //        highlightFileButton.addActionListener(e -> update_all_highlighting());
@@ -364,8 +360,6 @@ public class PycrunchToolWindow {
 
     public void connect_to_message_bus() {
         connect_pycrunch_bus();
-        connect_watchdog_bug();
-
         connect_intellij_events_bus();
     }
 
@@ -385,38 +379,11 @@ public class PycrunchToolWindow {
         label_engine_status.setText(text);
 
     }
-
-    private void connect_watchdog_bug() {
-        _bus.connect().subscribe(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchWatchdogBusNotifier() {
-            @Override
-            public void watchdogBegin(int test_count) {
-                System.out.println("watchdogBegin");
-                System.out.println(test_count);
-                String text;
-                if (test_count == 1) {
-                    text = "1 test queued...";
-                } else {
-                    text = test_count + " tests queued...";
-                }
-                _lblWatchdogText.setText(text);
-                _btnTerminate.setEnabled(true);
-                panelWatchdog.setVisible(true);
-            }
-
-            @Override
-            public void watchdogEnd() {
-                panelWatchdog.setVisible(false);
-                _btnTerminate.setEnabled(false);
-                System.out.println("watchdogEnd");
-                System.out.println();
-            }
-        });
-    }
     private void connect_pycrunch_bus() {
         _bus.connect().subscribe(PycrunchBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchBusNotifier() {
             @Override
             public void beforeAction(String event) {
-                textArea1.setText("Test output will be captured here");
+                textArea1.setText(_connector.GetCapturedOutput("todo"));
                 fill_test_list();
 //                update_all_highlighting();
 
@@ -479,13 +446,6 @@ public class PycrunchToolWindow {
             }
         });
     }
-    private void terminate_run() {
-        try {
-            _connector.TerminateRun();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void run_selected() {
         List<PycrunchTestMetadata> selectedValue = get_selected_tests_from_tree();
@@ -509,12 +469,9 @@ public class PycrunchToolWindow {
         applyWordWrap();
         configure_test_tree();
         configure_split_pane();
-        configure_watchdog_panel();
+
     }
 
-    private void configure_watchdog_panel() {
-        panelWatchdog.setVisible(false);
-    }
 
     private void configure_split_pane() {
         _splitPane.setDividerLocation(_uiState._splitPanePosition);
@@ -738,13 +695,10 @@ public class PycrunchToolWindow {
             return true;
         }
 
-        if (_uiState._showPendingTests && (test.state.equals("pending"))) {
+        if (_uiState._showPendingTests && (test.state.equals("pending") || test.state.equals("queued"))) {
             return true;
         }
 
-        if (test.state.equals("queued")) {
-            return true;
-        }
         return false;
     }
 
