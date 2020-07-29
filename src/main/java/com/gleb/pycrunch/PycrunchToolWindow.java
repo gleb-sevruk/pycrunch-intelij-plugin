@@ -25,6 +25,7 @@ import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBUI;
+import icons.PycrunchIcons;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
@@ -572,12 +573,12 @@ public class PycrunchToolWindow {
                     Object userObject = tree_node.getUserObject();
                     if (userObject instanceof PycrunchTestMetadata) {
 
-                        ImageIcon icon = icon_from_state(((PycrunchTestMetadata) userObject).state);
+                        Icon icon = icon_from_state(((PycrunchTestMetadata) userObject).state);
                         setIcon(icon);
                     } else {
                         // module node
                         String moduleStatus = _connector.GetModuleStatus((String) userObject);
-                        ImageIcon icon = icon_from_state(moduleStatus);
+                        Icon icon = icon_from_state(moduleStatus);
                         setIcon(icon);
                     }
                 }
@@ -588,21 +589,21 @@ public class PycrunchToolWindow {
 
 
             @NotNull
-            private ImageIcon icon_from_state(String state) {
-                URL resource = getClass().getResource("/list_pending.png");
+            private Icon icon_from_state(String state) {
+                Icon resource = PycrunchIcons.TEST_LIST_PENDING;
                 if (state != null) {
                     if (state.equals("success")) {
-                        resource = getClass().getResource("/list_success.png");
+                        resource = PycrunchIcons.TEST_LIST_SUCCESS;
                     }
                     if (state.equals("failed")) {
-                        resource = getClass().getResource("/list_failed.png");
+                        resource = PycrunchIcons.TEST_LIST_FAILED;
                     }
                     if (state.equals("queued")) {
-                        resource = getClass().getResource("/list_queued.png");
+                        resource = PycrunchIcons.TEST_LIST_QUEUED;
                     }
                 }
 
-                return new ImageIcon(resource);
+                return resource;
             }
         });
     }
