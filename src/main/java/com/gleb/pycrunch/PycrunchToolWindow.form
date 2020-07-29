@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gleb.pycrunch.PycrunchToolWindow">
-  <grid id="27dc6" binding="myToolWindowContent" layout-manager="GridLayoutManager" row-count="3" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="myToolWindowContent" layout-manager="GridLayoutManager" row-count="4" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
       <xy x="20" y="20" width="584" height="400"/>
     </constraints>
     <properties>
+      <alignmentY value="0.5"/>
       <background color="-1"/>
       <opaque value="false"/>
     </properties>
@@ -13,37 +14,65 @@
     <children>
       <toolbar id="fda91" binding="top_toolbar">
         <constraints>
-          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="1" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="272" height="38"/>
-            <maximum-size width="-1" height="38"/>
+          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="2" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="272" height="39"/>
+            <maximum-size width="-1" height="36"/>
           </grid>
         </constraints>
         <properties>
+          <alignmentX value="0.5"/>
+          <alignmentY value="0.5"/>
           <borderPainted value="false"/>
           <floatable value="false"/>
           <opaque value="false"/>
-          <rollover value="true"/>
+          <rollover value="false"/>
         </properties>
         <clientProperties>
-          <JToolBar.isRollover class="java.lang.Boolean" value="true"/>
+          <JToolBar.isRollover class="java.lang.Boolean" value="false"/>
         </clientProperties>
         <border type="none"/>
         <children>
           <component id="e8415" class="javax.swing.JButton" binding="runSelectedButton" default-binding="true">
             <constraints/>
             <properties>
-              <borderPainted value="false"/>
+              <alignmentY value="0.5"/>
+              <borderPainted value="true"/>
               <contentAreaFilled value="false"/>
               <hideActionText value="true"/>
               <icon value="run.png"/>
-              <iconTextGap value="4"/>
-              <maximumSize width="64" height="32"/>
-              <minimumSize width="64" height="32"/>
-              <opaque value="true"/>
-              <preferredSize width="64" height="32"/>
+              <iconTextGap value="5"/>
+              <maximumSize width="68" height="34"/>
+              <minimumSize width="68" height="34"/>
+              <opaque value="false"/>
+              <preferredSize width="64" height="34"/>
+              <rolloverEnabled value="true"/>
               <selected value="false"/>
               <text value="Run"/>
               <toolTipText value="Run Selected Tests"/>
+            </properties>
+          </component>
+          <hspacer id="50e3b">
+            <constraints/>
+          </hspacer>
+          <component id="990d7" class="javax.swing.JButton" binding="_btnTerminate">
+            <constraints/>
+            <properties>
+              <alignmentX value="0.0"/>
+              <borderPainted value="true"/>
+              <contentAreaFilled value="true"/>
+              <enabled value="false"/>
+              <focusPainted value="true"/>
+              <hideActionText value="true"/>
+              <icon value="actions/suspend.png"/>
+              <maximumSize width="34" height="34"/>
+              <minimumSize width="34" height="34"/>
+              <opaque value="true"/>
+              <preferredSize width="34" height="32"/>
+              <requestFocusEnabled value="true"/>
+              <rolloverEnabled value="true"/>
+              <selected value="false"/>
+              <text value=""/>
+              <toolTipText value="Terminate Current Run"/>
             </properties>
           </component>
           <hspacer id="710c5">
@@ -86,7 +115,7 @@
               <opaque value="false"/>
               <preferredSize width="32" height="32"/>
               <selected value="false"/>
-              <toolTipText value="Show Failed Tests"/>
+              <toolTipText value="Show Pending Tests"/>
             </properties>
           </component>
           <component id="2b5c3" class="javax.swing.JToggleButton" binding="togglePinnedTests">
@@ -207,7 +236,7 @@
       </splitpane>
       <component id="610c5" class="javax.swing.JLabel" binding="label_engine_status">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Not running."/>
@@ -215,12 +244,30 @@
       </component>
       <component id="c66a8" class="javax.swing.JButton" binding="activateButton">
         <constraints>
-          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Activate"/>
         </properties>
       </component>
+      <grid id="6dd6e" binding="panelWatchdog" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="3" anchor="10" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="867ed" class="javax.swing.JLabel" binding="_lblWatchdogText">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Tests are queued"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
     </children>
   </grid>
   <buttonGroups>

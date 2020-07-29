@@ -157,6 +157,11 @@ public class PycrunchConnector {
     private String full_api_url() {
         return api_uri + ':' + _port;
     }
+    public void TerminateRun() throws JSONException {
+        JSONObject obj = new JSONObject();
+        obj.put("action", "watchdog-terminate");
+        this._socket.emit("my event", obj);
+    }
 
     public void RunTests(List<PycrunchTestMetadata> tests) throws JSONException {
         JSONObject obj = new JSONObject();
@@ -192,6 +197,12 @@ public class PycrunchConnector {
     }
 
     private void combinedCoverageDidUpdate() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
+        });
+    }
+
+    private void watchdogWillBegin() {
         EventQueue.invokeLater(() -> {
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
         });
@@ -399,12 +410,34 @@ public class PycrunchConnector {
                 case "combined_coverage_updated":
                     ApplyCombinedCoverage(data);
                     break;
+                case "watchdog_begin":
+                    WatchdogBegin(data);
+                    break;
+                case "watchdog_end":
+                    WatchdogEnd(data);
+                    break;
+
 
             }
         } catch (JSONException e) {
             System.out.println(e.toString());
 
         }
+    }
+
+    private void WatchdogEnd(JSONObject data) {
+        EventQueue.invokeLater(() -> {
+            this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogEnd();
+        });
+
+    }
+
+    private void WatchdogBegin(JSONObject data) throws JSONException {
+        int totalTests = data.getInt("total_tests");
+
+        EventQueue.invokeLater(() -> {
+            this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogBegin(totalTests);
+        });
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
