@@ -72,11 +72,11 @@ public class PycrunchToolWindow {
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
-    private String _version_string;
 
     private ListSpeedSearch _listSpeedSearch;
     private TreeSpeedSearch _treeSpeedSearch;
     private PycrunchTreeState _treeState;
+    private PycrunchConnectionState _connectionState = new PycrunchConnectionState();
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
@@ -423,7 +423,8 @@ public class PycrunchToolWindow {
             }
             @Override
             public void engineDidConnect(String apiRoot) {
-                setStatus("Connected to " + apiRoot);
+                _connectionState._apiRoot = apiRoot;
+                setStatus(_connectionState.statusText());
             }
             @Override
             public void engineDidDisconnect(String context){
@@ -460,9 +461,9 @@ public class PycrunchToolWindow {
 
             @Override
             public void engineDidLoadVersion(int version_major, int version_minor) {
-                _version_string = String.format("v%s.%d", String.valueOf(version_major), version_minor);
-                setStatus(label_engine_status.getText() + " (" + _version_string + ")");
+                _connectionState.engineVersion(version_major, version_minor);
 
+                setStatus(_connectionState.statusText());
             }
 
             @Override
