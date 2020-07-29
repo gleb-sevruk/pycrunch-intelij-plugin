@@ -53,6 +53,7 @@ public class PyCrunchVariablesWindow {
     private PycrunchTestMetadata _selectedTest;
     private PyCrunchVariableSnapshot _selectedVariable;
     private ListSpeedSearch _listSpeedSearch;
+    private String _currentlySelectedVariableName;
 
     public PyCrunchVariablesWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
 
@@ -65,6 +66,11 @@ public class PyCrunchVariablesWindow {
         configure_split_pane();
         connect_pycrunch_bus();
         ui_will_mount();
+        resetState();
+    }
+
+    private void resetState() {
+        _currentlySelectedVariableName = null;
     }
 
 
@@ -153,13 +159,18 @@ public class PyCrunchVariablesWindow {
             return;
         }
         if (x instanceof PyCrunchVariableSnapshot) {
-            PyCrunchVariableSnapshot snapshot = (PyCrunchVariableSnapshot)x;
-            _selectedVariable =snapshot;
-            _variableValueText.setText(snapshot.get_value_as_text());
-
-            double ts = snapshot._ts;
-            updateTimestampLabel(ts);
+            PyCrunchVariableSnapshot casted = (PyCrunchVariableSnapshot) x;
+            redrawStateToUi(casted);
+            _currentlySelectedVariableName =casted._name;
         }
+    }
+
+    private void redrawStateToUi(PyCrunchVariableSnapshot x) {
+            _selectedVariable =x;
+            _variableValueText.setText(x.get_value_as_text());
+
+            double ts = x._ts;
+            updateTimestampLabel(ts);
     }
 
     private void updateTimestampLabel(double ts) {
@@ -229,14 +240,33 @@ public class PyCrunchVariablesWindow {
                     System.out.println("!!! error converting variables on did_select_test" );
                     e.printStackTrace();
                 }
-
                 _label_selected_test.setText(userObject.name);
+                if (_currentlySelectedVariableName != null) {
+                    selectLastKnownVariable();
+                }
             }
 
             @Override
             public void licenceActivated() {
             }
         });
+    }
+
+    private void selectLastKnownVariable() {
+        PyCrunchVariableSnapshot found_something = null;
+        for (PyCrunchVariableSnapshot __ : _currentState._variableSnapshots) {
+            if (__._name.equals(_currentlySelectedVariableName)) {
+                found_something =  __;
+                break;
+            }
+        }
+        if (found_something == null) {
+            return;
+        }
+
+        redrawStateToUi(found_something);
+        _variablesList.setSelectedValue(found_something, true);
+
     }
 
     private void invalidate_list() {
