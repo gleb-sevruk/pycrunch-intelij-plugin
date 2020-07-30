@@ -30,10 +30,36 @@ dependencies {
 //}
 patchPluginXml {
     changeNotes """
-      Configuration file will be generated automatically from now ( pip install pycrunch-engine==1.0 )    
-      Timestamp units should be seconds instead of ms in Trace Variables windows\n
-      Engine mode (auto/manual/pinned) will be preserved correctly from now\n
-      It is now possible to install plugin without IDE reload\n
-      On lost connection plugin will try to reconnect withing few short period of time before giving up\n
+    This is biggest update since release. <br><br>
+    Added ability to terminate test execution. <br>
+    Icon were redrawn for high-resolution screens. <br>
+    Added information about tests currently in progress. <br>
+    Cursor will now follow variables in variables timeline list <br>
+    Variables will show latest value from most recent run <br>
+    There are even more changes in pycrunch-engine from gathered feedback, including: <br>
+    <ul>
+    <li> 
+     Faster test execution
+     </li>
+    <li> 
+     Engine stability and better error reporting.
+     </li>
+    <li> 
+       Support for test run termination and test execution timeout.
+     </li>
+    </ul>
+    <br>
+       To use new termination feature, please upgrade engine using: <br>
+       pip install --upgrade pycrunch-engine <br>
+       
+       <br>
+    There are known issues with coverage v5 and pytest-coverage plugin.<br> 
+    If you experience that, please downgrade coverage by: <br>
+    pip install coverage==4.5.3<br>
+    and remove pytest-coverage plugin from venv and pytest.ini, while we are working on the next update.<br>
+
+
+ 
+    
       """
 }
