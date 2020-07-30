@@ -359,7 +359,7 @@ public class PycrunchToolWindow {
         if (cachedDocument != null) {
             connector.invalidate_markers(cachedDocument, _project);
         } else {
-            System.out.println("cached document is null " + fileByPath.getPath());
+//            System.out.println("cached document is null " + fileByPath.getPath());
         }
     }
 
