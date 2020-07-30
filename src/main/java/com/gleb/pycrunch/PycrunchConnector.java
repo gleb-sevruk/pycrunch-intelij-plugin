@@ -8,7 +8,9 @@ import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
 import com.gleb.pycrunch.shared.GlobalKeys;
+import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
@@ -36,6 +38,7 @@ public class PycrunchConnector {
     private String api_uri = "http://127.0.0.1";
     private int _port;
     private PycrunchCombinedCoverage _combined_coverage;
+    private boolean _upgradeNoticeAlreadyShownInCurrentSession;
 
     public PycrunchConnector() {
         PycrunchConnector.CounterOfSingletons++;
@@ -103,9 +106,23 @@ public class PycrunchConnector {
         String mode = data.getString("engine_mode");
 
         this.engineDidLoadMode(mode);
+        this.showUpgradeNoticeIfEngineOutdated(version_major, version_minor);
         this.engineDidLoadVersion(version_major, version_minor);
     }
 
+    private void showUpgradeNoticeIfEngineOutdated(int major, int minor) {
+//        last known version at the moment of writing is 1.1
+        if (_upgradeNoticeAlreadyShownInCurrentSession) {
+            return;
+        }
+
+        boolean reallyOld = major < 1;
+        boolean minorVersionIsOld = major == 1 && minor < 1;
+        if (reallyOld || minorVersionIsOld) {
+            IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
+            _upgradeNoticeAlreadyShownInCurrentSession = true;
+        }
+    }
 
 
     public void AttachToEngine(Project project) throws Exception {
