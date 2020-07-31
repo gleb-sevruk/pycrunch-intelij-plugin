@@ -38,6 +38,8 @@
               <alignmentY value="0.5"/>
               <borderPainted value="false"/>
               <contentAreaFilled value="false"/>
+              <focusPainted value="true"/>
+              <focusable value="true"/>
               <hideActionText value="true"/>
               <icon value="run.png"/>
               <iconTextGap value="3"/>
@@ -45,7 +47,7 @@
               <minimumSize width="68" height="34"/>
               <opaque value="false"/>
               <preferredSize width="68" height="34"/>
-              <rolloverEnabled value="false"/>
+              <rolloverEnabled value="true"/>
               <selected value="false"/>
               <text value="Run"/>
               <toolTipText value="Run Selected Tests"/>
@@ -69,7 +71,7 @@
               <opaque value="false"/>
               <preferredSize width="34" height="32"/>
               <requestFocusEnabled value="true"/>
-              <rolloverEnabled value="false"/>
+              <rolloverEnabled value="true"/>
               <selected value="false"/>
               <text value=""/>
               <toolTipText value="Terminate Current Run"/>

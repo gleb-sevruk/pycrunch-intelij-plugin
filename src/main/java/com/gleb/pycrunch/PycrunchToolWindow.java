@@ -7,6 +7,7 @@ import com.gleb.pycrunch.shared.PycrunchWindowStateService;
 import com.gleb.pycrunch.ui.PycrunchDefaultTestTree;
 import com.gleb.pycrunch.ui.PycrunchTreeState;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonPainter;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -30,16 +31,11 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import javax.swing.*;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeWillExpandListener;
+import javax.swing.event.*;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
@@ -509,11 +505,35 @@ public class PycrunchToolWindow {
         fill_test_list();
         configure_buttons();
         set_toolbar_icons();
+        set_toolbar_focusable_hack();
 
         applyWordWrap();
         configure_test_tree();
         configure_split_pane();
         configure_watchdog_panel();
+    }
+
+    private void set_toolbar_focusable_hack() {
+        fix_button_press_effect(runSelectedButton);
+        fix_button_press_effect(_btnTerminate);
+    }
+
+    private void fix_button_press_effect(JButton buttonToFix) {
+//        This fixed buttons inability to be in pressed state.
+        buttonToFix.setBorder(new DarculaButtonPainter());
+        buttonToFix.getModel().addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                ButtonModel model = (ButtonModel) e.getSource();
+                if (model.isRollover()) {
+                    buttonToFix.setBorderPainted(false);
+                } else if (model.isPressed()) {
+                    buttonToFix.setBorderPainted(true);
+                } else {
+                    buttonToFix.setBorderPainted(false);
+                }
+            }
+        });
     }
 
     private void configure_watchdog_panel() {
