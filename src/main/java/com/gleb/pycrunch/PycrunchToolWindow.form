@@ -40,11 +40,11 @@
               <contentAreaFilled value="false"/>
               <hideActionText value="true"/>
               <icon value="run.png"/>
-              <iconTextGap value="5"/>
+              <iconTextGap value="3"/>
               <maximumSize width="68" height="34"/>
               <minimumSize width="68" height="34"/>
               <opaque value="false"/>
-              <preferredSize width="64" height="34"/>
+              <preferredSize width="68" height="34"/>
               <rolloverEnabled value="true"/>
               <selected value="false"/>
               <text value="Run"/>

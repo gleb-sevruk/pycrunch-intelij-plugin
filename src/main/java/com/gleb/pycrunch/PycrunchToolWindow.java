@@ -508,6 +508,8 @@ public class PycrunchToolWindow {
 
         fill_test_list();
         configure_buttons();
+        set_toolbar_icons();
+
         applyWordWrap();
         configure_test_tree();
         configure_split_pane();
@@ -682,9 +684,20 @@ public class PycrunchToolWindow {
         });
         togglePinnedTests.setSelected(_uiState._showPinnedTests);
 
+    }
+
+    private void set_toolbar_icons() {
         _expandAllButton.setIcon(AllIcons.Actions.Expandall);
         _collapseAllButton.setIcon(AllIcons.Actions.Collapseall);
 
+        togglePendingTests.setIcon(PycrunchIcons.TOOLBAR_TOGGLE_PENDING);
+        toggleFailedTests.setIcon(PycrunchIcons.TOOLBAR_TOGGLE_FAILED);
+        togglePinnedTests.setIcon(PycrunchIcons.TOOLBAR_TOGGLE_PINNED);
+        togglePassedTests.setIcon(PycrunchIcons.TOOLBAR_TOGGLE_SUCCESS);
+
+        runSelectedButton.setIcon(PycrunchIcons.TOOLBAR_RUN);
+
+        settingsButton.setIcon(AllIcons.General.GearPlain);
     }
 
     @NotNull

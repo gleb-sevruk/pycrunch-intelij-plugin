@@ -14,4 +14,13 @@ public interface PycrunchIcons {
     Icon CIRCLE_GREEN = IconLoader.getIcon("/circle-green.png");
     Icon CIRCLE_RED= IconLoader.getIcon("/circle-red.png");
     Icon CIRCLE_PROGRESS= IconLoader.getIcon("/circle-progress.png");
+
+    Icon TOOLBAR_TOGGLE_PENDING = IconLoader.getIcon("/pending.png");
+    Icon TOOLBAR_TOGGLE_FAILED = IconLoader.getIcon("/cross.png");
+    Icon TOOLBAR_TOGGLE_PINNED = IconLoader.getIcon("/pin.png");
+    Icon TOOLBAR_TOGGLE_SUCCESS = IconLoader.getIcon("/check.png");
+
+    Icon TOOLBAR_RUN = IconLoader.getIcon("/run.png");
+
+
 }
