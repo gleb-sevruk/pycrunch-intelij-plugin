@@ -32,6 +32,7 @@ import org.json.JSONException;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -521,6 +522,7 @@ public class PycrunchToolWindow {
     private void fix_button_press_effect(JButton buttonToFix) {
 //        This fixed buttons inability to be in pressed state.
         buttonToFix.setBorder(new DarculaButtonPainter());
+        buttonToFix.setUI(new BasicButtonUI());
         buttonToFix.getModel().addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
