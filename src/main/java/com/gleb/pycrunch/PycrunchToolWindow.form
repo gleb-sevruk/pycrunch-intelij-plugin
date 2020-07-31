@@ -36,7 +36,7 @@
             <constraints/>
             <properties>
               <alignmentY value="0.5"/>
-              <borderPainted value="true"/>
+              <borderPainted value="false"/>
               <contentAreaFilled value="false"/>
               <hideActionText value="true"/>
               <icon value="run.png"/>
@@ -45,7 +45,7 @@
               <minimumSize width="68" height="34"/>
               <opaque value="false"/>
               <preferredSize width="68" height="34"/>
-              <rolloverEnabled value="true"/>
+              <rolloverEnabled value="false"/>
               <selected value="false"/>
               <text value="Run"/>
               <toolTipText value="Run Selected Tests"/>
@@ -58,18 +58,18 @@
             <constraints/>
             <properties>
               <alignmentX value="0.0"/>
-              <borderPainted value="true"/>
-              <contentAreaFilled value="true"/>
+              <borderPainted value="false"/>
+              <contentAreaFilled value="false"/>
               <enabled value="false"/>
               <focusPainted value="true"/>
               <hideActionText value="true"/>
               <icon value="actions/suspend.png"/>
               <maximumSize width="34" height="34"/>
               <minimumSize width="34" height="34"/>
-              <opaque value="true"/>
+              <opaque value="false"/>
               <preferredSize width="34" height="32"/>
               <requestFocusEnabled value="true"/>
-              <rolloverEnabled value="true"/>
+              <rolloverEnabled value="false"/>
               <selected value="false"/>
               <text value=""/>
               <toolTipText value="Terminate Current Run"/>
@@ -143,7 +143,7 @@
               <minimumSize width="32" height="32"/>
               <opaque value="true"/>
               <preferredSize width="32" height="32"/>
-              <rolloverEnabled value="true"/>
+              <rolloverEnabled value="false"/>
               <selected value="false"/>
               <text value=""/>
               <toolTipText value="Expand All"/>
@@ -157,7 +157,7 @@
               <minimumSize width="32" height="32"/>
               <opaque value="false"/>
               <preferredSize width="32" height="32"/>
-              <rolloverEnabled value="true"/>
+              <rolloverEnabled value="false"/>
               <selected value="false"/>
               <text value=""/>
               <toolTipText value="Collapse All"/>
