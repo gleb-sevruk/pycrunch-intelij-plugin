@@ -10,7 +10,7 @@ import com.intellij.util.messages.MessageBus;
 public class RunSelectedTests extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
-        MessageBus bus = project.getComponent(MessageBus.class);
+        MessageBus bus = project.getMessageBus();
         try {
             ((PycrunchToolbarBus) bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC)).runSelectedTests();
         } catch (Exception e) {

@@ -13,7 +13,7 @@ import com.intellij.util.messages.MessageBus;
 public class TerminateTestRun extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
-        MessageBus bus = project.getComponent(MessageBus.class);
+        MessageBus bus = project.getMessageBus();
         try {
             ((PycrunchToolbarBus) bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC)).terminateTestRun();
         } catch (Exception e) {
@@ -27,9 +27,5 @@ public class TerminateTestRun extends AnAction {
         PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
         Presentation presentation = e.getPresentation();
         presentation.setEnabled(connector._canTerminateTestRun);
-    }
-    @Override
-    public boolean displayTextInToolbar() {
-        return false; // like so
     }
 }

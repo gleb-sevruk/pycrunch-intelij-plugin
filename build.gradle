@@ -32,7 +32,9 @@ patchPluginXml {
     changeNotes """
     This is biggest update since release. <br><br>
     Added ability to terminate test execution. <br>
-    Icon were redrawn for high-resolution screens. <br>
+
+    UI is now drawn using standard ActionToolbar.<br>
+    Icon were redrawn for high-resolution screens.<br>
     Added information about tests currently in progress. <br>
     Cursor will now follow variables in variables timeline list <br>
     Variables will show latest value from most recent run <br>

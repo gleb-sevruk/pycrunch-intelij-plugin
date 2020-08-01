@@ -24,7 +24,7 @@ public class WrapTestOutputAction extends ToggleAction {
         PycrunchWindowStateService uiState = ServiceManager.getService(project, PycrunchWindowStateService.class);
         uiState._wrapOutput = state;
 
-        MessageBus bus = project.getComponent(MessageBus.class);
+        MessageBus bus = project.getMessageBus();
         bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC).applyWordWrap();
     }
 

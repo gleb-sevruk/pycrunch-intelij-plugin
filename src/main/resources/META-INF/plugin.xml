@@ -188,7 +188,12 @@ Official Site:
 
         <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="HelpMenu" />
-            <action id="PyChrunch.RunEngine" class="com.gleb.pycrunch.actions.RunPycrunchEngineAction" text="Run Engine" description="Create and run Pycrunch engine within current project" />
+            <action id="PyChrunch.RunEngine"
+                    class="com.gleb.pycrunch.actions.RunPycrunchEngineAction"
+                    text="Run/Restart PyCrunch Engine"
+                    description="Start Pycrunch engine process and connect to it within current project"
+                    icon="PycrunchIcons.TOOLBAR_CONNECT"
+            />
 
 
             <separator/>

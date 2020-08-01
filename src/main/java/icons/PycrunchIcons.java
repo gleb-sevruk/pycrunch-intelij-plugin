@@ -22,5 +22,5 @@ public interface PycrunchIcons {
 
     Icon TOOLBAR_RUN = IconLoader.getIcon("/run.png");
 
-
+    Icon TOOLBAR_CONNECT = IconLoader.getIcon("/connect_icon.png");
 }
