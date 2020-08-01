@@ -102,6 +102,7 @@ Official Site:
 
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchWindowStateService"/>
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchVariablesWindowStateService"/>
+        <projectService serviceImplementation="com.gleb.pycrunch.shared.EngineMode"/>
 
 
         <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
@@ -111,15 +112,93 @@ Official Site:
     </extensions>
 
     <actions>
+        <action id="PyChrunch.RunSelectedTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.RunSelectedTests"
+                text="Run" description="Runs selected tests"
+                icon="PycrunchIcons.TOOLBAR_RUN" >
+
+        </action>
+        <action id="PyChrunch.TerminateTestRun"
+                class="com.gleb.pycrunch.actions.toolbarActions.TerminateTestRun"
+                text="Terminate Current Run" description="Terminate Current Run"
+                icon="AllIcons.Actions.Suspend" >
+
+        </action>
+
+        <action id="PyChrunch.TogglePassedTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.TogglePassedTests"
+                text="Show Passed Tests" description="Show Passed Tests"
+                icon="PycrunchIcons.TOOLBAR_TOGGLE_SUCCESS" >
+
+        </action>
+        <action id="PyChrunch.ToggleFailedTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.ToggleFailedTests"
+                text="Show Failed Tests" description="Show Failed Tests"
+                icon="PycrunchIcons.TOOLBAR_TOGGLE_FAILED" >
+
+        </action>
+        <action id="PyChrunch.TogglePendingTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.TogglePendingTests"
+                text="Show Pending Tests" description="Show Pending Tests"
+                icon="PycrunchIcons.TOOLBAR_TOGGLE_PENDING" >
+        </action>
+        <action id="PyChrunch.TogglePinnedTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.TogglePinnedTests"
+                text="Show Pinned Tests" description="Show Pinned Tests"
+                icon="PycrunchIcons.TOOLBAR_TOGGLE_PINNED"  >
+        </action>
+        <action id="PyChrunch.ExpandAllTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.ExpandAllTests"
+                text="Expand All" description="Expand All"
+                icon="AllIcons.Actions.Expandall"  >
+        </action>
+        <action id="PyChrunch.CollapseAllTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.CollapseAllTests"
+                text="Collapse All" description="Collapse All"
+                icon="AllIcons.Actions.Collapseall"  >
+        </action>
+
+        <group id="PyChrunch.SettingsPopup"
+               popup="true"
+               text="Settings"
+               description="Engine Settings"
+               icon="AllIcons.General.GearPlain"
+        >
+            <action id="PyChrunch.EngineMode.SetAuto"
+                    class="com.gleb.pycrunch.actions.engineMode.SetAuto"
+                    text="Run tests automatically" description="Run tests automatically"
+            >
+            </action>
+            <action id="PyChrunch.EngineMode.SetManual"
+                    class="com.gleb.pycrunch.actions.engineMode.SetManual"
+                    text="Run all tests manually" description="Run all tests manually"
+            >
+            </action>
+            <action id="PyChrunch.EngineMode.SetPinnedOnlyP"
+                    class="com.gleb.pycrunch.actions.engineMode.SetPinnedOnly"
+                    text="Run pinned automatically, others manually" description="Run pinned automatically, others manually">
+            </action>
+            <separator></separator>
+            <action id="PyChrunch.Settings.WrapTestOutput"
+                    class="com.gleb.pycrunch.actions.WrapTestOutputAction"
+                    text="Wrap test output" description="Wrap test output">
+            </action>
+
+        </group>
+
         <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="HelpMenu" />
             <action id="PyChrunch.RunEngine" class="com.gleb.pycrunch.actions.RunPycrunchEngineAction" text="Run Engine" description="Create and run Pycrunch engine within current project" />
+
+
             <separator/>
             <action id="PyChrunch.ConnectToCustomPycrunchEngineAction" class="com.gleb.pycrunch.actions.ConnectToCustomPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
 <!--            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />-->
             <separator/>
             <action id="PyCrunch.DocumentationAction" class="com.gleb.pycrunch.actions.PycrunchOpenDocumentationAction" text="Documentation" description="Open documentation link" />
-            <action id="PyCrunch.FreeInfo" class="com.gleb.pycrunch.actions.PycrunchFreePeriodInfoAction" text="Free Edition" description="Free edition information" />
+            <action id="PyCrunch.FreeInfo" class="com.gleb.pycrunch.actions.PycrunchFreePeriodInfoAction" text="Free Edition" description="Free edition information" >
+
+            </action>
         </group>
     </actions>
 </idea-plugin>

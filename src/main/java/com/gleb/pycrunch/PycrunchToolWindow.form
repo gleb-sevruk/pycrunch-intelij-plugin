@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.gleb.pycrunch.PycrunchToolWindow">
-  <grid id="27dc6" binding="myToolWindowContent" layout-manager="GridLayoutManager" row-count="4" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="myToolWindowContent" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="584" height="400"/>
+      <xy x="87" y="7" width="584" height="400"/>
     </constraints>
     <properties>
       <alignmentY value="0.5"/>
@@ -12,181 +12,9 @@
     </properties>
     <border type="none"/>
     <children>
-      <toolbar id="fda91" binding="top_toolbar">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="2" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="272" height="39"/>
-            <maximum-size width="-1" height="36"/>
-          </grid>
-        </constraints>
-        <properties>
-          <alignmentX value="0.5"/>
-          <alignmentY value="0.5"/>
-          <borderPainted value="false"/>
-          <floatable value="false"/>
-          <opaque value="false"/>
-          <rollover value="false"/>
-        </properties>
-        <clientProperties>
-          <JToolBar.isRollover class="java.lang.Boolean" value="false"/>
-        </clientProperties>
-        <border type="none"/>
-        <children>
-          <component id="e8415" class="javax.swing.JButton" binding="runSelectedButton" default-binding="true">
-            <constraints/>
-            <properties>
-              <alignmentY value="0.5"/>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <focusPainted value="true"/>
-              <focusable value="true"/>
-              <hideActionText value="true"/>
-              <icon value="run.png"/>
-              <iconTextGap value="3"/>
-              <maximumSize width="68" height="34"/>
-              <minimumSize width="68" height="34"/>
-              <opaque value="false"/>
-              <preferredSize width="68" height="34"/>
-              <rolloverEnabled value="true"/>
-              <selected value="false"/>
-              <text value="Run"/>
-              <toolTipText value="Run Selected Tests"/>
-            </properties>
-          </component>
-          <hspacer id="50e3b">
-            <constraints/>
-          </hspacer>
-          <component id="990d7" class="javax.swing.JButton" binding="_btnTerminate">
-            <constraints/>
-            <properties>
-              <alignmentX value="0.0"/>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="false"/>
-              <enabled value="false"/>
-              <focusPainted value="true"/>
-              <hideActionText value="true"/>
-              <icon value="actions/suspend.png"/>
-              <maximumSize width="34" height="34"/>
-              <minimumSize width="34" height="34"/>
-              <opaque value="false"/>
-              <preferredSize width="34" height="32"/>
-              <requestFocusEnabled value="true"/>
-              <rolloverEnabled value="true"/>
-              <selected value="false"/>
-              <text value=""/>
-              <toolTipText value="Terminate Current Run"/>
-            </properties>
-          </component>
-          <hspacer id="710c5">
-            <constraints/>
-          </hspacer>
-          <component id="c9567" class="javax.swing.JToggleButton" binding="togglePassedTests">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <icon value="check.png"/>
-              <inheritsPopupMenu value="false"/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <opaque value="false"/>
-              <preferredSize width="32" height="32"/>
-              <selected value="false"/>
-              <toolTipText value="Show Passed Tests"/>
-            </properties>
-          </component>
-          <component id="c2bc4" class="javax.swing.JToggleButton" binding="toggleFailedTests">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <icon value="cross.png"/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <opaque value="false"/>
-              <preferredSize width="32" height="32"/>
-              <selected value="false"/>
-              <toolTipText value="Show Failed Tests"/>
-            </properties>
-          </component>
-          <component id="7f5ff" class="javax.swing.JToggleButton" binding="togglePendingTests">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <icon value="pending.png"/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <opaque value="false"/>
-              <preferredSize width="32" height="32"/>
-              <selected value="false"/>
-              <toolTipText value="Show Pending Tests"/>
-            </properties>
-          </component>
-          <component id="2b5c3" class="javax.swing.JToggleButton" binding="togglePinnedTests">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <icon value="pin.png"/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <opaque value="false"/>
-              <preferredSize width="32" height="32"/>
-              <selected value="false"/>
-              <toolTipText value="Show Pinned Tests"/>
-            </properties>
-          </component>
-          <hspacer id="ca0bc">
-            <constraints/>
-          </hspacer>
-          <component id="2c6e1" class="javax.swing.JButton" binding="_expandAllButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <contentAreaFilled value="true"/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <opaque value="true"/>
-              <preferredSize width="32" height="32"/>
-              <rolloverEnabled value="false"/>
-              <selected value="false"/>
-              <text value=""/>
-              <toolTipText value="Expand All"/>
-            </properties>
-          </component>
-          <component id="7b351" class="javax.swing.JButton" binding="_collapseAllButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <opaque value="false"/>
-              <preferredSize width="32" height="32"/>
-              <rolloverEnabled value="false"/>
-              <selected value="false"/>
-              <text value=""/>
-              <toolTipText value="Collapse All"/>
-            </properties>
-          </component>
-          <hspacer id="aef01">
-            <constraints/>
-          </hspacer>
-          <component id="7d990" class="javax.swing.JButton" binding="settingsButton">
-            <constraints/>
-            <properties>
-              <borderPainted value="false"/>
-              <focusable value="false"/>
-              <icon value="cog.png"/>
-              <label value=""/>
-              <maximumSize width="32" height="32"/>
-              <minimumSize width="32" height="32"/>
-              <preferredSize width="32" height="32"/>
-              <text value=""/>
-              <toolTipText value="Settings"/>
-            </properties>
-          </component>
-        </children>
-      </toolbar>
       <splitpane id="f695a" binding="_splitPane">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
           </grid>
         </constraints>
@@ -244,14 +72,6 @@
           <text value="Not running."/>
         </properties>
       </component>
-      <component id="c66a8" class="javax.swing.JButton" binding="activateButton">
-        <constraints>
-          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Activate"/>
-        </properties>
-      </component>
       <grid id="6dd6e" binding="panelWatchdog" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
@@ -269,6 +89,18 @@
             </properties>
           </component>
         </children>
+      </grid>
+      <grid id="beb3a" binding="_pcPanelLeft2" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="34"/>
+            <preferred-size width="24" height="36"/>
+            <maximum-size width="-1" height="36"/>
+          </grid>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children/>
       </grid>
     </children>
   </grid>

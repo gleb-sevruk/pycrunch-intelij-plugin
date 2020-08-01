@@ -1,22 +1,17 @@
 package com.gleb.pycrunch.timeline;
 
-import com.gleb.pycrunch.PycrunchBusNotifier;
+import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
 import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.PycrunchTestMetadata;
 import com.gleb.pycrunch.shared.PycrunchVariablesWindowStateService;
-import com.gleb.pycrunch.shared.PycrunchWindowStateService;
-import com.intellij.icons.AllIcons;
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.ListSpeedSearch;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.content.Content;
@@ -33,9 +28,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.List;
 
 public class PyCrunchVariablesWindow {
     private final ToolWindow _toolWindow;

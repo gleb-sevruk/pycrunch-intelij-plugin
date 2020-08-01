@@ -7,9 +7,12 @@ import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
 import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
+import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
+import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
 import com.gleb.pycrunch.shared.GlobalKeys;
 import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
+import com.intellij.ide.ActivityTracker;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
@@ -39,6 +42,7 @@ public class PycrunchConnector {
     private int _port;
     private PycrunchCombinedCoverage _combined_coverage;
     private boolean _upgradeNoticeAlreadyShownInCurrentSession;
+    public boolean _canTerminateTestRun;
 
     public PycrunchConnector() {
         PycrunchConnector.CounterOfSingletons++;
@@ -443,6 +447,8 @@ public class PycrunchConnector {
     }
 
     private void WatchdogEnd(JSONObject data) {
+        _canTerminateTestRun = false;
+        emit_syntetic_event();
         EventQueue.invokeLater(() -> {
             this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogEnd();
         });
@@ -451,10 +457,15 @@ public class PycrunchConnector {
 
     private void WatchdogBegin(JSONObject data) throws JSONException {
         int totalTests = data.getInt("total_tests");
-
+        _canTerminateTestRun = true;
+        emit_syntetic_event();
         EventQueue.invokeLater(() -> {
             this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogBegin(totalTests);
         });
+    }
+
+    private void emit_syntetic_event() {
+        ActivityTracker.getInstance().inc();
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {
