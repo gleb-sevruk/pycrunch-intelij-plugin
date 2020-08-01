@@ -362,14 +362,6 @@ public class PycrunchConnector {
         return _bus;
     }
 
-//    public String get_result_status() {
-//        if (_result == null) {
-//            return "unknown";
-//        }
-//
-//        return _result.status;
-//    }
-
     public String get_marker_color_for(String absolute_path, Integer line_number) {
         SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage.GetLinesCovering(absolute_path);
         if (singleFileCombinedCoverage == null) {
@@ -437,12 +429,9 @@ public class PycrunchConnector {
                 case "watchdog_end":
                     WatchdogEnd(data);
                     break;
-
-
             }
         } catch (JSONException e) {
             System.out.println(e.toString());
-
         }
     }
 
@@ -450,9 +439,9 @@ public class PycrunchConnector {
         _canTerminateTestRun = false;
         emit_syntetic_event();
         EventQueue.invokeLater(() -> {
+            emit_syntetic_event();
             this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogEnd();
         });
-
     }
 
     private void WatchdogBegin(JSONObject data) throws JSONException {
@@ -460,6 +449,7 @@ public class PycrunchConnector {
         _canTerminateTestRun = true;
         emit_syntetic_event();
         EventQueue.invokeLater(() -> {
+            emit_syntetic_event();
             this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogBegin(totalTests);
         });
     }

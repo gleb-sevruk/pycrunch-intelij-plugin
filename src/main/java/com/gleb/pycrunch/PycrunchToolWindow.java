@@ -37,8 +37,6 @@ import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,11 +49,13 @@ public class PycrunchToolWindow {
     private JTextArea textArea1;
     private JLabel label_engine_status;
     private JButton activateButton;
-    private JSplitPane _splitPane;
     private Tree _testTree;
     private JLabel _lblWatchdogText;
     private JPanel panelWatchdog;
-    private JPanel _pcPanelLeft2;
+    private JPanel _pcPanelToolbar;
+    private JScrollPane _surfaceTestList;
+    private JScrollPane _surfaceTestOutput;
+    private JBSplitter _splitterJb;
 
 
     private JLabel label1;
@@ -75,7 +75,6 @@ public class PycrunchToolWindow {
         _uiState = ServiceManager.getService(_project, PycrunchWindowStateService.class);
         _engineMode = ServiceManager.getService(_project, EngineMode.class);
         _treeState = new PycrunchTreeState();
-        _splitPane.setVisible(false);
 
         this.ui_will_mount();
 
@@ -320,8 +319,6 @@ public class PycrunchToolWindow {
         _bus.connect().subscribe(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchWatchdogBusNotifier() {
             @Override
             public void watchdogBegin(int test_count) {
-                System.out.println("watchdogBegin");
-                System.out.println(test_count);
                 String text;
                 if (test_count == 1) {
                     text = "1 test queued...";
@@ -365,7 +362,6 @@ public class PycrunchToolWindow {
 
             @Override
             public void licenceInvalid() {
-                _splitPane.setVisible(false);
                 label_engine_status.setVisible(false);
                 activateButton.setVisible(true);
             }
@@ -400,7 +396,6 @@ public class PycrunchToolWindow {
 
             @Override
             public void licenceActivated() {
-                _splitPane.setVisible(true);
                 label_engine_status.setVisible(true);
             }
         });
@@ -434,7 +429,6 @@ public class PycrunchToolWindow {
         build_action_toolbars();
         _applyWordWrap();
         configure_test_tree();
-        configure_split_pane();
         configure_watchdog_panel();
     }
 
@@ -482,8 +476,8 @@ public class PycrunchToolWindow {
                 actionManager.getAction("PyChrunch.RunEngine")
         );
 
-        toolbar.setTargetComponent(_pcPanelLeft2);
-        _pcPanelLeft2.add(toolbar.getComponent());
+        toolbar.setTargetComponent(_pcPanelToolbar);
+        _pcPanelToolbar.add(toolbar.getComponent());
     }
 
 
@@ -508,21 +502,6 @@ public class PycrunchToolWindow {
 
     private void configure_watchdog_panel() {
         panelWatchdog.setVisible(false);
-    }
-
-    private void configure_split_pane() {
-        _splitPane.setDividerLocation(_uiState._splitPanePosition);
-
-        _splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        System.out.println(pce.toString());
-                        _uiState._splitPanePosition = (int)pce.getNewValue();
-
-
-                    }
-                });
     }
 
     private void configure_test_tree() {
