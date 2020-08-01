@@ -1,5 +1,6 @@
 package com.gleb.pycrunch;
 
+import com.gleb.pycrunch.actions.ToggleTestPinnedState;
 import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
 import com.gleb.pycrunch.messaging.PycrunchToolbarBus;
 import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
@@ -16,6 +17,8 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.JBMenuItem;
+import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -115,10 +118,46 @@ public class PycrunchToolWindow {
                     System.out.println("null is selected instead of tests; returning...");
                     return;
                 }
+
+                JBPopupMenu menu = create_test_list_popup(selectedValuesList);
+                menu.show(_testTree, e.getPoint().x, e.getPoint().y);
             }
         };
     }
+    @NotNull
+    private JBPopupMenu create_test_list_popup(List<PycrunchTestMetadata> selectedValuesList) {
+        JBPopupMenu menu = new JBPopupMenu();
+        JBMenuItem navigateToTest = new JBMenuItem("Navigate to test");
+        navigateToTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new NavigateToTest().Go(selectedValuesList.get(0), _connector);
+            }
+        });
 
+
+        String ending = "";
+        if (selectedValuesList.size() > 1) {
+            ending = "s";
+        }
+        JBMenuItem pinTest = new JBMenuItem("Pin test" + ending);
+        pinTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new ToggleTestPinnedState().Run(selectedValuesList, _connector, true);
+            }
+        });
+        JBMenuItem unpinTest = new JBMenuItem("Unpin test" + ending);
+        unpinTest.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new ToggleTestPinnedState().Run(selectedValuesList, _connector, false);
+            }
+        });
+
+        menu.add(navigateToTest);
+        menu.add(pinTest);
+        menu.add(unpinTest);
+
+        return menu;
+    }
     @NotNull
     private List<PycrunchTestMetadata> get_selected_tests_from_tree() {
         TreePath[] paths = _testTree.getSelectionPaths();

@@ -16,6 +16,6 @@ public abstract class ToggleTestsAbstract extends ToggleAction {
 
     protected void notifyPycrunchUi(@NotNull AnActionEvent e) {
         MessageBus bus = e.getProject().getComponent(MessageBus.class);
-        bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC).applyWordWrap();
+        bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC).refillTestList();
     }
 }
