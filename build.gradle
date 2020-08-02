@@ -11,7 +11,7 @@ intellij {
     intellij.updateSinceUntilBuild false
 }
 group 'com.pycrunch'
-version '1.1-rc3'
+version '1.1'
 
 sourceCompatibility = 1.8
 
