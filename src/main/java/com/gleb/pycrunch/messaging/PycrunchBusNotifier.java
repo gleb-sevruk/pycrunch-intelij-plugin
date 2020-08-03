@@ -1,5 +1,6 @@
-package com.gleb.pycrunch;
+package com.gleb.pycrunch.messaging;
 
+import com.gleb.pycrunch.PycrunchTestMetadata;
 import com.intellij.util.messages.Topic;
 
 public interface PycrunchBusNotifier {

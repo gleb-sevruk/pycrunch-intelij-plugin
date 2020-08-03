@@ -3,6 +3,7 @@ package com.gleb.pycrunch;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
+import icons.PycrunchIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,9 +11,6 @@ import javax.swing.*;
 import java.util.HashSet;
 
 public class PycrunchTestGutterPopup extends BaseListPopupStep {
-    private final ImageIcon _imageGreen;
-    private final ImageIcon _imageRed;
-    private final Icon _imageProgress;
     private HashSet<String> strings;
     private PycrunchConnector _connector;
     private Project _project;
@@ -24,9 +22,6 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
         _connector = connector;
         _project = project;
         _line = line;
-        _imageGreen = new ImageIcon(getClass().getResource("/circle-green.png"));
-        _imageProgress = new ImageIcon(getClass().getResource("/circle-progress.png"));
-        _imageRed = new ImageIcon(getClass().getResource("/circle-red.png"));
     }
 
     @Override
@@ -39,17 +34,17 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
         String status = _connector.GetTestStatus((String) value);
 
         if (status.equals("failed")) {
-            return _imageRed;
+            return PycrunchIcons.CIRCLE_RED;
         }
         if (status.equals("queued")) {
-            return _imageProgress;
+            return PycrunchIcons.CIRCLE_PROGRESS;
         }
 
         if (status.equals("pending")) {
-            return _imageProgress;
+            return PycrunchIcons.CIRCLE_PROGRESS;
         }
 
-        return _imageGreen;
+        return PycrunchIcons.CIRCLE_GREEN;
     }
 
 

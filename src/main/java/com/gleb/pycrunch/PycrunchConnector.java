@@ -7,8 +7,13 @@ import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
 import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
+import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
+import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
 import com.gleb.pycrunch.shared.GlobalKeys;
+import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
+import com.intellij.ide.ActivityTracker;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
@@ -36,6 +41,8 @@ public class PycrunchConnector {
     private String api_uri = "http://127.0.0.1";
     private int _port;
     private PycrunchCombinedCoverage _combined_coverage;
+    private boolean _upgradeNoticeAlreadyShownInCurrentSession;
+    public boolean _canTerminateTestRun;
 
     public PycrunchConnector() {
         PycrunchConnector.CounterOfSingletons++;
@@ -103,9 +110,23 @@ public class PycrunchConnector {
         String mode = data.getString("engine_mode");
 
         this.engineDidLoadMode(mode);
+        this.showUpgradeNoticeIfEngineOutdated(version_major, version_minor);
         this.engineDidLoadVersion(version_major, version_minor);
     }
 
+    private void showUpgradeNoticeIfEngineOutdated(int major, int minor) {
+//        last known version at the moment of writing is 1.1
+        if (_upgradeNoticeAlreadyShownInCurrentSession) {
+            return;
+        }
+
+        boolean reallyOld = major < 1;
+        boolean minorVersionIsOld = major == 1 && minor < 1;
+        if (reallyOld || minorVersionIsOld) {
+            IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
+            _upgradeNoticeAlreadyShownInCurrentSession = true;
+        }
+    }
 
 
     public void AttachToEngine(Project project) throws Exception {
@@ -157,6 +178,11 @@ public class PycrunchConnector {
     private String full_api_url() {
         return api_uri + ':' + _port;
     }
+    public void TerminateRun() throws JSONException {
+        JSONObject obj = new JSONObject();
+        obj.put("action", "watchdog-terminate");
+        this._socket.emit("my event", obj);
+    }
 
     public void RunTests(List<PycrunchTestMetadata> tests) throws JSONException {
         JSONObject obj = new JSONObject();
@@ -192,6 +218,12 @@ public class PycrunchConnector {
     }
 
     private void combinedCoverageDidUpdate() {
+        EventQueue.invokeLater(() -> {
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
+        });
+    }
+
+    private void watchdogWillBegin() {
         EventQueue.invokeLater(() -> {
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
         });
@@ -330,14 +362,6 @@ public class PycrunchConnector {
         return _bus;
     }
 
-//    public String get_result_status() {
-//        if (_result == null) {
-//            return "unknown";
-//        }
-//
-//        return _result.status;
-//    }
-
     public String get_marker_color_for(String absolute_path, Integer line_number) {
         SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage.GetLinesCovering(absolute_path);
         if (singleFileCombinedCoverage == null) {
@@ -399,12 +423,39 @@ public class PycrunchConnector {
                 case "combined_coverage_updated":
                     ApplyCombinedCoverage(data);
                     break;
-
+                case "watchdog_begin":
+                    WatchdogBegin(data);
+                    break;
+                case "watchdog_end":
+                    WatchdogEnd(data);
+                    break;
             }
         } catch (JSONException e) {
             System.out.println(e.toString());
-
         }
+    }
+
+    private void WatchdogEnd(JSONObject data) {
+        _canTerminateTestRun = false;
+        emit_syntetic_event();
+        EventQueue.invokeLater(() -> {
+            emit_syntetic_event();
+            this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogEnd();
+        });
+    }
+
+    private void WatchdogBegin(JSONObject data) throws JSONException {
+        int totalTests = data.getInt("total_tests");
+        _canTerminateTestRun = true;
+        emit_syntetic_event();
+        EventQueue.invokeLater(() -> {
+            emit_syntetic_event();
+            this._bus.syncPublisher(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC).watchdogBegin(totalTests);
+        });
+    }
+
+    private void emit_syntetic_event() {
+        ActivityTracker.getInstance().inc();
     }
 
     public void pin_tests(List<PycrunchTestMetadata> tests) throws JSONException {

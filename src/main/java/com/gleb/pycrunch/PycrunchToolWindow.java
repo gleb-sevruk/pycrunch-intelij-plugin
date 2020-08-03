@@ -1,12 +1,16 @@
 package com.gleb.pycrunch;
 
 import com.gleb.pycrunch.actions.ToggleTestPinnedState;
-import com.gleb.pycrunch.activation.ActivationForm;
+import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
+import com.gleb.pycrunch.messaging.PycrunchToolbarBus;
+import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
 import com.gleb.pycrunch.shared.EngineMode;
 import com.gleb.pycrunch.shared.PycrunchWindowStateService;
 import com.gleb.pycrunch.ui.PycrunchDefaultTestTree;
 import com.gleb.pycrunch.ui.PycrunchTreeState;
-import com.intellij.icons.AllIcons;
+import com.intellij.ide.ActivityTracker;
+import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonPainter;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -19,29 +23,20 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.*;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBRadioButton;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBus;
-import com.intellij.util.ui.JBUI;
+import icons.PycrunchIcons;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import javax.swing.*;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeWillExpandListener;
+import javax.swing.event.*;
+import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.net.URL;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,132 +46,45 @@ public class PycrunchToolWindow {
     private EngineMode _engineMode;
     private PycrunchConnector _connector;
     private JPanel myToolWindowContent;
-    private JButton runSelectedButton;
     private JTextArea textArea1;
     private JLabel label_engine_status;
-    private JToolBar top_toolbar;
-    private JToggleButton togglePassedTests;
-    private JToggleButton toggleFailedTests;
-    private JToggleButton togglePendingTests;
-    private JButton settingsButton;
-    private JToggleButton togglePinnedTests;
     private JButton activateButton;
-    private JSplitPane _splitPane;
     private Tree _testTree;
-    private JButton _expandAllButton;
-    private JButton _collapseAllButton;
+    private JLabel _lblWatchdogText;
+    private JPanel panelWatchdog;
+    private JPanel _pcPanelToolbar;
+    private JScrollPane _surfaceTestList;
+    private JScrollPane _surfaceTestOutput;
+    private JBSplitter _splitterJb;
+
+
     private JLabel label1;
     private Project _project;
     private MessageBus _bus;
     private String _selectedTestFqn;
-    private String _version_string;
 
     private ListSpeedSearch _listSpeedSearch;
     private TreeSpeedSearch _treeSpeedSearch;
     private PycrunchTreeState _treeState;
+    private PycrunchConnectionState _connectionState = new PycrunchConnectionState();
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
         _project = project;
         _connector = connector;
         _uiState = ServiceManager.getService(_project, PycrunchWindowStateService.class);
+        _engineMode = ServiceManager.getService(_project, EngineMode.class);
         _treeState = new PycrunchTreeState();
-        top_toolbar.setVisible(false);
-        _splitPane.setVisible(false);
-        _engineMode = new EngineMode(_connector);
 
-        attach_events();
         this.ui_will_mount();
 
 
         connect_to_message_bus();
         _connector.invalidateLicenseStateAndNotifyUI();
-
-//        top_toolbar.setRollover(false);
-//        togglePassedTests.setBackground(JBColor.background());
-
-        settingsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        settingsButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                JBPopupMenu menu = create_engine_mode_popup();
-                menu.show(settingsButton, e.getPoint().x, e.getPoint().y);
-            }
-        });
-        activateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ActivationForm wrap = new ActivationForm(_project);
-
-                boolean pressed_ok = wrap.showAndGet();
-                if (pressed_ok) {
-                    System.out.println("Activation in another form");
-                }
-            }
-        });
     }
 
-    private JBPopupMenu create_engine_mode_popup() {
-        String currentMode = _engineMode._mode;
-        JBPopupMenu menu = new JBPopupMenu();
-        JBRadioButton option_auto = new JBRadioButton("Run tests automatically");
-        option_auto.setSelected(currentMode.equals(_engineMode.mode_run_all_automatically));
-        option_auto.setMargin(JBUI.insets(10));
-        option_auto.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                _engineMode.SetAutomaticMode();
-            }
-        });
 
-
-        JBRadioButton option_manual = new JBRadioButton("Run all tests manually");
-        option_manual.setSelected(currentMode.equals(_engineMode.mode_manual));
-        option_manual.setMargin(JBUI.insets(10));
-        option_manual.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                _engineMode.SetManualMode();
-            }
-        });
-
-        JBRadioButton option_pinned_only = new JBRadioButton("Run pinned automatically, others manually");
-        option_pinned_only.setSelected(currentMode.equals(_engineMode.mode_pinned_automatically));
-        option_pinned_only.setMargin(JBUI.insets(10));
-        option_pinned_only.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                _engineMode.SetPinnedOnlyMode();
-            }
-        });
-
-        JBCheckBox wrap_output_checkbox = new JBCheckBox("Wrap test output");
-        wrap_output_checkbox.setSelected(_uiState._wrapOutput);
-        wrap_output_checkbox.setMargin(JBUI.insets(10));
-        wrap_output_checkbox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                _uiState._wrapOutput = !_uiState._wrapOutput;
-                applyWordWrap();
-            }
-        });
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(option_auto);
-        group.add(option_manual);
-        group.add(option_pinned_only);
-
-        menu.add(option_auto);
-        menu.add(option_manual);
-        menu.add(option_pinned_only);
-
-        menu.add(wrap_output_checkbox);
-
-        return menu;
-    }
-
-    private void applyWordWrap() {
+    private void _applyWordWrap() {
         textArea1.setLineWrap(_uiState._wrapOutput);
     }
 
@@ -209,43 +117,12 @@ public class PycrunchToolWindow {
                     System.out.println("null is selected instead of tests; returning...");
                     return;
                 }
+
                 JBPopupMenu menu = create_test_list_popup(selectedValuesList);
                 menu.show(_testTree, e.getPoint().x, e.getPoint().y);
-
             }
         };
     }
-
-    @NotNull
-    private List<PycrunchTestMetadata> get_selected_tests_from_tree() {
-        TreePath[] paths = _testTree.getSelectionPaths();
-        if (paths == null) {
-            return new ArrayList<>();
-        }
-
-        List<PycrunchTestMetadata> selectedValuesList = new ArrayList<>();
-
-        for (TreePath path : paths) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-
-            System.out.println("You've selected: " + node);
-            if (node.getUserObject() instanceof PycrunchTestMetadata) {
-                selectedValuesList.add((PycrunchTestMetadata) node.getUserObject());
-            } else {
-//                has children
-                if (node.getChildCount() > 0) {
-                    Collections.list(node.children()).forEach(__ -> {
-                        Object userObject = ((DefaultMutableTreeNode) __).getUserObject();
-                        if (userObject instanceof PycrunchTestMetadata) {
-                            selectedValuesList.add((PycrunchTestMetadata) userObject);
-                        }
-                    });
-                }
-            }
-        }
-        return selectedValuesList;
-    }
-
     @NotNull
     private JBPopupMenu create_test_list_popup(List<PycrunchTestMetadata> selectedValuesList) {
         JBPopupMenu menu = new JBPopupMenu();
@@ -280,15 +157,36 @@ public class PycrunchToolWindow {
 
         return menu;
     }
+    @NotNull
+    private List<PycrunchTestMetadata> get_selected_tests_from_tree() {
+        TreePath[] paths = _testTree.getSelectionPaths();
+        if (paths == null) {
+            return new ArrayList<>();
+        }
 
-    private void attach_events() {
-        runSelectedButton.addActionListener(e -> run_selected());
-        _expandAllButton .addActionListener(e-> expandAll());
-        _collapseAllButton .addActionListener(e-> collapseAll());
-//        highlightFileButton.addActionListener(e -> update_all_highlighting());
+        List<PycrunchTestMetadata> selectedValuesList = new ArrayList<>();
+
+        for (TreePath path : paths) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+            if (node.getUserObject() instanceof PycrunchTestMetadata) {
+                selectedValuesList.add((PycrunchTestMetadata) node.getUserObject());
+            } else {
+//                has children
+                if (node.getChildCount() > 0) {
+                    Collections.list(node.children()).forEach(__ -> {
+                        Object userObject = ((DefaultMutableTreeNode) __).getUserObject();
+                        if (userObject instanceof PycrunchTestMetadata) {
+                            selectedValuesList.add((PycrunchTestMetadata) userObject);
+                        }
+                    });
+                }
+            }
+        }
+        return selectedValuesList;
     }
 
-    private void collapseAll() {
+    private void _collapseAll() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) _testTree.getModel().getRoot();
         if (root == null) {
             return;
@@ -300,7 +198,7 @@ public class PycrunchToolWindow {
         });
     }
 
-    private void expandAll() {
+    private void _expandAll() {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) _testTree.getModel().getRoot();
         if (root == null) {
             return;
@@ -337,7 +235,7 @@ public class PycrunchToolWindow {
                 if (cachedDocument != null) {
                     connector.invalidate_markers(cachedDocument, _project);
                 } else {
-                    System.out.println("cached document is null " + __);
+//                    System.out.println("cached document is null " + __);
                 }
             } else {
                 System.out.println("!! updating highlighting -> fileByPath is null " + __);
@@ -354,13 +252,50 @@ public class PycrunchToolWindow {
         if (cachedDocument != null) {
             connector.invalidate_markers(cachedDocument, _project);
         } else {
-            System.out.println("cached document is null " + fileByPath.getPath());
+//            System.out.println("cached document is null " + fileByPath.getPath());
         }
     }
 
     public void connect_to_message_bus() {
         connect_pycrunch_bus();
+        connect_watchdog_bus();
+        connect_toolbar_bus();
+
         connect_intellij_events_bus();
+    }
+
+    private void connect_toolbar_bus() {
+        _bus.connect().subscribe(PycrunchToolbarBus.CHANGE_ACTION_TOPIC, new PycrunchToolbarBus() {
+            @Override
+            public void runSelectedTests() {
+                run_selected();
+            }
+
+            @Override
+            public void terminateTestRun() {
+                terminate_run();
+            }
+
+            @Override
+            public void refillTestList() {
+                fill_test_list();
+            }
+
+            @Override
+            public void collapseAll() {
+                _collapseAll();
+            }
+
+            @Override
+            public void expandAll() {
+                _expandAll();
+            }
+
+            @Override
+            public void applyWordWrap() {
+                _applyWordWrap();
+            }
+        });
     }
 
     private void connect_intellij_events_bus() {
@@ -379,18 +314,42 @@ public class PycrunchToolWindow {
         label_engine_status.setText(text);
 
     }
+
+    private void connect_watchdog_bus() {
+        _bus.connect().subscribe(PycrunchWatchdogBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchWatchdogBusNotifier() {
+            @Override
+            public void watchdogBegin(int test_count) {
+                String text;
+                if (test_count == 1) {
+                    text = "1 test queued...";
+                } else {
+                    text = test_count + " tests queued...";
+                }
+                _lblWatchdogText.setText(text);
+                panelWatchdog.setVisible(true);
+                ActivityTracker.getInstance().inc();
+            }
+
+            @Override
+            public void watchdogEnd() {
+                panelWatchdog.setVisible(false);
+                ActivityTracker.getInstance().inc();
+            }
+        });
+    }
     private void connect_pycrunch_bus() {
         _bus.connect().subscribe(PycrunchBusNotifier.CHANGE_ACTION_TOPIC, new PycrunchBusNotifier() {
             @Override
             public void beforeAction(String event) {
-                textArea1.setText(_connector.GetCapturedOutput("todo"));
+                textArea1.setText("Test output will be captured here");
                 fill_test_list();
 //                update_all_highlighting();
 
             }
             @Override
             public void engineDidConnect(String apiRoot) {
-                setStatus("Connected to " + apiRoot);
+                _connectionState._apiRoot = apiRoot;
+                setStatus(_connectionState.statusText());
             }
             @Override
             public void engineDidDisconnect(String context){
@@ -403,8 +362,6 @@ public class PycrunchToolWindow {
 
             @Override
             public void licenceInvalid() {
-                top_toolbar.setVisible(false);
-                _splitPane.setVisible(false);
                 label_engine_status.setVisible(false);
                 activateButton.setVisible(true);
             }
@@ -427,9 +384,9 @@ public class PycrunchToolWindow {
 
             @Override
             public void engineDidLoadVersion(int version_major, int version_minor) {
-                _version_string = String.format("v%s.%d", String.valueOf(version_major), version_minor);
-                setStatus(label_engine_status.getText() + " (" + _version_string + ")");
+                _connectionState.engineVersion(version_major, version_minor);
 
+                setStatus(_connectionState.statusText());
             }
 
             @Override
@@ -439,12 +396,16 @@ public class PycrunchToolWindow {
 
             @Override
             public void licenceActivated() {
-                top_toolbar.setVisible(true);
-                _splitPane.setVisible(true);
                 label_engine_status.setVisible(true);
-                activateButton.setVisible(false);
             }
         });
+    }
+    private void terminate_run() {
+        try {
+            _connector.TerminateRun();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void run_selected() {
@@ -465,27 +426,82 @@ public class PycrunchToolWindow {
         // Get current date and time
 
         fill_test_list();
-        configure_buttons();
-        applyWordWrap();
+        build_action_toolbars();
+        _applyWordWrap();
         configure_test_tree();
-        configure_split_pane();
+        configure_watchdog_panel();
+    }
 
+    private void build_action_toolbars() {
+        DefaultActionGroup toolbarGroup = new DefaultActionGroup();
+        ActionManager actionManager = ActionManager.getInstance();
+        String loc = "Pycrunch_Right_Toolbar";
+        ActionToolbar toolbar =
+                actionManager.createActionToolbar(
+                        loc, toolbarGroup, true);
+        toolbarGroup.add(
+                actionManager.getAction("PyChrunch.RunSelectedTests")
+        );
+
+
+
+        toolbarGroup.addSeparator();
+        toolbarGroup.add(
+                actionManager.getAction("PyChrunch.TerminateTestRun")
+        );
+
+        toolbarGroup.addSeparator();
+
+        ArrayList<String> actions = new ArrayList<String>();
+        actions.add("PyChrunch.TogglePassedTests");
+        actions.add("PyChrunch.ToggleFailedTests");
+        actions.add("PyChrunch.TogglePendingTests");
+        actions.add("PyChrunch.TogglePinnedTests");
+        for (String __ : actions) {
+            toolbarGroup.add(actionManager.getAction(__));
+        }
+        toolbarGroup.addSeparator();
+
+        toolbarGroup.add(actionManager.getAction("PyChrunch.ExpandAllTests"));
+        toolbarGroup.add(actionManager.getAction("PyChrunch.CollapseAllTests"));
+
+
+
+        String ROW_CONTEXT_MENU_ID = "PyChrunch.SettingsPopup";
+        ActionGroup rowContextMenu = (ActionGroup) actionManager.getAction(ROW_CONTEXT_MENU_ID);
+        ActionPopupMenu popupMenu = actionManager.createActionPopupMenu(ROW_CONTEXT_MENU_ID, rowContextMenu);
+        toolbarGroup.addAction(popupMenu.getActionGroup());
+        toolbarGroup.addSeparator();
+        toolbarGroup.add(
+                actionManager.getAction("PyChrunch.RunEngine")
+        );
+
+        toolbar.setTargetComponent(_pcPanelToolbar);
+        _pcPanelToolbar.add(toolbar.getComponent());
     }
 
 
-    private void configure_split_pane() {
-        _splitPane.setDividerLocation(_uiState._splitPanePosition);
+    private void fix_button_press_effect(JButton buttonToFix) {
+//        This fixed buttons inability to be in pressed state.
+        buttonToFix.setBorder(new DarculaButtonPainter());
+        buttonToFix.setUI(new BasicButtonUI());
+        buttonToFix.getModel().addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                ButtonModel model = (ButtonModel) e.getSource();
+                if (model.isRollover()) {
+                    buttonToFix.setBorderPainted(false);
+                } else if (model.isPressed()) {
+                    buttonToFix.setBorderPainted(true);
+                } else {
+                    buttonToFix.setBorderPainted(false);
+                }
+            }
+        });
+    }
 
-        _splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY,
-                new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent pce) {
-                        System.out.println(pce.toString());
-                        _uiState._splitPanePosition = (int)pce.getNewValue();
-
-
-                    }
-                });
+    private void configure_watchdog_panel() {
+        panelWatchdog.setVisible(false);
     }
 
     private void configure_test_tree() {
@@ -501,7 +517,7 @@ public class PycrunchToolWindow {
 
                 //Print the name of the node if toString() was implemented
                 String data = node.getUserObject().toString();
-                System.out.println("WillCollapse: " + data);
+//                System.out.println("WillCollapse: " + data);
                 _treeState.nodeWillCollapse(data);
             }
 
@@ -528,12 +544,12 @@ public class PycrunchToolWindow {
                     Object userObject = tree_node.getUserObject();
                     if (userObject instanceof PycrunchTestMetadata) {
 
-                        ImageIcon icon = icon_from_state(((PycrunchTestMetadata) userObject).state);
+                        Icon icon = icon_from_state(((PycrunchTestMetadata) userObject).state);
                         setIcon(icon);
                     } else {
                         // module node
                         String moduleStatus = _connector.GetModuleStatus((String) userObject);
-                        ImageIcon icon = icon_from_state(moduleStatus);
+                        Icon icon = icon_from_state(moduleStatus);
                         setIcon(icon);
                     }
                 }
@@ -544,103 +560,25 @@ public class PycrunchToolWindow {
 
 
             @NotNull
-            private ImageIcon icon_from_state(String state) {
-                URL resource = getClass().getResource("/list_pending.png");
+            private Icon icon_from_state(String state) {
+                Icon resource = PycrunchIcons.TEST_LIST_PENDING;
                 if (state != null) {
                     if (state.equals("success")) {
-                        resource = getClass().getResource("/list_success.png");
+                        resource = PycrunchIcons.TEST_LIST_SUCCESS;
                     }
                     if (state.equals("failed")) {
-                        resource = getClass().getResource("/list_failed.png");
+                        resource = PycrunchIcons.TEST_LIST_FAILED;
                     }
                     if (state.equals("queued")) {
-                        resource = getClass().getResource("/list_queued.png");
+                        resource = PycrunchIcons.TEST_LIST_QUEUED;
                     }
                 }
 
-                return new ImageIcon(resource);
+                return resource;
             }
         });
     }
     // top bar icons - toggle passed/failed/pinned
-    private void configure_buttons() {
-        togglePassedTests.setFocusable(false);
-        togglePassedTests.setUI(get_metal_toggle_ui());
-        togglePassedTests.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean state = togglePassedTests.isSelected();
-                if (state) {
-
-                    System.out.println("Selected passed tests!");
-                } else {
-                    System.out.println("Deselected passed tests");
-                }
-                _uiState._showPassedTests = state;
-                fill_test_list();
-            }
-        });
-        togglePassedTests.setSelected(_uiState._showPassedTests);
-
-        toggleFailedTests.setFocusable(false);
-        toggleFailedTests.setUI(get_metal_toggle_ui());
-        toggleFailedTests.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean state = toggleFailedTests.isSelected();
-                if (state) {
-                    System.out.println("Selected failed tests!");
-                } else {
-                    System.out.println("Deselected failed tests");
-                }
-                _uiState._showFailedTests = state;
-                fill_test_list();
-            }
-        });
-        toggleFailedTests.setSelected(_uiState._showFailedTests);
-
-        togglePendingTests.setFocusable(false);
-        togglePendingTests.setUI(get_metal_toggle_ui());
-        togglePendingTests.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean state = togglePendingTests.isSelected();
-                if (state) {
-                    System.out.println("Selected pending tests!");
-                } else {
-                    System.out.println("Deselected pending tests");
-                }
-                _uiState._showPendingTests = state;
-
-                fill_test_list();
-
-            }
-        });
-        togglePendingTests.setSelected(_uiState._showPendingTests);
-
-        togglePinnedTests.setFocusable(false);
-        togglePinnedTests.setUI(get_metal_toggle_ui());
-        togglePinnedTests.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean state = togglePinnedTests.isSelected();
-                if (state) {
-                    System.out.println("Selected pinned tests!");
-                } else {
-                    System.out.println("Deselected pinned tests");
-                }
-                _uiState._showPinnedTests = state;
-
-                fill_test_list();
-
-            }
-        });
-        togglePinnedTests.setSelected(_uiState._showPinnedTests);
-
-        _expandAllButton.setIcon(AllIcons.Actions.Expandall);
-        _collapseAllButton.setIcon(AllIcons.Actions.Collapseall);
-
-    }
 
     @NotNull
     private MetalToggleButtonUI get_metal_toggle_ui() {
@@ -695,10 +633,13 @@ public class PycrunchToolWindow {
             return true;
         }
 
-        if (_uiState._showPendingTests && (test.state.equals("pending") || test.state.equals("queued"))) {
+        if (_uiState._showPendingTests && (test.state.equals("pending"))) {
             return true;
         }
 
+        if (test.state.equals("queued")) {
+            return true;
+        }
         return false;
     }
 

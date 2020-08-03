@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import icons.PycrunchIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +13,6 @@ import java.net.URL;
 
 public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements DumbAware {
     private final Icon _imageRed;
-    private final Icon _imageIcon2;
     private final Icon _imageGreen;
     private final Icon _imageProgress;
     public int _line;
@@ -26,11 +26,9 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         this.status = status;
         _filename = filename;
         _project = project;
-        URL resource = getClass().getResource("/circle-green.png");
-        _imageGreen = new ImageIcon(resource);
-        _imageIcon2 =new ImageIcon(getClass().getResource("/cherry-icon.png"));
-        _imageRed = new ImageIcon(getClass().getResource("/circle-red.png"));
-        _imageProgress = new ImageIcon(getClass().getResource("/circle-progress.png"));
+        _imageGreen = PycrunchIcons.CIRCLE_GREEN;
+        _imageRed = PycrunchIcons.CIRCLE_RED;
+        _imageProgress = PycrunchIcons.CIRCLE_PROGRESS;
 
     }
 
@@ -58,18 +56,17 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 //        if (_line % 2 == 0 ){
 //            return _imageIcon2;
 //        }
-        if (status.equals("failed")) {
-            return _imageRed;
+        switch (status) {
+            case "success":
+                return _imageGreen;
+            case "failed":
+                return _imageRed;
+            case "queued":
+            case "pending":
+                return _imageProgress;
+            default:
+                return _imageGreen;
         }
-
-        if (status.equals("queued")) {
-            return _imageProgress;
-        }
-        if (status.equals("pending")) {
-            return _imageProgress;
-        }
-
-        return _imageGreen;
     }
     public AnAction getClickAction() {
         return new ShowCoveringTestsAction(_project, this);
