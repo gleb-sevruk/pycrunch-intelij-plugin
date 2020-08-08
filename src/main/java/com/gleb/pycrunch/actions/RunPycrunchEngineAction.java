@@ -103,6 +103,7 @@ public class RunPycrunchEngineAction extends AnAction {
     private RunnerAndConfigurationSettings create_run_configuration_for_project(Project project) {
         RunnerAndConfigurationSettings settings;
         RunManager runManager = RunManager.getInstance(project);
+
         PythonConfigurationType.PythonConfigurationFactory factory = PythonConfigurationType.getInstance().getFactory();
         settings = runManager.createConfiguration("pycrunch-engine - auto", factory);
 //        runManager.addConfiguration(xxx);

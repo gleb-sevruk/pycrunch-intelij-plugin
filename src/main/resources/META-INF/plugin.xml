@@ -197,6 +197,7 @@ Official Site:
 
 
             <separator/>
+            <action id="PyChrunch.RunDebugPycrunchEngineAction" class="com.gleb.pycrunch.actions.RunDebugPycrunchEngineAction" text="Run debug" description="Starts debugger" />
             <action id="PyChrunch.ConnectToCustomPycrunchEngineAction" class="com.gleb.pycrunch.actions.ConnectToCustomPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
 <!--            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />-->
             <separator/>
