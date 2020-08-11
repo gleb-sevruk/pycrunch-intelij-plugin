@@ -13,7 +13,12 @@ import com.gleb.pycrunch.shared.GlobalKeys;
 import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.ide.ActivityTracker;
+import com.intellij.ide.impl.DataManagerImpl;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
@@ -185,13 +190,33 @@ public class PycrunchConnector {
     }
 
     public void RunTests(List<PycrunchTestMetadata> tests) throws JSONException {
+        this.DebugOrRunTests(tests, "run-tests", 0);
+    }
+
+    public void DebugTests(List<PycrunchTestMetadata> tests) throws JSONException {
+        ActionManager actionManager = ActionManager.getInstance();
+        AnAction debugAction = actionManager.getAction("PyChrunch.RunDebugPycrunchEngineAction");
+        AnActionEvent actionEvent = AnActionEvent.createFromDataContext(
+                ActionPlaces.UNKNOWN,
+                null,
+                DataManagerImpl.getInstance().getDataContext());
+        debugAction.actionPerformed(actionEvent);
+        int userData = (int)_project.getUserData(GlobalKeys.REMOTE_DEBUG_PORT_KEY);
+        this.DebugOrRunTests(tests, "debug-tests", userData);
+    }
+
+    private void DebugOrRunTests(List<PycrunchTestMetadata> tests, String action, int port) throws JSONException {
         JSONObject obj = new JSONObject();
-        obj.put("action", "run-tests");
+        obj.put("action", action);
 
         JSONArray payload = new JSONArray();
         for (PycrunchTestMetadata __ : tests) {
             payload.put(__.to_json());
         }
+        if (action.equals("debug-tests")) {
+            obj.put("debugger_port", port);
+        }
+
         obj.put("tests", payload);
         this._socket.emit("my event", obj);
     }

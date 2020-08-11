@@ -118,6 +118,13 @@ Official Site:
                 icon="PycrunchIcons.TOOLBAR_RUN" >
 
         </action>
+        <action id="PyChrunch.DebugSelectedTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.DebugSelectedTests"
+                text="Debug Selected Tests" description="Start remote debugger and runs tests"
+                icon="AllIcons.Actions.StartDebugger" >
+
+        </action>
+
         <action id="PyChrunch.TerminateTestRun"
                 class="com.gleb.pycrunch.actions.toolbarActions.TerminateTestRun"
                 text="Terminate Current Run" description="Terminate Current Run"

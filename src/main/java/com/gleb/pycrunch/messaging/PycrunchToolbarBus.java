@@ -7,6 +7,7 @@ public interface PycrunchToolbarBus {
     Topic<PycrunchToolbarBus> CHANGE_ACTION_TOPIC = Topic.create("pycrunch.toolbar", PycrunchToolbarBus.class);
 
     void runSelectedTests();
+    void debugSelectedTests();
     void terminateTestRun();
 
     void refillTestList();
