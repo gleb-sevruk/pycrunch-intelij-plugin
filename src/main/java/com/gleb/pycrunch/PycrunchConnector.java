@@ -7,6 +7,7 @@ import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
 import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
+import com.gleb.pycrunch.debugging.PyRemoteDebugState;
 import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
 import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
 import com.gleb.pycrunch.shared.GlobalKeys;
@@ -194,13 +195,9 @@ public class PycrunchConnector {
     }
 
     public void DebugTests(List<PycrunchTestMetadata> tests) throws JSONException {
-        ActionManager actionManager = ActionManager.getInstance();
-        AnAction debugAction = actionManager.getAction("PyChrunch.RunDebugPycrunchEngineAction");
-        AnActionEvent actionEvent = AnActionEvent.createFromDataContext(
-                ActionPlaces.UNKNOWN,
-                null,
-                DataManagerImpl.getInstance().getDataContext());
-        debugAction.actionPerformed(actionEvent);
+        PyRemoteDebugState debugState = ServiceManager.getService(_project, com.gleb.pycrunch.debugging.PyRemoteDebugState.class);
+
+        debugState.build_configuration_and_run_debugger(_project);
         int userData = (int)_project.getUserData(GlobalKeys.REMOTE_DEBUG_PORT_KEY);
         this.DebugOrRunTests(tests, "debug-tests", userData);
     }

@@ -103,6 +103,7 @@ Official Site:
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchWindowStateService"/>
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchVariablesWindowStateService"/>
         <projectService serviceImplementation="com.gleb.pycrunch.shared.EngineMode"/>
+        <projectService serviceImplementation="com.gleb.pycrunch.debugging.PyRemoteDebugState"/>
 
 
         <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
