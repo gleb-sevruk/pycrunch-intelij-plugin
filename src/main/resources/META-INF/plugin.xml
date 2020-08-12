@@ -121,7 +121,7 @@ Official Site:
         </action>
         <action id="PyChrunch.DebugSelectedTests"
                 class="com.gleb.pycrunch.actions.toolbarActions.DebugSelectedTests"
-                text="Debug Selected Tests" description="Start remote debugger and runs tests"
+                text="Debug Selected Tests" description="Start remote debugger and run test (Remember to set breakpoint before you launch debugger)"
                 icon="AllIcons.Actions.StartDebugger" >
 
         </action>
