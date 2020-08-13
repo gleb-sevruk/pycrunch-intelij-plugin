@@ -121,13 +121,13 @@ public class PycrunchConnector {
     }
 
     private void showUpgradeNoticeIfEngineOutdated(int major, int minor) {
-//        last known version at the moment of writing is 1.1
+//        last known version at the moment of writing is 1.2
         if (_upgradeNoticeAlreadyShownInCurrentSession) {
             return;
         }
 
         boolean reallyOld = major < 1;
-        boolean minorVersionIsOld = major == 1 && minor < 1;
+        boolean minorVersionIsOld = major == 1 && minor < 2;
         if (reallyOld || minorVersionIsOld) {
             IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
             _upgradeNoticeAlreadyShownInCurrentSession = true;
