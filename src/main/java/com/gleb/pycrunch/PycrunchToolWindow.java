@@ -238,13 +238,13 @@ public class PycrunchToolWindow {
 //                    System.out.println("cached document is null " + __);
                 }
             } else {
-                System.out.println("!! updating highlighting -> fileByPath is null " + __);
+//                System.out.println("!! updating highlighting -> fileByPath is null " + __);
             }
         });
 
         long elapsedTime = System.nanoTime() - start;
         long diffInMillis = elapsedTime/1000000;
-        System.out.println("redraw markers elapsed: " + diffInMillis + "ms");
+//        System.out.println("redraw markers elapsed: " + diffInMillis + "ms");
     }
 
     private void update_highlighting_in_single_file(PycrunchHighlighterMarkersState connector, VirtualFile fileByPath) {
