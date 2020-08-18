@@ -131,19 +131,6 @@ public class PycrunchHighlighterMarkersState {
         highlighter = markup.addPersistentLineHighlighter(myLine, 5001, (TextAttributes)null);
         if (highlighter != null) {
             highlighter.setGutterIconRenderer(new PyCrunchGutterIconRenderer(myLine, status, absolute_path, project));
-            TextAttributes textAttributes = (TextAttributes) ObjectUtils.notNull(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(CodeInsightColors.BOOKMARKS_ATTRIBUTES), new TextAttributes());
-//            Color stripeColor = (Color)ObjectUtils.notNull(textAttributes.getErrorStripeColor(), new JBColor(0, 14408667));
-//            highlighter.setErrorStripeMarkColor(stripeColor);
-//            highlighter.setErrorStripeTooltip("abc");
-            TextAttributes attributes = highlighter.getTextAttributes();
-            if (attributes == null) {
-                attributes = new TextAttributes();
-            }
-
-//            attributes.setBackgroundColor(new JBColor(0x35D5DB, 14408667));
-            attributes.setBackgroundColor(textAttributes.getBackgroundColor());
-            attributes.setForegroundColor(textAttributes.getForegroundColor());
-            highlighter.setTextAttributes(attributes);
             all_highlighters_per_current_file.add(highlighter);
 //            markup.fireAfterAdded(highlighter);
 

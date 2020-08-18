@@ -103,6 +103,7 @@ Official Site:
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchWindowStateService"/>
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchVariablesWindowStateService"/>
         <projectService serviceImplementation="com.gleb.pycrunch.shared.EngineMode"/>
+        <projectService serviceImplementation="com.gleb.pycrunch.debugging.PyRemoteDebugState"/>
 
 
         <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
@@ -118,6 +119,13 @@ Official Site:
                 icon="PycrunchIcons.TOOLBAR_RUN" >
 
         </action>
+        <action id="PyChrunch.DebugSelectedTests"
+                class="com.gleb.pycrunch.actions.toolbarActions.DebugSelectedTests"
+                text="Debug Selected Tests" description="Start remote debugger and run test (Remember to set breakpoint before you launch debugger)"
+                icon="AllIcons.Actions.StartDebugger" >
+
+        </action>
+
         <action id="PyChrunch.TerminateTestRun"
                 class="com.gleb.pycrunch.actions.toolbarActions.TerminateTestRun"
                 text="Terminate Current Run" description="Terminate Current Run"
@@ -197,6 +205,7 @@ Official Site:
 
 
             <separator/>
+            <action id="PyChrunch.RunDebugPycrunchEngineAction" class="com.gleb.pycrunch.actions.RunDebugPycrunchEngineAction" text="Run debug" description="Starts debugger" />
             <action id="PyChrunch.ConnectToCustomPycrunchEngineAction" class="com.gleb.pycrunch.actions.ConnectToCustomPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
 <!--            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />-->
             <separator/>

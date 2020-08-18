@@ -4,5 +4,6 @@ import com.intellij.openapi.util.Key;
 
 public  class GlobalKeys {
     public static Key PORT_KEY = new Key<>("PYCRUNCH_PORT");
+    public static Key REMOTE_DEBUG_PORT_KEY = new Key<>("PYCRUNCH_REMOTE_DEBUG_PORT");
     public static Key DOCUMENT_PATH_KEY = new Key<>("PYCRUNCH_DOCUMENT_PATH");
 }

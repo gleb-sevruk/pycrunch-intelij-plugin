@@ -238,13 +238,13 @@ public class PycrunchToolWindow {
 //                    System.out.println("cached document is null " + __);
                 }
             } else {
-                System.out.println("!! updating highlighting -> fileByPath is null " + __);
+//                System.out.println("!! updating highlighting -> fileByPath is null " + __);
             }
         });
 
         long elapsedTime = System.nanoTime() - start;
         long diffInMillis = elapsedTime/1000000;
-        System.out.println("redraw markers elapsed: " + diffInMillis + "ms");
+//        System.out.println("redraw markers elapsed: " + diffInMillis + "ms");
     }
 
     private void update_highlighting_in_single_file(PycrunchHighlighterMarkersState connector, VirtualFile fileByPath) {
@@ -269,6 +269,11 @@ public class PycrunchToolWindow {
             @Override
             public void runSelectedTests() {
                 run_selected();
+            }
+
+            @Override
+            public void debugSelectedTests() {
+                debug_selected();
             }
 
             @Override
@@ -421,6 +426,19 @@ public class PycrunchToolWindow {
         }
     }
 
+    public void debug_selected() {
+
+        List<PycrunchTestMetadata> selectedValue = get_selected_tests_from_tree();
+        if (selectedValue == null || selectedValue.size() <= 0) {
+            return;
+        }
+
+        try {
+            _connector.DebugTests(selectedValue);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void ui_will_mount() {
         // Get current date and time
@@ -442,10 +460,14 @@ public class PycrunchToolWindow {
         toolbarGroup.add(
                 actionManager.getAction("PyChrunch.RunSelectedTests")
         );
-
-
-
         toolbarGroup.addSeparator();
+
+        toolbarGroup.add(
+                actionManager.getAction("PyChrunch.DebugSelectedTests")
+        );
+        toolbarGroup.addSeparator();
+
+
         toolbarGroup.add(
                 actionManager.getAction("PyChrunch.TerminateTestRun")
         );
