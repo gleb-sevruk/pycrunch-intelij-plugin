@@ -38,7 +38,7 @@ public class PyRemoteDebugState {
 
         project.putUserData(GlobalKeys.REMOTE_DEBUG_PORT_KEY, port);
         parameters.setPort(port);
-        settings.getConfiguration().setAllowRunningInParallel(false);
+//        settings.getConfiguration().setAllowRunningInParallel(false);
 
         return settings;
     }
