@@ -118,7 +118,7 @@ public class PyCrunchVariablesWindow {
             return;
         }
 
-        ScrollableJBTextEditor editor = new ScrollableJBTextEditor(_variableValueText.getText(), _project, new JsonFileType());
+        ScrollableJBTextEditor editor = new ScrollableJBTextEditor(_variableValueText.getText(), _project, JsonFileType.INSTANCE);
         Font font = EditorColorsManager.getInstance().getGlobalScheme().getFont(EditorFontType.PLAIN);
 //                    font = new Font(font.getFontName(), font.getStyle(), font.getSize());
         editor.setFont(font);

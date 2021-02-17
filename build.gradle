@@ -11,7 +11,7 @@ intellij {
     intellij.updateSinceUntilBuild false
 }
 group 'com.pycrunch'
-version '1.2'
+version '1.2.1'
 
 sourceCompatibility = 1.8
 
@@ -30,6 +30,7 @@ dependencies {
 //}
 patchPluginXml {
     changeNotes """
-    Added ability to start test debugging. <br><br>
+    Fixed deprecated invocation inside variables timeline. <br><br>
+    Added forgotten hi-resolution icon for pending test. <br><br>
     """
 }
