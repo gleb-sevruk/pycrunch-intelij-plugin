@@ -4,17 +4,13 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import icons.PycrunchIcons;
+import icons.PycrunchCachedIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.net.URL;
 
 public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements DumbAware {
-    private final Icon _imageRed;
-    private final Icon _imageGreen;
-    private final Icon _imageProgress;
     public int _line;
     private String status;
     public String _filename;
@@ -26,9 +22,6 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
         this.status = status;
         _filename = filename;
         _project = project;
-        _imageGreen = PycrunchIcons.CIRCLE_GREEN;
-        _imageRed = PycrunchIcons.CIRCLE_RED;
-        _imageProgress = PycrunchIcons.CIRCLE_PROGRESS;
 
     }
 
@@ -45,7 +38,7 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 
     @Override
     public int hashCode() {
-        return _imageGreen.hashCode();
+        return PycrunchCachedIcons.CIRCLE_GREEN.hashCode();
     }
 
     @Override
@@ -58,14 +51,14 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
 //        }
         switch (status) {
             case "success":
-                return _imageGreen;
+                return PycrunchCachedIcons.CIRCLE_GREEN;
             case "failed":
-                return _imageRed;
+                return PycrunchCachedIcons.CIRCLE_RED;
             case "queued":
             case "pending":
-                return _imageProgress;
+                return PycrunchCachedIcons.CIRCLE_PROGRESS;
             default:
-                return _imageGreen;
+                return PycrunchCachedIcons.CIRCLE_GREEN;
         }
     }
     public AnAction getClickAction() {

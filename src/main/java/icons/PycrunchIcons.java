@@ -6,21 +6,22 @@ import javax.swing.Icon;
 
 
 public interface PycrunchIcons {
-    Icon TEST_LIST_PENDING = IconLoader.getIcon("/list_pending.png");
-    Icon TEST_LIST_QUEUED = IconLoader.getIcon("/list_queued.png");
-    Icon TEST_LIST_FAILED = IconLoader.getIcon("/list_failed.png");
-    Icon TEST_LIST_SUCCESS = IconLoader.getIcon("/list_success.png");
+    static Icon TEST_LIST_PENDING = IconLoader.getIcon("/list_pending.png", PycrunchIcons.class);
+    static Icon TEST_LIST_QUEUED = IconLoader.getIcon("/list_queued.png", PycrunchIcons.class);
+    static Icon TEST_LIST_FAILED = IconLoader.getIcon("/list_failed.png", PycrunchIcons.class);
+    static Icon TEST_LIST_SUCCESS = IconLoader.getIcon("/list_success.png", PycrunchIcons.class);
 
-    Icon CIRCLE_GREEN = IconLoader.getIcon("/circle-green.png");
-    Icon CIRCLE_RED= IconLoader.getIcon("/circle-red.png");
-    Icon CIRCLE_PROGRESS= IconLoader.getIcon("/circle-progress.png");
+    static Icon CIRCLE_GREEN = IconLoader.getIcon("/circle-green.png", PycrunchIcons.class);
+    static Icon CIRCLE_RED= IconLoader.getIcon("/circle-red.png", PycrunchIcons.class);
+    static Icon CIRCLE_PROGRESS= IconLoader.getIcon("/circle-progress.png", PycrunchIcons.class);
 
-    Icon TOOLBAR_TOGGLE_PENDING = IconLoader.getIcon("/pending.png");
-    Icon TOOLBAR_TOGGLE_FAILED = IconLoader.getIcon("/cross.png");
-    Icon TOOLBAR_TOGGLE_PINNED = IconLoader.getIcon("/pin.png");
-    Icon TOOLBAR_TOGGLE_SUCCESS = IconLoader.getIcon("/check.png");
+    static Icon TOOLBAR_TOGGLE_PENDING = IconLoader.getIcon("/pending.png", PycrunchIcons.class);
+    static Icon TOOLBAR_TOGGLE_FAILED = IconLoader.getIcon("/cross.png", PycrunchIcons.class);
+    static Icon TOOLBAR_TOGGLE_PINNED = IconLoader.getIcon("/pin.png", PycrunchIcons.class);
+    static Icon TOOLBAR_TOGGLE_SUCCESS = IconLoader.getIcon("/check.png", PycrunchIcons.class);
 
-    Icon TOOLBAR_RUN = IconLoader.getIcon("/run.png");
+    static Icon TOOLBAR_RUN = IconLoader.getIcon("/run.png", PycrunchIcons.class);
 
-    Icon TOOLBAR_CONNECT = IconLoader.getIcon("/connect_icon.png");
+    static Icon TOOLBAR_CONNECT = IconLoader.getIcon("/connect_icon.png", PycrunchIcons.class);
 }
+
