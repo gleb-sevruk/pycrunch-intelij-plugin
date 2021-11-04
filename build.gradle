@@ -1,26 +1,34 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.9'
+
+    id 'org.jetbrains.intellij' version '1.2.1'
 }
 
 intellij {
-    // PC-LATEST-EAP-SNAPSHOT is also available here
-    version 'PY-2019.2.1'
-    type 'PY'
-    downloadSources true
-    intellij.updateSinceUntilBuild false
+    plugins = ['python']
+    version = 'PY-2021.2'
+    type = 'PY'
+    downloadSources = false
 }
+
+buildSearchableOptions {
+    enabled = false
+}
+//autoReloadPlugins = true
+
+
 group 'com.pycrunch'
 version '1.2.2'
 
-sourceCompatibility = 1.8
-
+//sourceCompatibility = 1.8
+sourceCompatibility = 11
 repositories {
     mavenCentral()
 }
+//https://github.com/JetBrains/intellij-sdk-code-samples/blob/main/product_specific/pycharm_basics/src/main/resources/META-INF/plugin.xml
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+//    testCompile group: 'junit', name: 'junit', version: '4.12'
     implementation 'com.github.nkzawa:socket.io-client:0.6.0'
 }
 
@@ -29,7 +37,9 @@ dependencies {
 //    version '2019.1.3'
 //}
 patchPluginXml {
-    changeNotes """
+    sinceBuild = '203'
+//    untilBuild = '212.*'
+    changeNotes = """
     Fixed issue with degraded smooth scrolling performance while rendering line markers<br><br>
     """
 }

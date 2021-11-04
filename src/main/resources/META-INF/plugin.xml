@@ -87,6 +87,7 @@ Official Site:
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
 <!--    &lt;!&ndash; uncomment to enable plugin in all products-->
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
 <!--    &ndash;&gt;-->
@@ -109,6 +110,7 @@ Official Site:
         <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
         <toolWindow id="PyCrunch Timeline" canCloseContents="true" icon="/logo.svg" anchor="bottom" factoryClass="com.gleb.pycrunch.timeline.PyCrunchVariablesWindowFactory"/>
 
+        <notificationGroup id="Custom Notification Group" displayType="BALLOON" key="Pycrunch"/>
 
     </extensions>
 
