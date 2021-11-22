@@ -131,6 +131,7 @@ public class PycrunchHighlighterMarkersState {
         highlighter = markup.addPersistentLineHighlighter(myLine, 5001, (TextAttributes)null);
         if (highlighter != null) {
             highlighter.setGutterIconRenderer(new PyCrunchGutterIconRenderer(myLine, status, absolute_path, project));
+            highlighter.setAfterEndOfLine(false);
             all_highlighters_per_current_file.add(highlighter);
 //            markup.fireAfterAdded(highlighter);
 

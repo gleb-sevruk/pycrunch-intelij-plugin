@@ -28,9 +28,9 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
     @Override
     @NotNull
     public GutterIconRenderer.Alignment getAlignment() {
-        GutterIconRenderer.Alignment var10000 = Alignment.RIGHT ;
-        return var10000;
+        return Alignment.LEFT;
     }
+
     @Override
     public boolean equals(Object o) {
         return (o instanceof PyCrunchGutterIconRenderer) && ((PyCrunchGutterIconRenderer) o)._line == _line;
