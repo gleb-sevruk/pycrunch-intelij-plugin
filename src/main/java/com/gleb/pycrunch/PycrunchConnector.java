@@ -259,11 +259,17 @@ public class PycrunchConnector {
 
     private void engineWillTryToReconnect() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
             this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineWillTryToReconnect("---");
         });
     }
     private void engineDidFailToReconnect() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
             this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineDidFailToReconnect("---");
         });
     }

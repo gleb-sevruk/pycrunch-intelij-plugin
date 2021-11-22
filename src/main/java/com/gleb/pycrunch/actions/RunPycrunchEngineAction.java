@@ -70,7 +70,6 @@ public class RunPycrunchEngineAction extends AnAction {
             _map.put(project, settings);
         }
         Executor runExecutorInstance = DefaultRunExecutor.getRunExecutorInstance();
-
         ExecutionUtil.runConfiguration(settings, runExecutorInstance);
     }
 
@@ -88,7 +87,9 @@ public class RunPycrunchEngineAction extends AnAction {
         RunManager runManager = RunManager.getInstance(project);
 
         PythonConfigurationType.PythonConfigurationFactory factory = PythonConfigurationType.getInstance().getFactory();
+
         settings = runManager.createConfiguration("pycrunch-engine - auto", factory);
+
 //        runManager.addConfiguration(xxx);
 //        runManager.
 //        runManager.makeStable(xxx);
@@ -98,7 +99,6 @@ public class RunPycrunchEngineAction extends AnAction {
         AbstractPythonRunConfigurationParams baseParams = parameters.getBaseParams();
         baseParams.setWorkingDirectory(basePath);
         parameters.setScriptName("pycrunch.main");
-
 
         int port = FreePort.find_free_port();
 

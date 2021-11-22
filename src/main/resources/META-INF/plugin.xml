@@ -82,7 +82,8 @@ Official Site:
 
 
     ]]></description>
-    <idea-version since-build="192" />
+
+    <idea-version since-build="203" />
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -91,7 +92,9 @@ Official Site:
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
 <!--    &ndash;&gt;-->
-
+    <applicationListeners>
+        <listener class="com.gleb.pycrunch.PluginLoadEvents" topic="com.intellij.ide.plugins.DynamicPluginListener"></listener>
+    </applicationListeners>
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceImplementation="com.gleb.pycrunch.activation.MyStateService"/>
 
@@ -110,7 +113,7 @@ Official Site:
         <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
         <toolWindow id="PyCrunch Timeline" canCloseContents="true" icon="/logo.svg" anchor="bottom" factoryClass="com.gleb.pycrunch.timeline.PyCrunchVariablesWindowFactory"/>
 
-        <notificationGroup id="Custom Notification Group" displayType="BALLOON" key="Pycrunch"/>
+        <notificationGroup id="Pycrunch-engine Connector Plugin" displayType="BALLOON" key="pycrunch.connector.notification_group"/>
 
     </extensions>
 

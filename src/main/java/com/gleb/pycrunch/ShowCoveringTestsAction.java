@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.HashSet;
 
-public class ShowCoveringTestsAction extends AnAction implements AnAction.TransparentUpdate, DumbAware {
+public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
     private final PycrunchConnector _connector;
     private Object myInitialBreakpoint;
     private final Project _project;
@@ -30,7 +30,6 @@ public class ShowCoveringTestsAction extends AnAction implements AnAction.Transp
 
 
     public void actionPerformed(@NotNull AnActionEvent e) {
-//        System.out.println("AAA?!");
         Editor editor = e.getData(PlatformDataKeys.EDITOR);
         Project project = e.getData(PlatformDataKeys.PROJECT);
         HashSet<String> strings = _connector.GetCoveredLinesForFile(_gutterIcon._filename).TestsAtLine(_gutterIcon._line + 1);
@@ -41,7 +40,7 @@ public class ShowCoveringTestsAction extends AnAction implements AnAction.Transp
         int vpostoxy = editor.visualPositionToXY(visualPosition).y;
         int y = vpostoxy + editor.getLineHeight() / 2;
         int x = gutterComponent.getWidth();
-        point = new Point(x, y);
+//        point = new Point(x, y);
 
         JBPopupFactory.getInstance().createListPopup(new PycrunchTestGutterPopup(strings, _connector, project, _gutterIcon._line + 1)).show(new RelativePoint(gutterComponent, centerPoint));
     }
