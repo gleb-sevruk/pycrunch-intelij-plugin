@@ -9,7 +9,6 @@ public final class PluginLoadEvents implements DynamicPluginListener {
     @Override
     public void pluginUnloaded(@NotNull IdeaPluginDescriptor pluginDescriptor, boolean isUpdate) {
 //        System.out.println("pluginUnloaded ");
-
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.gleb.pycrunch.actions;
 
 import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.shared.GlobalKeys;
+import com.gleb.pycrunch.shared.IdeNotifications;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -18,6 +20,7 @@ public class ConnectToCustomPycrunchEngineAction extends AnAction {
     public ConnectToCustomPycrunchEngineAction() {
         // Set the menu item name.
         super("Connect to Custom PyCrunch _Engine");
+
         // Set the menu item name, description and icon.
         // super("Text _Boxes","Item description",IconLoader.getIcon("/Mypackage/icon.png"));
     }
@@ -35,10 +38,29 @@ public class ConnectToCustomPycrunchEngineAction extends AnAction {
         Project project = event.getData(PlatformDataKeys.PROJECT);
 //        ProjectManager.getInstance().addProjectManagerListener(project, new ProjectManagerListener() {
 //        });
-        String txt= Messages.showInputDialog(project, "Custom port when engine is running?", "Connect to PyCrunch Engine", Messages.getQuestionIcon(), "5000", null);
+        Object pycrunch_port = project.getUserData(GlobalKeys.PORT_KEY);
+        if (pycrunch_port == null) {
+            pycrunch_port = 5000;
+        }
+
+        String txt = Messages.showInputDialog(
+                project,
+                "Custom port where engine is running?",
+                "Connect to PyCrunch Engine",
+                Messages.getQuestionIcon(),
+                pycrunch_port.toString(),
+                null);
+        if (txt == null) {
+//            cancel
+            return;
+        }
         Integer port = tryParse(txt);
         if (port == null) {
-            Messages.showMessageDialog(project, "Invalid port entered, " + txt + "!", "PyCrunch ", Messages.getInformationIcon());
+            IdeNotifications.notify(
+                    project,
+                    "PyCrunch",
+                    "Cannot connect to custom port: " + txt,
+                    NotificationType.WARNING);
             return;
         }
 

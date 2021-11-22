@@ -83,7 +83,7 @@ Official Site:
 
     ]]></description>
 
-    <idea-version since-build="203" />
+    <idea-version since-build="203.5981.155" />
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -96,6 +96,9 @@ Official Site:
         <listener class="com.gleb.pycrunch.PluginLoadEvents" topic="com.intellij.ide.plugins.DynamicPluginListener"></listener>
     </applicationListeners>
     <extensions defaultExtensionNs="com.intellij">
+<!--        <runLineMarkerContributor language="Python"-->
+<!--                                  implementationClass="com.gleb.pycrunch.experimental.PycrunchLineMarkerContributor"/>-->
+
         <applicationService serviceImplementation="com.gleb.pycrunch.activation.MyStateService"/>
 
         <projectService serviceInterface="com.gleb.pycrunch.PycrunchHighlighterMarkersState"
