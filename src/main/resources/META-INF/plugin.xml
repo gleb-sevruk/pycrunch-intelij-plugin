@@ -8,7 +8,7 @@
     <ul>
     <li>Automatically runs impacted tests on code change</li>
     <li>Shows coverage inline with your code</li>
-    <li>See which lines are hit by each tests</li>
+    <li>See exactly what lines are hit by which test</li>
     <li>Instant feedback about failing tests and affected lines</li>
     <li>Captures output for each test separately, allowing better diagnostics per test</li>
     <li>Easy navigation between code and tests</li>
