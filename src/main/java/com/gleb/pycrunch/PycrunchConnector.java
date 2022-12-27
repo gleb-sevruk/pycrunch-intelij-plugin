@@ -20,7 +20,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
 import org.json.JSONArray;
@@ -52,7 +52,7 @@ public class PycrunchConnector {
 
     public PycrunchConnector() {
         PycrunchConnector.CounterOfSingletons++;
-        _persistentState = ServiceManager.getService(MyStateService.class);
+        _persistentState = ApplicationManager.getApplication().getService(MyStateService.class);
     }
 
     private Socket _socket;
@@ -137,6 +137,7 @@ public class PycrunchConnector {
 
     public void AttachToEngine(Project project) throws Exception {
         _project = project;
+
         _bus = project.getMessageBus();
         invalidateLicenseStateAndNotifyUI();
         Object pycrunch_port = project.getUserData(GlobalKeys.PORT_KEY);
@@ -195,7 +196,7 @@ public class PycrunchConnector {
     }
 
     public void DebugTests(List<PycrunchTestMetadata> tests) throws JSONException {
-        PyRemoteDebugState debugState = ServiceManager.getService(_project, com.gleb.pycrunch.debugging.PyRemoteDebugState.class);
+        PyRemoteDebugState debugState = _project.getService(com.gleb.pycrunch.debugging.PyRemoteDebugState.class);
 
         debugState.build_configuration_and_run_debugger(_project);
         int userData = (int)_project.getUserData(GlobalKeys.REMOTE_DEBUG_PORT_KEY);

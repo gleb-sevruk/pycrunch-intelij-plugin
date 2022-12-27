@@ -1,7 +1,6 @@
 package com.gleb.pycrunch;
 
 import com.gleb.pycrunch.shared.GlobalKeys;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
@@ -24,14 +23,14 @@ public class PycrunchHighlighterMarkersState {
     private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
 
     public void cleanup_everything(Project project) {
-        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+        PycrunchConnector connector = project.getService(PycrunchConnector.class);
         _highlighters_per_file.forEach(
                 (s, markers) -> markers.forEach(__ -> __.dispose()));
         _highlighters_per_file = new Hashtable<>();
     }
 
     public void invalidate_markers(Document document, Project project) {
-        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+        PycrunchConnector connector = project.getService(PycrunchConnector.class);
 
         int myLine = 0;
 //        System.out.println(myLine);
@@ -85,14 +84,6 @@ public class PycrunchHighlighterMarkersState {
             } else {
                 highlighter = null;
             }
-//        PycrunchConnector connector = ServiceManager.getService(PycrunchConnector.class);
-//        try {
-//            connector.AttachToEngine(project);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        String txt= Messages.showInputDialog(project, "What is your name?", "Input your name", Messages.getQuestionIcon());
-//        Messages.showMessageDialog(project, "Hello, " + txt + "!\n I am glad to see you.", "Information", Messages.getInformationIcon());
         }
         else {
             System.out.println("maybe path cannot be resolved: " + absolute_path);

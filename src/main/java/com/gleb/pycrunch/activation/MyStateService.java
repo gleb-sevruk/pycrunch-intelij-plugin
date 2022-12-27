@@ -1,5 +1,6 @@
 package com.gleb.pycrunch.activation;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 
@@ -26,6 +27,6 @@ public class MyStateService implements PersistentStateComponent<MyStateService> 
     }
 
     public static MyStateService getInstance() {
-        return ServiceManager.getService(MyStateService.class);
+        return ApplicationManager.getApplication().getService(MyStateService.class);
     }
 }

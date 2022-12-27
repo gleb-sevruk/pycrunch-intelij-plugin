@@ -1,7 +1,6 @@
 package com.gleb.pycrunch.timeline;
 
 import com.gleb.pycrunch.PycrunchConnector;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -14,18 +13,14 @@ public class PyCrunchVariablesWindowFactory implements ToolWindowFactory {
     // Create the tool window content.
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         MessageBus bus = project.getMessageBus();
-        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+        PycrunchConnector connector = project.getService(PycrunchConnector.class);
         toolWindow.setAutoHide(false);
         PyCrunchVariablesWindow pycrunchToolWindow = new PyCrunchVariablesWindow(toolWindow, project, bus, connector);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+//        TODO: Change to after 2022.2 only is supported
+//        ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(pycrunchToolWindow.getContent(), "Variables", false);
         toolWindow.getContentManager().addContent(content);
         content.setCloseable(false);
-
-        try {
-//            connector.AttachToEngine(project);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

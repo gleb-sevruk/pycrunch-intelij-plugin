@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
 
@@ -24,7 +23,7 @@ public class TerminateTestRun extends AnAction {
     @Override
     public void update(AnActionEvent e) {
         Project project = e.getData(PlatformDataKeys.PROJECT);
-        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+        PycrunchConnector connector = project.getService(PycrunchConnector.class);
         Presentation presentation = e.getPresentation();
         presentation.setEnabled(connector._canTerminateTestRun);
     }

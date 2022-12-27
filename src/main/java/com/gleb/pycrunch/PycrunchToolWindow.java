@@ -11,7 +11,6 @@ import com.gleb.pycrunch.ui.PycrunchTreeState;
 import com.intellij.ide.ActivityTracker;
 import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonPainter;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -72,8 +71,8 @@ public class PycrunchToolWindow {
         _bus = bus;
         _project = project;
         _connector = connector;
-        _uiState = ServiceManager.getService(_project, PycrunchWindowStateService.class);
-        _engineMode = ServiceManager.getService(_project, EngineMode.class);
+        _uiState = _project.getService(PycrunchWindowStateService.class);
+        _engineMode = _project.getService(EngineMode.class);
         _treeState = new PycrunchTreeState();
 
         this.ui_will_mount();
@@ -217,7 +216,7 @@ public class PycrunchToolWindow {
             return;
         }
 
-        PycrunchHighlighterMarkersState connector = ServiceManager.getService(_project, PycrunchHighlighterMarkersState.class);
+        PycrunchHighlighterMarkersState connector = _project.getService(PycrunchHighlighterMarkersState.class);
 
         HashSet<String> files_to_redraw = new HashSet<>();
 
@@ -308,7 +307,7 @@ public class PycrunchToolWindow {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
                 EventQueue.invokeLater(() -> {
-                    PycrunchHighlighterMarkersState highlighterMarkersState = ServiceManager.getService(_project, PycrunchHighlighterMarkersState.class);
+                    PycrunchHighlighterMarkersState highlighterMarkersState = _project.getService(PycrunchHighlighterMarkersState.class);
                     update_highlighting_in_single_file(highlighterMarkersState, file);
                 });
             }

@@ -12,7 +12,6 @@ import com.intellij.execution.runners.ExecutionUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.python.run.AbstractPythonRunConfigurationParams;
 import com.jetbrains.python.run.PythonConfigurationType;
@@ -42,7 +41,7 @@ public class RunPycrunchEngineAction extends AnAction {
     }
 
     private void cleanup_all_markers(Project project) {
-        PycrunchHighlighterMarkersState connector = ServiceManager.getService(project, PycrunchHighlighterMarkersState.class);
+        PycrunchHighlighterMarkersState connector = project.getService(PycrunchHighlighterMarkersState.class);
         connector.cleanup_everything(project);
     }
 
@@ -51,7 +50,7 @@ public class RunPycrunchEngineAction extends AnAction {
 
         exec.schedule(new Runnable() {
             public void run() {
-                PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+                PycrunchConnector connector = project.getService(PycrunchConnector.class);
                 try {
                     connector.AttachToEngine(project);
                 } catch (Exception e) {

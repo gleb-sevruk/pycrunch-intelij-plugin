@@ -5,7 +5,6 @@ import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.PycrunchTestMetadata;
 import com.gleb.pycrunch.shared.PycrunchVariablesWindowStateService;
 import com.intellij.json.JsonFileType;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.project.Project;
@@ -53,7 +52,7 @@ public class PyCrunchVariablesWindow {
         _project = project;
         _bus = bus;
         _connector = connector;
-        _uiState = ServiceManager.getService(_project, PycrunchVariablesWindowStateService.class);
+        _uiState = _project.getService(PycrunchVariablesWindowStateService.class);
 
         configure_split_pane();
         connect_pycrunch_bus();

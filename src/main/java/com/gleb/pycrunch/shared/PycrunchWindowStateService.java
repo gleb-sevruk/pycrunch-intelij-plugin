@@ -1,7 +1,7 @@
 package com.gleb.pycrunch.shared;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -26,6 +26,6 @@ public class PycrunchWindowStateService implements PersistentStateComponent<Pycr
     }
 
     public static PycrunchWindowStateService getInstance() {
-        return ServiceManager.getService(PycrunchWindowStateService.class);
+        return ApplicationManager.getApplication().getService(PycrunchWindowStateService.class);
     }
 }

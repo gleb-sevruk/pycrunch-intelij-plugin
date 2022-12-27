@@ -1,7 +1,6 @@
 package com.gleb.pycrunch;
 
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -24,7 +23,7 @@ public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
     public ShowCoveringTestsAction(Project project, PyCrunchGutterIconRenderer gutterIcon) {
         _project = project;
         _gutterIcon = gutterIcon;
-        _connector = ServiceManager.getService(_project, PycrunchConnector.class);
+        _connector = _project.getService(PycrunchConnector.class);
 
     }
 

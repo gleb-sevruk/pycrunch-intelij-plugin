@@ -1,6 +1,5 @@
 package com.gleb.pycrunch;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.*;
 import com.intellij.ui.content.*;
@@ -10,10 +9,12 @@ public class PyCrunchToolWindowFactory implements ToolWindowFactory {
     // Create the tool window content.
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         MessageBus bus = project.getMessageBus();
-        PycrunchConnector connector = ServiceManager.getService(project, PycrunchConnector.class);
+        PycrunchConnector connector = project.getService(PycrunchConnector.class);
         toolWindow.setAutoHide(false);
         PycrunchToolWindow pycrunchToolWindow = new PycrunchToolWindow(toolWindow, project, bus, connector);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+//        TODO: Change to after 2022.2 only is supported
+//        ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(pycrunchToolWindow.getContent(), "Tests", false);
         toolWindow.getContentManager().addContent(content);
         try {

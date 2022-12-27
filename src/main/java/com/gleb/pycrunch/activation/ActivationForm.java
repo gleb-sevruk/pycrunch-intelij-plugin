@@ -5,7 +5,7 @@ import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.credentialStore.Credentials;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.util.messages.MessageBus;
@@ -37,8 +37,8 @@ public class ActivationForm extends DialogWrapper {
     public ActivationForm(@Nullable Project project) {
         super(project);
         _bus = project.getMessageBus();
-        _connector = ServiceManager.getService(project, PycrunchConnector.class);
-        _persistentState = ServiceManager.getService(MyStateService.class);
+        _connector = project.getService(PycrunchConnector.class);
+        _persistentState = ApplicationManager.getApplication().getService(MyStateService.class);
 
         this._project = project;
         init();
