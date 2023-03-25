@@ -322,6 +322,10 @@ public class PycrunchToolWindow {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
                 EventQueue.invokeLater(() -> {
+                    if(_bus.isDisposed()) {
+                        return;
+                    }
+
                     PycrunchHighlighterMarkersState highlighterMarkersState = _project.getService(PycrunchHighlighterMarkersState.class);
                     update_highlighting_in_single_file(highlighterMarkersState, file);
                 });
@@ -388,7 +392,6 @@ public class PycrunchToolWindow {
             @Override
             public void did_select_test(PycrunchTestMetadata userObject) {
 //                System.out.println("FAKE! did_select_test" );
-
             }
 
             @Override

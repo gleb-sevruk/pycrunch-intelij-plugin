@@ -41,12 +41,13 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
-    Added feature to see exception prewiew;<br><br>
+    Added feature to see exception preview;<br><br>
     Alongside with exception preview popup there will be `Local Variables`, so you don't need to run debugger for simple cases;<br><br>
     Added separate gutter icon (red cross) for the lines where exception has occured.;<br><br>
     Added ability to navigate directly to exception from the test list.;<br><br>
     Added different colors for markers in indeterminate state (they will no longer be green).;<br><br>
     Fixed various issues where opening/closing project may use already disposed message bus;<br><br>
+    UI small gliches fixes when using 2023.1 Pycharm;<br><br>
     
     """
 }

@@ -58,7 +58,7 @@ public class PycrunchHighlighterMarkersState {
 
         SingleFileCombinedCoverage lines_covered = connector.GetCoveredLinesForFile(absolute_path);
         if (lines_covered == null) {
-            System.out.println("maybe path cannot be resolved: " + absolute_path);
+//            System.out.println("maybe path cannot be resolved: " + absolute_path);
             return;
         }
 
@@ -81,6 +81,7 @@ public class PycrunchHighlighterMarkersState {
     }
 
     private void cleanup_stale_or_renamed_markers(VirtualFile virtualFile, String new_path) {
+
         Object userData = virtualFile.getUserData(GlobalKeys.DOCUMENT_PATH_KEY);
         String previous_filename = (String) userData;
         if (previous_filename == null) {
