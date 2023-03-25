@@ -19,7 +19,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.3.1'
+version '1.5.0-alpha.3'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -41,6 +41,12 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
-    Added support for 2023.1<br><br>
+    Added feature to see exception prewiew;<br><br>
+    Alongside with exception preview popup there will be `Local Variables`, so you don't need to run debugger for simple cases;<br><br>
+    Added separate gutter icon (red cross) for the lines where exception has occured.;<br><br>
+    Added ability to navigate directly to exception from the test list.;<br><br>
+    Added different colors for markers in indeterminate state (they will no longer be green).;<br><br>
+    Fixed various issues where opening/closing project may use already disposed message bus;<br><br>
+    
     """
 }

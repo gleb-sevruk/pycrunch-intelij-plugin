@@ -1,6 +1,7 @@
 package com.gleb.pycrunch;
 
 import com.gleb.pycrunch.actions.ToggleTestPinnedState;
+import com.gleb.pycrunch.exceptionPreview.CapturedException;
 import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
 import com.gleb.pycrunch.messaging.PycrunchToolbarBus;
 import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
@@ -32,6 +33,7 @@ import org.json.JSONException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -132,6 +134,15 @@ public class PycrunchToolWindow {
             }
         });
 
+        CapturedException exceptionForCurrentTestUnderCursor = _connector.getExceptionFor(selectedValuesList.get(0).fqn);
+        JBMenuItem navigateToException = null;
+        if (exceptionForCurrentTestUnderCursor != null) {
+            navigateToException = new JBMenuItem("Navigate to exception");
+            navigateToException.addActionListener(e ->
+                    new NavigateToException().Go(selectedValuesList.get(0), exceptionForCurrentTestUnderCursor, _connector)
+            );
+
+        }
 
         String ending = "";
         if (selectedValuesList.size() > 1) {
@@ -151,6 +162,9 @@ public class PycrunchToolWindow {
         });
 
         menu.add(navigateToTest);
+        if (exceptionForCurrentTestUnderCursor != null) {
+            menu.add(navigateToException);
+        }
         menu.add(pinTest);
         menu.add(unpinTest);
 
@@ -211,7 +225,7 @@ public class PycrunchToolWindow {
 
     private void update_all_highlighting() {
         long start = System.nanoTime();
-        ConcurrentHashMap<String, TestRunResult> results = _connector.get_results();
+        ConcurrentHashMap<String, TestRunResult> results = _connector.get_test_run_results();
         if (results.size() <= 0) {
             return;
         }
@@ -231,6 +245,7 @@ public class PycrunchToolWindow {
             VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
             if (fileByPath != null) {
                 Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
+//                Document cachedDocument = FileDocumentManager.getInstance().getDocument(fileByPath);
                 if (cachedDocument != null) {
                     connector.invalidate_markers(cachedDocument, _project);
                 } else {
@@ -251,7 +266,7 @@ public class PycrunchToolWindow {
         if (cachedDocument != null) {
             connector.invalidate_markers(cachedDocument, _project);
         } else {
-//            System.out.println("cached document is null " + fileByPath.getPath());
+//            System.out.println("update_highlighting_in_single_file cached document is null " + fileByPath.getPath());
         }
     }
 
@@ -440,7 +455,6 @@ public class PycrunchToolWindow {
     }
 
     public void ui_will_mount() {
-        // Get current date and time
 
         fill_test_list();
         build_action_toolbars();
@@ -526,6 +540,8 @@ public class PycrunchToolWindow {
     }
 
     private void configure_test_tree() {
+        _surfaceTestList.setBorder(BorderFactory.createEmptyBorder());
+
         _testTree.addTreeSelectionListener(e -> tree_selection_did_change(e));
         _testTree.addMouseListener(tree_mouse_click_listener());
         _treeSpeedSearch = new TreeSpeedSearch(_testTree);
