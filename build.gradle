@@ -1,43 +1,47 @@
+buildscript {
+    ext {
+        junit = '5.8.1'
+        socketIO = '0.6.0'
+    }
+}
+
 plugins {
     id 'java'
-
     id 'org.jetbrains.intellij' version '1.10.1'
+}
+
+group = "$groupId"
+version = "$version"
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+//    TODO: substitute with implementation 'io.socket:socket.io-client:1.0.1'
+    implementation "com.github.nkzawa:socket.io-client:${socketIO}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junit}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junit}"
+}
+
+test {
+    useJUnitPlatform()
 }
 
 intellij {
     plugins = ['python']
     version = '231.8109-EAP-CANDIDATE-SNAPSHOT'
     type = 'PY'
-
     downloadSources = false
 }
 
 buildSearchableOptions {
     enabled = false
 }
-//autoReloadPlugins = true
 
-
-group 'com.pycrunch'
-version '1.5.0-alpha.3'
-
-//sourceCompatibility = 1.8
-sourceCompatibility = 11
-repositories {
-    mavenCentral()
-}
-//https://github.com/JetBrains/intellij-sdk-code-samples/blob/main/product_specific/pycharm_basics/src/main/resources/META-INF/plugin.xml
-
-dependencies {
-//    testCompile group: 'junit', name: 'junit', version: '4.12'
-    implementation 'com.github.nkzawa:socket.io-client:0.6.0'
-}
-
-
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-//intellij {
-//    version '2019.1.3'
-//}
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
@@ -48,6 +52,5 @@ patchPluginXml {
     Added different colors for markers in indeterminate state (they will no longer be green).;<br><br>
     Fixed various issues where opening/closing project may use already disposed message bus;<br><br>
     UI small gliches fixes when using 2023.1 Pycharm;<br><br>
-    
     """
 }
