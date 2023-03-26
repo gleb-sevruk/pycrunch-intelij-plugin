@@ -112,7 +112,7 @@
               <maximumSize width="2147483647" height="20"/>
               <minimumSize width="79" height="20"/>
               <preferredSize width="79" height="20"/>
-              <requestFocusEnabled value="true"/>
+              <requestFocusEnabled value="false"/>
             </properties>
             <border type="none"/>
             <children>
