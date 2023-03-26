@@ -93,9 +93,9 @@ public class PycrunchConnector {
         });
     }
 
-    private void engineDidLoadVersion(int version_major, int version_minor) {
+    private void engineDidLoadVersion(int version_major, int version_minor, int version_patch) {
         EventQueue.invokeLater(() -> {
-            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidLoadVersion(version_major, version_minor);
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidLoadVersion(version_major, version_minor, version_patch);
         });
     }
 
@@ -107,16 +107,21 @@ public class PycrunchConnector {
         }
         int version_major = version.getInt("major");
         int version_minor = version.getInt("minor");
+        int version_patch = 0;
+        if (version.has("patch")) {
+//            patch field added only in 1.5.x,
+            version_patch = version.getInt("patch");
+        }
 
 
         String mode = data.getString("engine_mode");
 
         this.engineDidLoadMode(mode);
-        this.showUpgradeNoticeIfEngineOutdated(version_major, version_minor);
-        this.engineDidLoadVersion(version_major, version_minor);
+        this.showUpgradeNoticeIfEngineOutdated(version_major, version_minor, version_patch);
+        this.engineDidLoadVersion(version_major, version_minor, version_patch);
     }
 
-    private void showUpgradeNoticeIfEngineOutdated(int major, int minor) {
+    private void showUpgradeNoticeIfEngineOutdated(int major, int minor, int version_patch) {
 //        last known version at the moment of writing is 1.3
         if (_upgradeNoticeAlreadyShownInCurrentSession) {
             return;

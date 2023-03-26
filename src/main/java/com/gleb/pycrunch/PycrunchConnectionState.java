@@ -20,7 +20,7 @@ public class PycrunchConnectionState {
     }
 
 
-    public void engineVersion(int version_major, int version_minor) {
-        _version_string = String.format("v%s.%d", String.valueOf(version_major), version_minor);
+    public void engineVersion(int version_major, int version_minor, int version_patch) {
+        _version_string = String.format("v%s.%d.%d", String.valueOf(version_major), version_minor, version_patch);
     }
 }

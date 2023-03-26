@@ -33,7 +33,6 @@ import org.json.JSONException;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicButtonUI;
-import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
@@ -405,8 +404,8 @@ public class PycrunchToolWindow {
             }
 
             @Override
-            public void engineDidLoadVersion(int version_major, int version_minor) {
-                _connectionState.engineVersion(version_major, version_minor);
+            public void engineDidLoadVersion(int version_major, int version_minor, int version_patch) {
+                _connectionState.engineVersion(version_major, version_minor, version_patch);
 
                 setStatus(_connectionState.statusText());
             }

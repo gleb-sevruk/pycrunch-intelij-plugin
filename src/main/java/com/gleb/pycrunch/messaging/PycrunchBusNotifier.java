@@ -19,7 +19,7 @@ public interface PycrunchBusNotifier {
 
     void engineDidLoadMode(String new_mode);
 
-    void engineDidLoadVersion(int version_major, int version_minor);
+    void engineDidLoadVersion(int version_major, int version_minor, int version_patch);
 
     void engineDidFailToReconnect(String dummy);
 }
