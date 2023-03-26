@@ -23,7 +23,7 @@ public class CombinedCoverageTest extends TestCase {
         PycrunchCombinedCoverage target = createTarget();
 
         String filename = "/Users/gleb/code/PyCrunch/tests_one.py";
-        SingleFileCombinedCoverage actual = target.GetLinesCovering(filename);
+        SingleFileCombinedCoverage actual = target.GetSingleFileCoverage(filename);
         HashSet<String> strings = actual._lines_hit_by_run.get(1);
         assertTrue(strings.contains("tests_one:test_1"));
         assertTrue(strings.contains("tests_one:test_6"));

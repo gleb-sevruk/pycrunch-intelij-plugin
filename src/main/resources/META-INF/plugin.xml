@@ -4,14 +4,16 @@
     <vendor email="support@pycrunch.com" url="https://pycrunch.com">PyCrunch</vendor>
 
     <description><![CDATA[
-    PyCrunch is an continuous test runner for Python.
+    PyCrunch is a continuous test runner for Python.
     <ul>
     <li>Automatically runs impacted tests on code change</li>
     <li>Shows coverage inline with your code</li>
     <li>See exactly what lines are hit by which test</li>
     <li>Instant feedback about failing tests and affected lines</li>
+    <li>Indicates the location where exceptions were recorded during test execution</li>
+    <li>Inspect stack trace and locals variables at the Exception point</li>
     <li>Captures output for each test separately, allowing better diagnostics per test</li>
-    <li>Easy navigation between code and tests</li>
+    <li>Easy navigation between code, tests, and test failure origin</li>
     <li>Support for Django</li>
 </ul>
 <br>

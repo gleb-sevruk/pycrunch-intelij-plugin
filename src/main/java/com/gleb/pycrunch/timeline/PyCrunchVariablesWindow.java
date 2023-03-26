@@ -211,7 +211,7 @@ public class PyCrunchVariablesWindow {
             }
 
             @Override
-            public void engineDidLoadVersion(int version_major, int version_minor) {
+            public void engineDidLoadVersion(int version_major, int version_minor, int version_patch) {
                 // unused here
             }
 

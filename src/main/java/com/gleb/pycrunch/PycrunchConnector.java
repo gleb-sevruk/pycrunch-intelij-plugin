@@ -8,18 +8,14 @@ import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
 import com.gleb.pycrunch.activation.MyStateService;
 import com.gleb.pycrunch.debugging.PyRemoteDebugState;
+import com.gleb.pycrunch.exceptionPreview.CapturedException;
 import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
 import com.gleb.pycrunch.messaging.PycrunchWatchdogBusNotifier;
 import com.gleb.pycrunch.shared.GlobalKeys;
 import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.ide.ActivityTracker;
-import com.intellij.ide.impl.DataManagerImpl;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
@@ -97,9 +93,9 @@ public class PycrunchConnector {
         });
     }
 
-    private void engineDidLoadVersion(int version_major, int version_minor) {
+    private void engineDidLoadVersion(int version_major, int version_minor, int version_patch) {
         EventQueue.invokeLater(() -> {
-            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidLoadVersion(version_major, version_minor);
+            ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidLoadVersion(version_major, version_minor, version_patch);
         });
     }
 
@@ -111,23 +107,28 @@ public class PycrunchConnector {
         }
         int version_major = version.getInt("major");
         int version_minor = version.getInt("minor");
+        int version_patch = 0;
+        if (version.has("patch")) {
+//            patch field added only in 1.5.x,
+            version_patch = version.getInt("patch");
+        }
 
 
         String mode = data.getString("engine_mode");
 
         this.engineDidLoadMode(mode);
-        this.showUpgradeNoticeIfEngineOutdated(version_major, version_minor);
-        this.engineDidLoadVersion(version_major, version_minor);
+        this.showUpgradeNoticeIfEngineOutdated(version_major, version_minor, version_patch);
+        this.engineDidLoadVersion(version_major, version_minor, version_patch);
     }
 
-    private void showUpgradeNoticeIfEngineOutdated(int major, int minor) {
+    private void showUpgradeNoticeIfEngineOutdated(int major, int minor, int version_patch) {
 //        last known version at the moment of writing is 1.3
         if (_upgradeNoticeAlreadyShownInCurrentSession) {
             return;
         }
 
         boolean reallyOld = major < 1;
-        boolean minorVersionIsOld = major == 1 && minor < 3;
+        boolean minorVersionIsOld = major == 1 && minor < 5;
         if (reallyOld || minorVersionIsOld) {
             IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
             _upgradeNoticeAlreadyShownInCurrentSession = true;
@@ -236,24 +237,40 @@ public class PycrunchConnector {
     }
     private void queueMessageBusEvent() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
+
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).beforeAction("---");
         });
     }
 
     private void combinedCoverageDidUpdate() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
+
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
         });
     }
 
     private void watchdogWillBegin() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
+
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).combinedCoverageDidUpdate("---");
         });
     }
 
     private void engineWillConnect() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
+
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidConnect(full_api_url());
         });
     }
@@ -278,6 +295,10 @@ public class PycrunchConnector {
 
     private void engineWillDisconnect() {
         EventQueue.invokeLater(() -> {
+            if (this._bus.isDisposed()) {
+                return;
+            }
+
             ((PycrunchBusNotifier) this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC)).engineDidDisconnect("---");
         });
     }
@@ -379,33 +400,53 @@ public class PycrunchConnector {
             return null;
         }
 
-        return _combined_coverage.GetLinesCovering(absolute_path);
+        return _combined_coverage.GetSingleFileCoverage(absolute_path);
     }
 
 
-    public ConcurrentHashMap<String, TestRunResult> get_results(){
+    public ConcurrentHashMap<String, TestRunResult> get_test_run_results(){
         return _results;
     }
 
+    /*
+      Returns the exception for the given test, or null if there is no exception
+     */
+    public CapturedException getExceptionFor(String fqn){
+        TestRunResult testRunResult = _results.get(fqn);
+        if (testRunResult == null){
+            return null;
+        }
+        if (testRunResult.captured_exception == null){
+            return null;
+        }
+
+        return testRunResult.captured_exception;
+    }
     public MessageBus GetMessageBus() {
         return _bus;
     }
 
-    public String get_marker_color_for(String absolute_path, Integer line_number) {
-        SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage.GetLinesCovering(absolute_path);
+    public String get_marker_color_for(String absolute_path, Integer line_number, HashSet<Integer> exceptions_in_current_file) {
+        SingleFileCombinedCoverage singleFileCombinedCoverage = _combined_coverage.GetSingleFileCoverage(absolute_path);
         if (singleFileCombinedCoverage == null) {
             System.out.println("get_marker_color_for " + absolute_path + " returned null");
             return "queued";
         }
+
         HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
         for (String fqn: tests_at_line) {
             String status = GetTestStatus(fqn);
-            // todo: this is piece of bullshit. need correct status icons
-//            if (status.equals("pending")) {
-//                return "pending";
-//            }
+            // TODO: Update the status icons in the Pycrunch IntelliJ connector code to reflect the correct status.
+            if (status.equals("pending")) {
+//                Pending?? This is when the test ran, but connector invalidates statuses.
+                return "pending";
+            }
             if (status.equals("failed")) {
+                if (exceptions_in_current_file.contains(line_number)) {
+                    return "exception";
+                }
                 return "failed";
+
             }
             if (status.equals("queued")) {
                 return "queued";
@@ -433,9 +474,6 @@ public class PycrunchConnector {
     }
     private void didReceiveSocketEvent(Object... args) {
         JSONObject data = (JSONObject) args[args.length - 1];
-        String str = data.toString();
-        String username;
-        String message;
 
         try {
             String evt = data.getString("event_type");
@@ -539,5 +577,18 @@ public class PycrunchConnector {
             return pycrunchTestMetadata.variables_state;
         }
         return new JSONArray();
+    }
+
+    public Set<Integer> get_captured_exception_lines_for_file(String absolutePath) {
+        Set<Integer> exception_lines = new HashSet<>();
+        for (TestRunResult testRunResult : _results.values()) {
+            if (testRunResult.captured_exception != null) {
+                CapturedException capturedException = testRunResult.captured_exception;
+                if (capturedException.filename.equals(absolutePath)) {
+                    exception_lines.add(testRunResult.captured_exception.line_number);
+                }
+            }
+        }
+        return exception_lines;
     }
 }

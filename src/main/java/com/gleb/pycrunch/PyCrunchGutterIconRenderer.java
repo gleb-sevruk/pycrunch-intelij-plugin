@@ -40,7 +40,6 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
     public int hashCode() {
         return PycrunchCachedIcons.CIRCLE_GREEN.hashCode();
     }
-
     @Override
     public @NotNull Icon getIcon() {
 //        if (_line % 3 == 0 ){
@@ -54,9 +53,12 @@ public  class PyCrunchGutterIconRenderer extends GutterIconRenderer implements D
                 return PycrunchCachedIcons.CIRCLE_GREEN;
             case "failed":
                 return PycrunchCachedIcons.CIRCLE_RED;
+            case "exception":
+                return PycrunchCachedIcons.EXCEPTION_CROSS;
             case "queued":
-            case "pending":
                 return PycrunchCachedIcons.CIRCLE_PROGRESS;
+            case "pending":
+                return PycrunchCachedIcons.CIRCLE_PENDING;
             default:
                 return PycrunchCachedIcons.CIRCLE_GREEN;
         }

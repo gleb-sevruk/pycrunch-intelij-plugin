@@ -13,7 +13,10 @@ public interface PycrunchIcons {
 
     static Icon CIRCLE_GREEN = IconLoader.getIcon("/circle-green.png", PycrunchIcons.class);
     static Icon CIRCLE_RED= IconLoader.getIcon("/circle-red.png", PycrunchIcons.class);
-    static Icon CIRCLE_PROGRESS= IconLoader.getIcon("/circle-progress.png", PycrunchIcons.class);
+
+    static Icon EXCEPTION_CROSS = IconLoader.getIcon("/exception-cross.png", PycrunchIcons.class);
+    static Icon CIRCLE_PROGRESS = IconLoader.getIcon("/circle-progress.png", PycrunchIcons.class);
+    static Icon CIRCLE_PENDING = IconLoader.getIcon("/circle-pending.png", PycrunchIcons.class);
 
     static Icon TOOLBAR_TOGGLE_PENDING = IconLoader.getIcon("/pending.png", PycrunchIcons.class);
     static Icon TOOLBAR_TOGGLE_FAILED = IconLoader.getIcon("/cross.png", PycrunchIcons.class);

@@ -9,6 +9,8 @@ import javax.swing.*;
 public class PycrunchCachedIcons {
     public static Icon CIRCLE_GREEN = IconLoader.getIconSnapshot(PycrunchIcons.CIRCLE_GREEN);
     public static Icon CIRCLE_RED = IconLoader.getIconSnapshot(PycrunchIcons.CIRCLE_RED);
+    public static Icon EXCEPTION_CROSS = IconLoader.getIconSnapshot(PycrunchIcons.EXCEPTION_CROSS);
     public static Icon CIRCLE_PROGRESS = IconLoader.getIconSnapshot(PycrunchIcons.CIRCLE_PROGRESS);
+    public static Icon CIRCLE_PENDING = IconLoader.getIconSnapshot(PycrunchIcons.CIRCLE_PENDING);
 
 }

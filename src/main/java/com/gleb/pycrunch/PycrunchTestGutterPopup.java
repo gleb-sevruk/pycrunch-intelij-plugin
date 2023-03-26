@@ -36,6 +36,7 @@ public class PycrunchTestGutterPopup extends BaseListPopupStep {
         if (status.equals("failed")) {
             return PycrunchIcons.CIRCLE_RED;
         }
+//        This smells strange, why two icons on the same state? (seems to be fixed, but lets keep monitoring)
         if (status.equals("queued")) {
             return PycrunchIcons.CIRCLE_PROGRESS;
         }

@@ -9,12 +9,22 @@ import java.util.HashSet;
 
 public class SingleFileCombinedCoverage {
     public HashMap<Integer, HashSet<String>> _lines_hit_by_run = new HashMap<>();
+    public HashSet<Integer> _exceptions = new HashSet<>();
 
     public static SingleFileCombinedCoverage from_json(JSONObject j) throws JSONException {
+        SingleFileCombinedCoverage result = new SingleFileCombinedCoverage();
+        if (j.has("exceptions")) {
+//            Since pycrunch-engine 1.5
+            var exception_lines = j.getJSONArray("exceptions");
+            for (int i = 0; i < exception_lines.length(); i++) {
+                int line_number = exception_lines.getInt(i);
+                result._exceptions.add(line_number);
+            }
+        }
+
         JSONObject lines = j.getJSONObject("lines_with_entrypoints");
         JSONArray array = lines.names();
 
-        SingleFileCombinedCoverage result = new SingleFileCombinedCoverage();
         for (int i = 0; i < array.length(); i++) {
             String line_number = array.getString(i);
             HashSet<String> current_line_fqns = new HashSet<>();

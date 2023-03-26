@@ -36,7 +36,6 @@ public class PycrunchHighlighterMarkersState {
 //        System.out.println(myLine);
 
         VirtualFile virtualFile = file_from_document(project, document);
-
         String absolute_path = virtualFile.getPath();
         ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
         if (!_highlighters_per_file.containsKey(absolute_path)) {
@@ -57,40 +56,32 @@ public class PycrunchHighlighterMarkersState {
 
         virtualFile.putUserData(GlobalKeys.DOCUMENT_PATH_KEY, absolute_path);
 
-
         SingleFileCombinedCoverage lines_covered = connector.GetCoveredLinesForFile(absolute_path);
-        if (lines_covered != null) {
-
-
-            MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
-            RangeHighlighterEx highlighter;
-            HashMap<Integer, HashSet<String>> lines_hit_by_run = lines_covered._lines_hit_by_run;
-            if (lines_hit_by_run != null) {
-                lines_hit_by_run.keySet()
-                        .forEach(
-                                __ -> addHighlighterForLine(
-                                        __ - 1,
-                                        connector.get_marker_color_for(absolute_path, __),
-                                        markup,
-                                        all_highlighters_per_current_file,
-                                        absolute_path,
-                                        project)
-                        );
-            }
-            if (myLine >= 0) {
-//            addHighlighterForLine(myLine, markup);
-//            addHighlighterForLine(myLine+1, markup);
-//            addHighlighterForLine(myLine+2, markup);
-            } else {
-                highlighter = null;
-            }
+        if (lines_covered == null) {
+//            System.out.println("maybe path cannot be resolved: " + absolute_path);
+            return;
         }
-        else {
-            System.out.println("maybe path cannot be resolved: " + absolute_path);
+
+        MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
+        RangeHighlighterEx highlighter;
+        HashMap<Integer, HashSet<String>> lines_hit_by_run = lines_covered._lines_hit_by_run;
+        var exceptions_in_current_file = lines_covered._exceptions;
+        if (lines_hit_by_run != null) {
+            lines_hit_by_run.keySet()
+                    .forEach(
+                            __ -> addHighlighterForLine(
+                                    __ - 1,
+                                    connector.get_marker_color_for(absolute_path, __, exceptions_in_current_file),
+                                    markup,
+                                    all_highlighters_per_current_file,
+                                    absolute_path,
+                                    project)
+                    );
         }
     }
 
     private void cleanup_stale_or_renamed_markers(VirtualFile virtualFile, String new_path) {
+
         Object userData = virtualFile.getUserData(GlobalKeys.DOCUMENT_PATH_KEY);
         String previous_filename = (String) userData;
         if (previous_filename == null) {

@@ -19,7 +19,7 @@ public class PycrunchDefaultTestTree {
 
     public DefaultMutableTreeNode getRoot() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(ROOT);
-
+//        TODO: Add more nesting options to the modules
         TreeMap<String, ArrayList<PycrunchTestMetadata>> modules = build_module_tree();
         for (String module_name : modules.keySet()) {
             DefaultMutableTreeNode module_tree_node = new DefaultMutableTreeNode(module_name);
