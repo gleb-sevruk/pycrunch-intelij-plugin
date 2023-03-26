@@ -11,7 +11,7 @@
     <li>See exactly what lines are hit by which test</li>
     <li>Instant feedback about failing tests and affected lines</li>
     <li>Indicates the location where exceptions were recorded during test execution</li>
-    <li>Inspect stack trace and locals variables at the Exception point</li>
+    <li>Inspect stack trace and locals variables at the exception point</li>
     <li>Captures output for each test separately, allowing better diagnostics per test</li>
     <li>Easy navigation between code, tests, and test failure origin</li>
     <li>Support for Django</li>
