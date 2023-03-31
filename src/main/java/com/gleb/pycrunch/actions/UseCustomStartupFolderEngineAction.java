@@ -27,7 +27,7 @@ public class UseCustomStartupFolderEngineAction extends AnAction {
         CachedRuntimeConfigurations cache = project.getService(CachedRuntimeConfigurations.class);
         String current_dir = RecentlyUsedFolders.getLastSelectedFolder(project);
         String userInput = Messages.showEditableChooseDialog(
-                "Custom directory where to run the engine?",
+                "Custom directory where to run the engine",
                 "Setting up custom working directory",
                 Messages.getQuestionIcon(),
                 RecentlyUsedFolders.getRecentFolders(project).toArray(new String[0]),
