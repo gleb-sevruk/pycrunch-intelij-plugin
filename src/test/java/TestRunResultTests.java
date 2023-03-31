@@ -20,6 +20,8 @@ public class TestRunResultTests  extends TestCase {
                         "          \"name\": \"test_failing\",\n" +
                         "          \"state\": \"failed\"\n" +
                         "        },\n" +
+                        "        \"variables_state\": [],\n" +
+
                         "        \"captured_output\": \"'/Users/gleb/code/PyCrunch/tests_two.py::test_failing'\\n" +
                                 "48574\\n" +
                                 "F\\n" +
