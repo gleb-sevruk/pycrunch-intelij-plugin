@@ -15,6 +15,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
@@ -36,9 +37,12 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PycrunchToolWindow {
@@ -262,6 +266,7 @@ public class PycrunchToolWindow {
     }
 
     private void update_highlighting_in_single_file(PycrunchHighlighterMarkersState connector, VirtualFile fileByPath) {
+//        System.out.println("update_highlighting_in_single_file " + fileByPath.getPath());
         Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
         if (cachedDocument != null) {
             connector.invalidate_markers(cachedDocument, _project);
@@ -321,18 +326,29 @@ public class PycrunchToolWindow {
         _bus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                EventQueue.invokeLater(() -> {
-                    if(_bus.isDisposed()) {
-                        return;
-                    }
-
-                    PycrunchHighlighterMarkersState highlighterMarkersState = _project.getService(PycrunchHighlighterMarkersState.class);
-                    update_highlighting_in_single_file(highlighterMarkersState, file);
-                });
+                update_highlighting_thread_safe(file);
             }
-
+            @Override
+            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                VirtualFile newFile = event.getNewFile();
+                if (newFile != null) {
+                    update_highlighting_thread_safe(newFile);
+                }
+            }
         });
     }
+
+    private void update_highlighting_thread_safe(@NotNull VirtualFile file) {
+        EventQueue.invokeLater(() -> {
+            if(_bus.isDisposed()) {
+                return;
+            }
+
+            PycrunchHighlighterMarkersState highlighterMarkersState = _project.getService(PycrunchHighlighterMarkersState.class);
+            update_highlighting_in_single_file(highlighterMarkersState, file);
+        });
+    }
+
     private void setStatus(String text) {
         label_engine_status.setText(text);
 
