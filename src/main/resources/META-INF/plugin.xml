@@ -113,6 +113,7 @@ Official Site:
         <projectService serviceImplementation="com.gleb.pycrunch.shared.PycrunchVariablesWindowStateService"/>
         <projectService serviceImplementation="com.gleb.pycrunch.shared.EngineMode"/>
         <projectService serviceImplementation="com.gleb.pycrunch.debugging.PyRemoteDebugState"/>
+        <projectService serviceImplementation="com.gleb.pycrunch.shared.CachedRuntimeConfigurations"/>
 
 
         <toolWindow id="PyCrunch" icon="/logo.svg" anchor="right" factoryClass="com.gleb.pycrunch.PyCrunchToolWindowFactory"/>
@@ -218,6 +219,9 @@ Official Site:
             <action id="PyChrunch.RunDebugPycrunchEngineAction" class="com.gleb.pycrunch.actions.RunDebugPycrunchEngineAction" text="Run debug" description="Starts debugger" />
             <action id="PyChrunch.ConnectToCustomPycrunchEngineAction" class="com.gleb.pycrunch.actions.ConnectToCustomPycrunchEngineAction" text="Attach to PyCrunch-Engine" description="A test menu item" />
 <!--            <action id="PyCrunch.RemoveLicence" class="com.gleb.pycrunch.actions.PycrunchRemoveLicenseAction" text="Remove _License" description="Removes previously bound license" />-->
+            <separator/>
+            <action id="PyChrunch.UseCustomStartupFolderEngineAction" class="com.gleb.pycrunch.actions.UseCustomStartupFolderEngineAction" text="Use custom Startup Directory" description="A test menu item" />
+
             <separator/>
             <action id="PyCrunch.DocumentationAction" class="com.gleb.pycrunch.actions.PycrunchOpenDocumentationAction" text="Documentation" description="Open documentation link" />
             <action id="PyCrunch.FreeInfo" class="com.gleb.pycrunch.actions.PycrunchFreePeriodInfoAction" text="Free Edition" description="Free edition information" >

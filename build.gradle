@@ -19,7 +19,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.5.0'
+version '1.5.1-alpha-1'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -41,6 +41,10 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
+    1.5.1<br><br>
+    Added ability to customize folder used to start up the test runner engine; Usefull if you have multiple python projects in same directory.<br><br> 
+    
+    1.5<br><br>
     Added feature to see exception preview;<br><br>
     Alongside with exception preview popup there will be `Local Variables`, so you don't need to run debugger for simple cases;<br><br>
     Added separate gutter icon (red cross) for the lines where exception has occured.;<br><br>

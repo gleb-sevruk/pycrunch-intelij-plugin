@@ -246,6 +246,7 @@ public class PycrunchToolWindow {
                 Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
 //                Document cachedDocument = FileDocumentManager.getInstance().getDocument(fileByPath);
                 if (cachedDocument != null) {
+//                    System.out.println("Invalidating markers for " + __);
                     connector.invalidate_markers(cachedDocument, _project);
                 } else {
 //                    System.out.println("cached document is null " + __);
