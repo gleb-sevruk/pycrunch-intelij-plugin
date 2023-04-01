@@ -71,6 +71,7 @@ public class PycrunchToolWindow {
     private TreeSpeedSearch _treeSpeedSearch;
     private PycrunchTreeState _treeState;
     private PycrunchConnectionState _connectionState = new PycrunchConnectionState();
+    private boolean _needs_redraw_on_next_editor_change = false;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
@@ -141,8 +142,11 @@ public class PycrunchToolWindow {
         JBMenuItem navigateToException = null;
         if (exceptionForCurrentTestUnderCursor != null) {
             navigateToException = new JBMenuItem("Navigate to exception");
-            navigateToException.addActionListener(e ->
-                    new NavigateToException().Go(selectedValuesList.get(0), exceptionForCurrentTestUnderCursor, _connector)
+            navigateToException.addActionListener(e -> {
+                        // Optimization: redraw markers on newly opened file only if this flag is set
+                        _needs_redraw_on_next_editor_change = true;
+                        new NavigateToException().Go(selectedValuesList.get(0), exceptionForCurrentTestUnderCursor, _connector);
+                    }
             );
 
         }
@@ -233,7 +237,7 @@ public class PycrunchToolWindow {
             return;
         }
 
-        PycrunchHighlighterMarkersState connector = _project.getService(PycrunchHighlighterMarkersState.class);
+        PycrunchHighlighterMarkersState markersState = _project.getService(PycrunchHighlighterMarkersState.class);
 
         HashSet<String> files_to_redraw = new HashSet<>();
 
@@ -243,6 +247,8 @@ public class PycrunchToolWindow {
 
             });
         }
+//        Add previously highlighted files
+        files_to_redraw.addAll(markersState.get_all_files_with_markers());
 
         files_to_redraw.forEach(__ -> {
             VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
@@ -251,7 +257,7 @@ public class PycrunchToolWindow {
 //                Document cachedDocument = FileDocumentManager.getInstance().getDocument(fileByPath);
                 if (cachedDocument != null) {
 //                    System.out.println("Invalidating markers for " + __);
-                    connector.invalidate_markers(cachedDocument, _project);
+                    markersState.invalidate_markers(cachedDocument, _project);
                 } else {
 //                    System.out.println("cached document is null " + __);
                 }
@@ -270,6 +276,7 @@ public class PycrunchToolWindow {
         Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
         if (cachedDocument != null) {
             connector.invalidate_markers(cachedDocument, _project);
+
         } else {
 //            System.out.println("update_highlighting_in_single_file cached document is null " + fileByPath.getPath());
         }
@@ -330,9 +337,14 @@ public class PycrunchToolWindow {
             }
             @Override
             public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                if (!_needs_redraw_on_next_editor_change) {
+                    return;
+                }
                 VirtualFile newFile = event.getNewFile();
                 if (newFile != null) {
+                    System.out.println("selectionChanged " + newFile.getPath());
                     update_highlighting_thread_safe(newFile);
+                    _needs_redraw_on_next_editor_change = false;
                 }
             }
         });

@@ -107,6 +107,10 @@ public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
         // test_names is optimization to not look everywhere
         var results = new ArrayList<TestRunResult>();
         var testRunResults = _connector.get_test_run_results();
+        if (test_names.size() == 0) {
+//            Hack, search through all tests if we cannot find in failing first
+            test_names.addAll(testRunResults.keySet());
+        }
         for (var test_name : test_names) {
             var testRunResult = testRunResults.get(test_name);
             if (testRunResult == null)

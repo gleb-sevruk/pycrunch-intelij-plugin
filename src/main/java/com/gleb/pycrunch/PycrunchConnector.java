@@ -434,11 +434,18 @@ public class PycrunchConnector {
         }
 
         HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
+        if (tests_at_line.isEmpty()) {
+            if (exceptions_in_current_file.contains(line_number)) {
+                return "exception";
+            }
+        }
+
+//      1.  First, check if there are any non-success tests at this line, and return early
         for (String fqn: tests_at_line) {
             String status = GetTestStatus(fqn);
-            // TODO: Update the status icons in the Pycrunch IntelliJ connector code to reflect the correct status.
             if (status.equals("pending")) {
 //                Pending?? This is when the test ran, but connector invalidates statuses.
+//                Or, web-ui connected and tests are rediscovered
                 return "pending";
             }
             if (status.equals("failed")) {
@@ -451,11 +458,8 @@ public class PycrunchConnector {
             if (status.equals("queued")) {
                 return "queued";
             }
-
-
-
         }
-
+//       2. All tests are green, so return success
         return "success";
     }
 
