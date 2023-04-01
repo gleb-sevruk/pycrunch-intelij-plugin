@@ -126,12 +126,23 @@ public class PycrunchConnector {
         if (_upgradeNoticeAlreadyShownInCurrentSession) {
             return;
         }
-
+        boolean should_show_warning_now = false;
         boolean reallyOld = major < 1;
         boolean minorVersionIsOld = major == 1 && minor < 5;
         if (reallyOld || minorVersionIsOld) {
+            should_show_warning_now = true;
+        }
+
+        if (major == 1 && minor == 5) {
+            if (version_patch < 1) {
+                should_show_warning_now = true;
+            }
+        }
+
+        if (should_show_warning_now) {
             IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
             _upgradeNoticeAlreadyShownInCurrentSession = true;
+
         }
     }
 
