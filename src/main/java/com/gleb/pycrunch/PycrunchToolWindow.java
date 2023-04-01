@@ -342,7 +342,6 @@ public class PycrunchToolWindow {
                 }
                 VirtualFile newFile = event.getNewFile();
                 if (newFile != null) {
-                    System.out.println("selectionChanged " + newFile.getPath());
                     update_highlighting_thread_safe(newFile);
                     _needs_redraw_on_next_editor_change = false;
                 }
