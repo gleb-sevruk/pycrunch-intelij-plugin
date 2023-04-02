@@ -24,6 +24,7 @@ public class SingleFileCombinedCoverage {
 
         JSONObject lines = j.getJSONObject("lines_with_entrypoints");
         JSONArray array = lines.names();
+//        check if lines_with_entrypoints != {} (empty object)
         if (array != null) {
             for (int i = 0; i < array.length(); i++) {
                 String line_number = array.getString(i);
