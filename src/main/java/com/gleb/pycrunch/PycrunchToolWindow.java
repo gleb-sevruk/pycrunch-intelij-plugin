@@ -15,6 +15,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.JBMenuItem;
@@ -36,9 +37,12 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.metal.MetalToggleButtonUI;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PycrunchToolWindow {
@@ -67,6 +71,7 @@ public class PycrunchToolWindow {
     private TreeSpeedSearch _treeSpeedSearch;
     private PycrunchTreeState _treeState;
     private PycrunchConnectionState _connectionState = new PycrunchConnectionState();
+    private boolean _needs_redraw_on_next_editor_change = false;
 
     public PycrunchToolWindow(ToolWindow toolWindow, Project project, MessageBus bus, PycrunchConnector connector) {
         _bus = bus;
@@ -137,8 +142,11 @@ public class PycrunchToolWindow {
         JBMenuItem navigateToException = null;
         if (exceptionForCurrentTestUnderCursor != null) {
             navigateToException = new JBMenuItem("Navigate to exception");
-            navigateToException.addActionListener(e ->
-                    new NavigateToException().Go(selectedValuesList.get(0), exceptionForCurrentTestUnderCursor, _connector)
+            navigateToException.addActionListener(e -> {
+                        // Optimization: redraw markers on newly opened file only if this flag is set
+                        _needs_redraw_on_next_editor_change = true;
+                        new NavigateToException().Go(selectedValuesList.get(0), exceptionForCurrentTestUnderCursor, _connector);
+                    }
             );
 
         }
@@ -229,7 +237,7 @@ public class PycrunchToolWindow {
             return;
         }
 
-        PycrunchHighlighterMarkersState connector = _project.getService(PycrunchHighlighterMarkersState.class);
+        PycrunchHighlighterMarkersState markersState = _project.getService(PycrunchHighlighterMarkersState.class);
 
         HashSet<String> files_to_redraw = new HashSet<>();
 
@@ -239,6 +247,8 @@ public class PycrunchToolWindow {
 
             });
         }
+//        Add previously highlighted files
+        files_to_redraw.addAll(markersState.get_all_files_with_markers());
 
         files_to_redraw.forEach(__ -> {
             VirtualFile fileByPath = LocalFileSystem.getInstance().findFileByPath(__);
@@ -246,7 +256,8 @@ public class PycrunchToolWindow {
                 Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
 //                Document cachedDocument = FileDocumentManager.getInstance().getDocument(fileByPath);
                 if (cachedDocument != null) {
-                    connector.invalidate_markers(cachedDocument, _project);
+//                    System.out.println("Invalidating markers for " + __);
+                    markersState.invalidate_markers(cachedDocument, _project);
                 } else {
 //                    System.out.println("cached document is null " + __);
                 }
@@ -261,9 +272,11 @@ public class PycrunchToolWindow {
     }
 
     private void update_highlighting_in_single_file(PycrunchHighlighterMarkersState connector, VirtualFile fileByPath) {
+//        System.out.println("update_highlighting_in_single_file " + fileByPath.getPath());
         Document cachedDocument = FileDocumentManager.getInstance().getCachedDocument(fileByPath);
         if (cachedDocument != null) {
             connector.invalidate_markers(cachedDocument, _project);
+
         } else {
 //            System.out.println("update_highlighting_in_single_file cached document is null " + fileByPath.getPath());
         }
@@ -320,18 +333,33 @@ public class PycrunchToolWindow {
         _bus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
             @Override
             public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                EventQueue.invokeLater(() -> {
-                    if(_bus.isDisposed()) {
-                        return;
-                    }
-
-                    PycrunchHighlighterMarkersState highlighterMarkersState = _project.getService(PycrunchHighlighterMarkersState.class);
-                    update_highlighting_in_single_file(highlighterMarkersState, file);
-                });
+                update_highlighting_thread_safe(file);
             }
-
+            @Override
+            public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                if (!_needs_redraw_on_next_editor_change) {
+                    return;
+                }
+                VirtualFile newFile = event.getNewFile();
+                if (newFile != null) {
+                    update_highlighting_thread_safe(newFile);
+                    _needs_redraw_on_next_editor_change = false;
+                }
+            }
         });
     }
+
+    private void update_highlighting_thread_safe(@NotNull VirtualFile file) {
+        EventQueue.invokeLater(() -> {
+            if(_bus.isDisposed()) {
+                return;
+            }
+
+            PycrunchHighlighterMarkersState highlighterMarkersState = _project.getService(PycrunchHighlighterMarkersState.class);
+            update_highlighting_in_single_file(highlighterMarkersState, file);
+        });
+    }
+
     private void setStatus(String text) {
         label_engine_status.setText(text);
 

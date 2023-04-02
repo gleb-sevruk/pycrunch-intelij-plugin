@@ -24,17 +24,19 @@ public class SingleFileCombinedCoverage {
 
         JSONObject lines = j.getJSONObject("lines_with_entrypoints");
         JSONArray array = lines.names();
-
-        for (int i = 0; i < array.length(); i++) {
-            String line_number = array.getString(i);
-            HashSet<String> current_line_fqns = new HashSet<>();
-            JSONArray test_fqns = lines.getJSONArray(line_number);
-            for (int x = 0; x < test_fqns.length(); x++) {
-                String fqn = test_fqns.getString(x);
-                current_line_fqns.add(fqn);
-            }
-            if (current_line_fqns.size() > 0) {
-                result._lines_hit_by_run.put(Integer.parseInt(line_number), current_line_fqns);
+//        check if lines_with_entrypoints != {} (empty object)
+        if (array != null) {
+            for (int i = 0; i < array.length(); i++) {
+                String line_number = array.getString(i);
+                HashSet<String> current_line_fqns = new HashSet<>();
+                JSONArray test_fqns = lines.getJSONArray(line_number);
+                for (int x = 0; x < test_fqns.length(); x++) {
+                    String fqn = test_fqns.getString(x);
+                    current_line_fqns.add(fqn);
+                }
+                if (current_line_fqns.size() > 0) {
+                    result._lines_hit_by_run.put(Integer.parseInt(line_number), current_line_fqns);
+                }
             }
         }
         return result;

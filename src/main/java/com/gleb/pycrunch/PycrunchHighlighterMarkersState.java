@@ -14,10 +14,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.impl.PsiDocumentManagerImpl;
 import com.intellij.util.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.*;
 
 public class PycrunchHighlighterMarkersState {
     private static Hashtable<String, ArrayList<RangeHighlighterEx>> _highlighters_per_file = new Hashtable<>();
@@ -28,32 +25,29 @@ public class PycrunchHighlighterMarkersState {
                 (s, markers) -> markers.forEach(__ -> __.dispose()));
         _highlighters_per_file = new Hashtable<>();
     }
-
+    public Set<String> get_all_files_with_markers() {
+        return _highlighters_per_file.keySet();
+    }
     public void invalidate_markers(Document document, Project project) {
         PycrunchConnector connector = project.getService(PycrunchConnector.class);
-
-        int myLine = 0;
-//        System.out.println(myLine);
 
         VirtualFile virtualFile = file_from_document(project, document);
         String absolute_path = virtualFile.getPath();
         ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
-        if (!_highlighters_per_file.containsKey(absolute_path)) {
-            all_highlighters_per_current_file = new ArrayList<>();
-            _highlighters_per_file.put(absolute_path, all_highlighters_per_current_file);
-
-        } else {
+        if (_highlighters_per_file.containsKey(absolute_path)) {
+//          There are old markers, clean all of them!
             all_highlighters_per_current_file = _highlighters_per_file.get(absolute_path);
             all_highlighters_per_current_file.forEach(__ -> __.dispose());
             all_highlighters_per_current_file.removeIf(__ -> true);
+        } else {
+            all_highlighters_per_current_file = new ArrayList<>();
+            _highlighters_per_file.put(absolute_path, all_highlighters_per_current_file);
         }
 
         cleanup_stale_or_renamed_markers(virtualFile, absolute_path);
 
-//        System.out.println("new user data value: " + absolute_path);
 //        This is for tracking file renames.
 //        Virtual Document will contain old filename in metadata even when file already renamed on disk
-
         virtualFile.putUserData(GlobalKeys.DOCUMENT_PATH_KEY, absolute_path);
 
         SingleFileCombinedCoverage lines_covered = connector.GetCoveredLinesForFile(absolute_path);
@@ -63,21 +57,32 @@ public class PycrunchHighlighterMarkersState {
         }
 
         MarkupModelEx markup = (MarkupModelEx) DocumentMarkupModel.forDocument(document, project, true);
-        RangeHighlighterEx highlighter;
         HashMap<Integer, HashSet<String>> lines_hit_by_run = lines_covered._lines_hit_by_run;
         var exceptions_in_current_file = lines_covered._exceptions;
-        if (lines_hit_by_run != null) {
-            lines_hit_by_run.keySet()
-                    .forEach(
-                            __ -> addHighlighterForLine(
-                                    __ - 1,
-                                    connector.get_marker_color_for(absolute_path, __, exceptions_in_current_file),
-                                    markup,
-                                    all_highlighters_per_current_file,
-                                    absolute_path,
-                                    project)
-                    );
-        }
+
+        Set<Integer> line_numbers = lines_hit_by_run.keySet();
+        line_numbers.forEach(
+                        __ -> addHighlighterForLine(
+                                __ - 1,
+                                connector.get_marker_color_for(absolute_path, __, exceptions_in_current_file),
+                                markup,
+                                all_highlighters_per_current_file,
+                                absolute_path,
+                                project)
+                );
+
+//            Process lines that are not in coverage but in exceptions
+        exceptions_in_current_file.stream()
+                .filter(lineNumber -> !line_numbers.contains(lineNumber))
+                .forEach(lineNumber -> {
+                    addHighlighterForLine(
+                            lineNumber - 1,
+                            connector.get_marker_color_for(absolute_path, lineNumber, exceptions_in_current_file),
+                            markup,
+                            all_highlighters_per_current_file,
+                            absolute_path,
+                            project);
+                });
     }
 
     private void cleanup_stale_or_renamed_markers(VirtualFile virtualFile, String new_path) {

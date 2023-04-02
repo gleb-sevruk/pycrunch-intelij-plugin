@@ -2,13 +2,13 @@ package com.gleb.pycrunch.actions;
 
 import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.PycrunchHighlighterMarkersState;
-import com.gleb.pycrunch.shared.FreePort;
-import com.gleb.pycrunch.shared.GlobalKeys;
+import com.gleb.pycrunch.shared.*;
 import com.intellij.execution.Executor;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.execution.runners.ExecutionUtil;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -18,25 +18,20 @@ import com.jetbrains.python.run.PythonConfigurationType;
 import com.jetbrains.python.run.PythonRunConfigurationParams;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class RunPycrunchEngineAction extends AnAction {
-    private ConcurrentHashMap<Project, RunnerAndConfigurationSettings> _map;
-
     public RunPycrunchEngineAction() {
         super("_Run/Restart PyCrunch Engine");
-        if (_map == null) {
-            _map = new ConcurrentHashMap<>();
-        }
     }
 
     public void actionPerformed(AnActionEvent event) {
-        cleanup_disposed_projects();
         Project project = event.getData(PlatformDataKeys.PROJECT);
+        CachedRuntimeConfigurations cache = project.getService(CachedRuntimeConfigurations.class);
+        cache.cleanup_disposed_projects();
         cleanup_all_markers(project);
-        build_configuration_and_run_engine(project);
+        build_configuration_and_run_engine(project, cache);
         connect_to_engine(project);
     }
 
@@ -62,24 +57,17 @@ public class RunPycrunchEngineAction extends AnAction {
 
     }
 
-    private void build_configuration_and_run_engine(Project project) {
-        RunnerAndConfigurationSettings settings = _map.get(project);
+    private void build_configuration_and_run_engine(Project project, CachedRuntimeConfigurations cache) {
+        RunnerAndConfigurationSettings settings = cache._map.get(project);
         if (settings == null) {
             settings = create_run_configuration_for_project(project);
-            _map.put(project, settings);
+            cache._map.put(project, settings);
         }
         Executor runExecutorInstance = DefaultRunExecutor.getRunExecutorInstance();
-
         ExecutionUtil.runConfiguration(settings, runExecutorInstance);
     }
 
-    private void cleanup_disposed_projects() {
-        for (Project p : _map.keySet()) {
-            if (p.isDisposed()) {
-                _map.remove(p);
-            }
-        }
-    }
+
 
     @NotNull
     private RunnerAndConfigurationSettings create_run_configuration_for_project(Project project) {
@@ -89,14 +77,14 @@ public class RunPycrunchEngineAction extends AnAction {
         PythonConfigurationType.PythonConfigurationFactory factory = PythonConfigurationType.getInstance().getFactory();
 
         settings = runManager.createConfiguration("pycrunch-engine - auto", factory);
-
 //        runManager.addConfiguration(xxx);
 //        runManager.
 //        runManager.makeStable(xxx);
 //        List<RunConfiguration> allConfigurationsList = runManager.getAllConfigurationsList();
         PythonRunConfigurationParams parameters = (PythonRunConfigurationParams) settings.getConfiguration();
 
-        String basePath = project.getBasePath();
+        String basePath = RecentlyUsedFolders.getLastSelectedFolder(project);
+
         AbstractPythonRunConfigurationParams baseParams = parameters.getBaseParams();
         baseParams.setWorkingDirectory(basePath);
 

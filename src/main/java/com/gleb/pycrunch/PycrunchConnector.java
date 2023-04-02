@@ -15,8 +15,10 @@ import com.gleb.pycrunch.shared.GlobalKeys;
 import com.gleb.pycrunch.shared.IdeNotifications;
 import com.gleb.pycrunch.shared.MyPasswordStore;
 import com.intellij.ide.ActivityTracker;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
 import org.json.JSONArray;
@@ -24,11 +26,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PycrunchConnector {
@@ -76,11 +80,26 @@ public class PycrunchConnector {
     private void socketDidConnect(Object... args) {
         engineWillConnect();
         try {
+            post_version_info();
             post_discovery_command();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private void post_version_info() throws JSONException {
+        PluginId pluginId = PluginId.getId("com.pycrunch.intellijconnector");
+        var pluginDescriptor = PluginManagerCore.getPlugin(pluginId);
+        String pluginVersion = pluginDescriptor != null ? pluginDescriptor.getVersion() : "unknown";
+
+        JSONObject obj = new JSONObject();
+        obj.put("action", "plugin_version");
+        obj.put("plugin_version", pluginVersion);
+
+        this._socket.emit("my event", obj);
+
+    }
+
     private void ApplyCombinedCoverage(JSONObject data) throws JSONException {
         _combined_coverage = PycrunchCombinedCoverage.from_json(data);
 
@@ -126,12 +145,23 @@ public class PycrunchConnector {
         if (_upgradeNoticeAlreadyShownInCurrentSession) {
             return;
         }
-
+        boolean should_show_warning_now = false;
         boolean reallyOld = major < 1;
         boolean minorVersionIsOld = major == 1 && minor < 5;
         if (reallyOld || minorVersionIsOld) {
+            should_show_warning_now = true;
+        }
+
+        if (major == 1 && minor == 5) {
+            if (version_patch < 1) {
+                should_show_warning_now = true;
+            }
+        }
+
+        if (should_show_warning_now) {
             IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
             _upgradeNoticeAlreadyShownInCurrentSession = true;
+
         }
     }
 
@@ -434,11 +464,18 @@ public class PycrunchConnector {
         }
 
         HashSet<String> tests_at_line = singleFileCombinedCoverage.TestsAtLine(line_number);
+        if (tests_at_line.isEmpty()) {
+            if (exceptions_in_current_file.contains(line_number)) {
+                return "exception";
+            }
+        }
+
+//      1.  First, check if there are any non-success tests at this line, and return early
         for (String fqn: tests_at_line) {
             String status = GetTestStatus(fqn);
-            // TODO: Update the status icons in the Pycrunch IntelliJ connector code to reflect the correct status.
             if (status.equals("pending")) {
 //                Pending?? This is when the test ran, but connector invalidates statuses.
+//                Or, web-ui connected and tests are rediscovered
                 return "pending";
             }
             if (status.equals("failed")) {
@@ -451,11 +488,8 @@ public class PycrunchConnector {
             if (status.equals("queued")) {
                 return "queued";
             }
-
-
-
         }
-
+//       2. All tests are green, so return success
         return "success";
     }
 
