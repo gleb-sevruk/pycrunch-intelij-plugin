@@ -19,7 +19,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.5.1-beta-4'
+version '1.5.1'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
