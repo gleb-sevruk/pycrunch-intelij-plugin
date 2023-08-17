@@ -6,7 +6,7 @@ plugins {
 
 intellij {
     plugins = ['python']
-    version = '231.8109-EAP-CANDIDATE-SNAPSHOT'
+    version = '2023.1.3'
     type = 'PY'
 
     downloadSources = false
@@ -19,7 +19,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.5.1'
+version '1.5.2'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -41,6 +41,10 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
+    1.5.2<br><br>
+    `Tests covering this line` popup will now be sorted<br><br> 
+    <br><br> 
+
     1.5.1<br><br>
     Added ability to customize folder used to start up the test runner engine; Usefull if you have multiple python projects in same directory.<br><br> 
     Exceptions will now be shown even if file is a system library<br><br> 

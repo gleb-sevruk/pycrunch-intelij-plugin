@@ -12,6 +12,9 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,8 +43,11 @@ public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
         int current_line_number = _gutterIcon._line + 1;
 
         ;
-        HashSet<String> test_names = singleFileCombinedCoverage.TestsAtLine(current_line_number);
+        HashSet<String> test_names_set = singleFileCombinedCoverage.TestsAtLine(current_line_number);
+        var test_names = new ArrayList<>(test_names_set);
+        Collections.sort(test_names);
         var regularTooltip = !singleFileCombinedCoverage._exceptions.contains(current_line_number);
+
         EditorGutterComponentEx gutterComponent = ((EditorEx)editor).getGutterComponentEx();
         Point centerPoint = gutterComponent.getCenterPoint(_gutterIcon);
         Point point = centerPoint;
@@ -103,13 +109,15 @@ public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
         return maxPopupSize;
     }
 
-    private ArrayList<TestRunResult>  build_list_of_test_failing_on_this_line(HashSet<String> test_names, String filename, int currentLineNumber) {
+    private ArrayList<TestRunResult>  build_list_of_test_failing_on_this_line(Collection<String> test_names, String filename, int currentLineNumber) {
         // test_names is optimization to not look everywhere
         var results = new ArrayList<TestRunResult>();
         var testRunResults = _connector.get_test_run_results();
         if (test_names.size() == 0) {
 //            Hack, search through all tests if we cannot find in failing first
-            test_names.addAll(testRunResults.keySet());
+            var sortedTestNames = new ArrayList<>(testRunResults.keySet());
+            Collections.sort(sortedTestNames);
+            test_names.addAll(sortedTestNames);
         }
         for (var test_name : test_names) {
             var testRunResult = testRunResults.get(test_name);
