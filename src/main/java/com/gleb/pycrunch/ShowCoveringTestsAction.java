@@ -60,7 +60,7 @@ public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
             JBPopupFactory.getInstance().createListPopup(new PycrunchTestGutterPopup(test_names, _connector, project, current_line_number)).show(new RelativePoint(gutterComponent, centerPoint));
 
         } else {
-            //OPENAI:
+            //Build exception details popup
             var tests = build_list_of_test_failing_on_this_line(test_names, _gutterIcon._filename, current_line_number);
 
 // Set the maximum size of the JScrollPane
