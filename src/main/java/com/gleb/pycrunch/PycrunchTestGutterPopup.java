@@ -8,15 +8,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Collection;
 import java.util.HashSet;
 
 public class PycrunchTestGutterPopup extends BaseListPopupStep {
-    private HashSet<String> strings;
+    private Collection<String> strings;
     private PycrunchConnector _connector;
     private Project _project;
     private int _line;
 
-    public PycrunchTestGutterPopup(HashSet<String> strings, PycrunchConnector connector, Project project, int line) {
+    public PycrunchTestGutterPopup(Collection<String> strings, PycrunchConnector connector, Project project, int line) {
         super("Tests covering this line:", strings.toArray());
         this.strings = strings;
         _connector = connector;
