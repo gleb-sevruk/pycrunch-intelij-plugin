@@ -1,8 +1,11 @@
 package com.gleb.pycrunch;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import com.gleb.pycrunch.actions.TogglePinnedTestsAction;
 import com.gleb.pycrunch.actions.UpdateModeAction;
 import com.gleb.pycrunch.activation.ActivationValidation;
@@ -21,8 +24,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBus;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -37,6 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class PycrunchConnector {
     private static int CounterOfSingletons = 0;
+    //    This is to mimic nzkava socketio library
+    private final ConnectionState _connectionState = new ConnectionState();
     private final MyStateService _persistentState;
     // Sets the maximum allowed number of opened projects.
     public  Project _project;
@@ -60,26 +63,23 @@ public class PycrunchConnector {
     private Emitter.Listener onNewMessage = args -> didReceiveSocketEvent(args);
     private Emitter.Listener onSocketClose = args -> socketDidDisconnect(args);
     private Emitter.Listener onSocketConnect = args -> socketDidConnect(args);
-    private Emitter.Listener onSocketReconnection = args -> socketWillTryToReconnect(args);
-    private Emitter.Listener onSocketFailToReconnect = args -> socketDidFailToReconnect(args);
+    private Emitter.Listener onSocketConnectError = args -> socketWillHaveConnectError(args);
 
     private void socketDidDisconnect(Object... args) {
         engineWillDisconnect();
     }
 
-    private void socketWillTryToReconnect(Object... args) {
-        engineWillTryToReconnect();
-    }
-
-    private void socketDidFailToReconnect(Object... args) {
-        System.out.println("socketDidFailToReconnect");
-        engineDidFailToReconnect();
+    private void socketWillHaveConnectError(Object... args) {
+        System.out.println("socketWillHaveConnectError - connection failed " + _connectionState.current_retry + " of " + _connectionState.max_retries);
+        _connectionState.connectionFailed();
+        socketDidHaveConnectError();
     }
 
 
     private void socketDidConnect(Object... args) {
         engineWillConnect();
         try {
+            _connectionState.reset();
             post_version_info();
             post_discovery_command();
         } catch (Exception e) {
@@ -147,7 +147,7 @@ public class PycrunchConnector {
         }
         boolean should_show_warning_now = false;
         boolean reallyOld = major < 1;
-        boolean minorVersionIsOld = major == 1 && minor < 5;
+        boolean minorVersionIsOld = major == 1 && minor < 6;
         if (reallyOld || minorVersionIsOld) {
             should_show_warning_now = true;
         }
@@ -179,22 +179,28 @@ public class PycrunchConnector {
         _port = (int) pycrunch_port;
 
         try {
+            int MAX_RETRIES = 30;
+
             if (_socket != null) {
                 _socket.off();
                 _socket.disconnect();
             }
+            _connectionState.current_retry = 0;
+            _connectionState.max_retries = MAX_RETRIES;
             IO.Options options = new IO.Options();
             options.reconnection = true;
             options.forceNew = true;
-            options.reconnectionAttempts = 30;
+
+//            In milliseconds
+            options.reconnectionDelay = 1000;
+            options.reconnectionDelayMax = 3000;
+            options.reconnectionAttempts = MAX_RETRIES;
 
             _socket = IO.socket(full_api_url(), options);
             _socket.on("event", onNewMessage)
                     .on(Socket.EVENT_DISCONNECT, onSocketClose)
                     .on(Socket.EVENT_CONNECT, onSocketConnect)
-                    .on(Socket.EVENT_RECONNECT, onSocketConnect)
-                    .on(Socket.EVENT_RECONNECTING, onSocketReconnection)
-                    .on(Socket.EVENT_RECONNECT_FAILED, onSocketFailToReconnect)
+                    .on(Socket.EVENT_CONNECT_ERROR, onSocketConnectError)
             ;
 
             _socket.connect();
@@ -305,20 +311,13 @@ public class PycrunchConnector {
         });
     }
 
-    private void engineWillTryToReconnect() {
+    private void socketDidHaveConnectError() {
         EventQueue.invokeLater(() -> {
             if (this._bus.isDisposed()) {
                 return;
             }
-            this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineWillTryToReconnect("---");
-        });
-    }
-    private void engineDidFailToReconnect() {
-        EventQueue.invokeLater(() -> {
-            if (this._bus.isDisposed()) {
-                return;
-            }
-            this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineDidFailToReconnect("---");
+
+            this._bus.syncPublisher(PycrunchBusNotifier.CHANGE_ACTION_TOPIC).engineDidFailToReconnect(_connectionState);
         });
     }
 

@@ -1,6 +1,6 @@
 package com.gleb.pycrunch.actions;
+import io.socket.client.Socket;
 
-import com.github.nkzawa.socketio.client.Socket;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;

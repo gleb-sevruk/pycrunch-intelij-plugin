@@ -1,6 +1,7 @@
 package com.gleb.pycrunch.actions;
 
-import com.github.nkzawa.socketio.client.Socket;
+import io.socket.client.Socket;
+
 import com.gleb.pycrunch.PycrunchTestMetadata;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

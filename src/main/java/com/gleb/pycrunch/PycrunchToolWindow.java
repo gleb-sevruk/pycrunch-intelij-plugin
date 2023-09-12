@@ -403,7 +403,7 @@ public class PycrunchToolWindow {
             }
             @Override
             public void engineDidDisconnect(String context){
-                setStatus("Lost connection to PyCrunch Engine");
+                setStatus("Lost connection to PyCrunch Engine. Reconnecting...");
             }
             @Override
             public void combinedCoverageDidUpdate(String context) {
@@ -418,17 +418,11 @@ public class PycrunchToolWindow {
 
             @Override
             public void did_select_test(PycrunchTestMetadata userObject) {
-//                System.out.println("FAKE! did_select_test" );
             }
 
             @Override
             public void engineDidLoadMode(String new_mode){
                 _engineMode.WillChangeTo(new_mode);
-            }
-
-            @Override
-            public void engineWillTryToReconnect(String unused) {
-                setStatus("Connection lost. Trying to reconnect to the engine...");
             }
 
             @Override
@@ -439,8 +433,12 @@ public class PycrunchToolWindow {
             }
 
             @Override
-            public void engineDidFailToReconnect(String dummy) {
-                setStatus("Failed to reconnect. Please start the engine again.");
+            public void engineDidFailToReconnect(ConnectionState cs) {
+                if (cs.current_retry < cs.max_retries) {
+                    setStatus("Connection lost. Trying to reconnect to the engine...");
+                } else {
+                    setStatus("Failed to reconnect. Please start the engine again.");
+                }
             }
 
             @Override

@@ -21,10 +21,19 @@ public class VariableTreeJsonTreeStructure {
     private void processNode(Object json, DefaultMutableTreeNode parentNode) throws JSONException {
         if (json instanceof JSONObject) {
             JSONObject jsonObject = (JSONObject) json;
-            Iterator<String> keys = jsonObject.sortedKeys();
-            ArrayList<String> keyList = new ArrayList<>();
+            Iterator<String> keys = jsonObject.keys();
+            List<String> keysListSorted = new ArrayList<>();
             while (keys.hasNext()) {
-                String key = keys.next();
+                keysListSorted.add(keys.next());
+            }
+
+            // Sort the list
+            Collections.sort(keysListSorted);
+
+            ArrayList<String> keyList = new ArrayList<>();
+            var iter = keysListSorted.listIterator();
+            while (iter.hasNext()) {
+                String key = iter.next();
                 keyList.add(key);
                 Object value = jsonObject.get(key);
 

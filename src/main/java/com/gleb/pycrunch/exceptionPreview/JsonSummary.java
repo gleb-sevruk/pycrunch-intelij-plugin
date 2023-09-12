@@ -3,7 +3,9 @@ package com.gleb.pycrunch.exceptionPreview;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,10 +29,21 @@ public class JsonSummary {
         int remainingLength = maxLength - 2; // Subtracting the length of the opening and closing brackets
         int keyCount = jsonObject.length();
         int keysProcessed = 0;
-        Iterator<String> keys = jsonObject.sortedKeys();
-        ArrayList<String> keyList = new ArrayList<>();
+        Iterator<String> keys = jsonObject.keys();
+
+        List<String> keysListSorted = new ArrayList<>();
         while (keys.hasNext()) {
-            String key = keys.next();
+            keysListSorted.add(keys.next());
+        }
+
+        // Sort the list
+        Collections.sort(keysListSorted);
+
+
+        ArrayList<String> keyList = new ArrayList<>();
+        var iter = keysListSorted.listIterator();
+        while (iter.hasNext()) {
+            String key = iter.next();
             String keyValueStr = key + ": " + jsonObject.optString(key, "N/A") + ", ";
 
             if (keyValueStr.length() > remainingLength) {
