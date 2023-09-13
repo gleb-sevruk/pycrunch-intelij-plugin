@@ -49,7 +49,16 @@ patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
     1.6.0<br><br>
-    socket.io library replaced for better<br><br> 
+    `nkzawa:socket.io-client` replaced with `io.socket:socket.io-client` to support Python 3.11; <br><br>
+    If you see the error like:
+    <br>
+        `engineio.server - ERROR - The client is using an unsupported version of the Socket.IO or Engine.IO protocols`
+    <br>
+    Please update the engine via `pip install --upgrade pycrunch-engine`<br><br>
+    <br>
+    Make sure both engine and plugin are 1.6.0 version or higher.
+    <br>
+    This was major dependency change, so please report any issues you may have. 
     <br><br> 
 
     1.5.2<br><br>
