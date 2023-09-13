@@ -1,5 +1,6 @@
 package com.gleb.pycrunch.timeline;
 
+import com.gleb.pycrunch.ConnectionState;
 import com.gleb.pycrunch.messaging.PycrunchBusNotifier;
 import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.PycrunchTestMetadata;
@@ -191,11 +192,6 @@ public class PyCrunchVariablesWindow {
             }
 
             @Override
-            public void engineWillTryToReconnect(String context) {
-//                nothing to do here. This should be different bus, but no time to implement
-            }
-
-            @Override
             public void combinedCoverageDidUpdate(String context) {
 
             }
@@ -216,7 +212,7 @@ public class PyCrunchVariablesWindow {
             }
 
             @Override
-            public void engineDidFailToReconnect(String dummy) {
+            public void engineDidFailToReconnect(ConnectionState dummy) {
                 // unused here
             }
 

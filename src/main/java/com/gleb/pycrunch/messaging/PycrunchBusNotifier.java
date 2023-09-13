@@ -1,5 +1,6 @@
 package com.gleb.pycrunch.messaging;
 
+import com.gleb.pycrunch.ConnectionState;
 import com.gleb.pycrunch.PycrunchTestMetadata;
 import com.intellij.util.messages.Topic;
 
@@ -10,7 +11,6 @@ public interface PycrunchBusNotifier {
     void beforeAction(String context);
     void engineDidConnect(String context);
     void engineDidDisconnect(String context);
-    void engineWillTryToReconnect(String context);
     void combinedCoverageDidUpdate(String context);
     void licenceActivated();
     void licenceInvalid();
@@ -21,5 +21,5 @@ public interface PycrunchBusNotifier {
 
     void engineDidLoadVersion(int version_major, int version_minor, int version_patch);
 
-    void engineDidFailToReconnect(String dummy);
+    void engineDidFailToReconnect(ConnectionState state);
 }
