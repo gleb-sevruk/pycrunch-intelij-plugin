@@ -21,7 +21,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.6.0'
+version '1.6.1'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -48,6 +48,9 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
+    1.6.1<br><br>
+    Updated compatibility with Pycharm 2023.3
+    <br><br><br>
     1.6.0<br><br>
     `nkzawa:socket.io-client` replaced with `io.socket:socket.io-client` to support Python 3.11; <br><br>
     If you see the error like:
