@@ -205,7 +205,7 @@ Official Site:
 
         </group>
 
-        <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch">
+        <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch" popup="true">
             <add-to-group group-id="MainMenu" anchor="after" relative-to-action="HelpMenu" />
             <action id="PyChrunch.RunEngine"
                     class="com.gleb.pycrunch.actions.RunPycrunchEngineAction"
