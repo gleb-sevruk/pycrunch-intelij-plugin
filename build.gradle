@@ -21,7 +21,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.6.2'
+version '1.6.3'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -48,6 +48,9 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
+    1.6.3<br><br>
+    Updated compatibility with PyCharm 2024.1
+    <br><br><br>
     1.6.2<br><br>
     Fixed an issue where the 'PyCrunch' menu was not appearing in PyCharm 2023.3
     <br><br><br>

@@ -9,8 +9,8 @@ import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.runners.ExecutionUtil;
 import com.intellij.openapi.project.Project;
-import com.jetbrains.python.debugger.remote.PyRemoteDebugConfigurationParams;
-import com.jetbrains.python.debugger.remote.PyRemoteDebugConfigurationType;
+import com.intellij.python.pro.debugger.remote.PyRemoteDebugConfigurationParams;
+import com.intellij.python.pro.debugger.remote.PyRemoteDebugConfigurationType;
 
 public class PyRemoteDebugState {
     private RunnerAndConfigurationSettings _cachedConfiguration;
