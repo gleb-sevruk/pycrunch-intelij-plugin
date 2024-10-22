@@ -8,7 +8,7 @@ plugins {
 //2023.2.1 RC EAP
 intellij {
     plugins = ['python']
-    version = 'LATEST-EAP-SNAPSHOT'
+    version = '2024.2.2'
     type = 'PY'
 
     downloadSources = false
@@ -21,7 +21,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.6.3'
+version '1.6.4'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -37,7 +37,8 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
     implementation 'org.json:json:20210307'
-
+//    implementation "com.jetbrains.plugins:python"
+//    implementation "com.jetbrains.plugins:python-pro"
 }
 
 
@@ -48,6 +49,11 @@ dependencies {
 patchPluginXml {
     sinceBuild = '203.5981.155'
     changeNotes = """
+    1.6.4<br><br>
+    Updated compatibility with PyCharm 2024.2.
+    <br><br>
+    PyCrunch Menu moved under the Tools 
+    <br><br><br>
     1.6.3<br><br>
     Updated compatibility with PyCharm 2024.1
     <br><br><br>

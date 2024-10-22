@@ -2,6 +2,7 @@ package com.gleb.pycrunch.actions;
 
 import com.gleb.pycrunch.messaging.PycrunchToolbarBus;
 import com.gleb.pycrunch.shared.PycrunchWindowStateService;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
@@ -9,6 +10,11 @@ import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 
 public class WrapTestOutputAction extends ToggleAction {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
         Project project = e.getProject();

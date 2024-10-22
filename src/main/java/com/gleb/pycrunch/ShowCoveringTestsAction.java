@@ -21,8 +21,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
     private final PycrunchConnector _connector;
-    private Object myInitialBreakpoint;
     private final Project _project;
     private PyCrunchGutterIconRenderer _gutterIcon;
 
@@ -96,7 +100,6 @@ public class ShowCoveringTestsAction extends AnAction implements  DumbAware {
             popup.setSize(exceptionPopupForm._preferredSize);
             popup.show(new RelativePoint(gutterComponent, centerPoint));;
 
-//            END OPENAI
         }
     }
 

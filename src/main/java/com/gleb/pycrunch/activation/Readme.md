@@ -1,0 +1,1 @@
+This initially was created as commercial product, with 30-days trial, but now I guess we don't need it 

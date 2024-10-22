@@ -1,16 +1,23 @@
 package com.gleb.pycrunch.actions;
 
 import com.gleb.pycrunch.activation.ActivationConnector;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.net.URI;
 
 public class PycrunchOpenDocumentationAction extends AnAction {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
     public PycrunchOpenDocumentationAction() {
         // Set the menu item name.
         super("_Documentation");

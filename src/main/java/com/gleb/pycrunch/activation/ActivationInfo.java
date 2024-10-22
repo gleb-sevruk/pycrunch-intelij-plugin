@@ -56,8 +56,6 @@ public class ActivationInfo {
 
     private boolean verify_sig(String msg, String sign) {
         try {
-
-//        Make sure we are not answering to fake response from server emulator.
             RSAPublicKey publicKey = open_rsa_file();
             Signature signature = Signature.getInstance("SHA512withRSA", "SunRsaSign");
             signature.initVerify(publicKey);

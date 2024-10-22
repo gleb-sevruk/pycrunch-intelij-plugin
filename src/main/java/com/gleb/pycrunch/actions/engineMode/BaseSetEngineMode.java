@@ -2,12 +2,17 @@ package com.gleb.pycrunch.actions.engineMode;
 
 import com.gleb.pycrunch.PycrunchConnector;
 import com.gleb.pycrunch.shared.EngineMode;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseSetEngineMode extends ToggleAction {
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 
     private final String currentMode;
 
