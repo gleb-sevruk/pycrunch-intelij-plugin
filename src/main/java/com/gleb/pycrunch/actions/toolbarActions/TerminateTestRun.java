@@ -10,11 +10,15 @@ import org.jetbrains.annotations.NotNull;
 public class TerminateTestRun extends AnAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
+        if (project == null){
+            return;
+        }
+
         MessageBus bus = project.getMessageBus();
         try {
             ((PycrunchToolbarBus) bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC)).terminateTestRun();
@@ -26,6 +30,9 @@ public class TerminateTestRun extends AnAction {
     @Override
     public void update(AnActionEvent e) {
         Project project = e.getData(PlatformDataKeys.PROJECT);
+        if (project == null) {
+            return;
+        }
         PycrunchConnector connector = project.getService(PycrunchConnector.class);
         Presentation presentation = e.getPresentation();
         presentation.setEnabled(connector._canTerminateTestRun);

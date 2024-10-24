@@ -85,7 +85,7 @@ Official Site:
 
     ]]></description>
 
-    <idea-version since-build="242.22855.74" />
+    <idea-version since-build="242.*" />
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -93,7 +93,7 @@ Official Site:
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
-    <depends>PythonCore</depends>
+<!--    <depends>PythonCore</depends>-->
     <depends>Pythonid</depends>
 <!--    &ndash;&gt;-->
     <applicationListeners>

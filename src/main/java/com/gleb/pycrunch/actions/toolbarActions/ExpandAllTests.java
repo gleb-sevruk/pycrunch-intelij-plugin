@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class ExpandAllTests extends AnAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     public void actionPerformed(AnActionEvent event) {

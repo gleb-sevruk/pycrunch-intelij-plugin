@@ -18,6 +18,9 @@ public class WrapTestOutputAction extends ToggleAction {
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
         Project project = e.getProject();
+        if (project == null) {
+            return false;
+        }
         PycrunchWindowStateService uiState = project.getService(PycrunchWindowStateService.class);
         return uiState._wrapOutput;
 

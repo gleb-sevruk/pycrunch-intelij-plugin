@@ -9,12 +9,18 @@ public class TogglePinnedTests extends ToggleTestsAbstract {
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
         PycrunchWindowStateService uiState = getUiState(e);
+        if (uiState == null){
+            return false;
+        }
         return uiState._showPinnedTests;
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
         PycrunchWindowStateService uiState = getUiState(e);
+        if (uiState == null){
+            return;
+        }
         uiState._showPinnedTests = state;
         notifyPycrunchUi(e);
     }

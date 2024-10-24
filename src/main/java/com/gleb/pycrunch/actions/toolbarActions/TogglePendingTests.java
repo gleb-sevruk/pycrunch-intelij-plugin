@@ -9,6 +9,10 @@ public class TogglePendingTests extends ToggleTestsAbstract {
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
         PycrunchWindowStateService uiState = getUiState(e);
+        if (uiState == null) {
+            return false;
+        }
+
         return uiState._showPendingTests;
     }
 

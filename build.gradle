@@ -8,7 +8,7 @@ plugins {
 //2023.2.1 RC EAP
 intellij {
     plugins = ['python']
-    version = '2024.2.2'
+    version = '2024.2.3'
     type = 'PY'
 
     downloadSources = false
@@ -21,7 +21,7 @@ buildSearchableOptions {
 
 
 group 'com.pycrunch'
-version '1.6.4'
+version '1.6.5-pro'
 
 //sourceCompatibility = 1.8
 sourceCompatibility = 11
@@ -47,7 +47,6 @@ dependencies {
 //    version '2019.1.3'
 //}
 patchPluginXml {
-    sinceBuild = '203.5981.155'
     changeNotes = """
     1.6.4<br><br>
     Updated compatibility with PyCharm 2024.2.

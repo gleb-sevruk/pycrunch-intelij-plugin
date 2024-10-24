@@ -12,16 +12,23 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ToggleTestsAbstract extends ToggleAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     protected PycrunchWindowStateService getUiState(@NotNull AnActionEvent e) {
         Project project = e.getProject();
+        if (project == null) {
+            return null;
+        }
         return project.getService(PycrunchWindowStateService.class);
     }
 
     protected void notifyPycrunchUi(@NotNull AnActionEvent e) {
-        MessageBus bus = e.getProject().getMessageBus();
+        Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
+        MessageBus bus = project.getMessageBus();
         bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC).refillTestList();
     }
 }

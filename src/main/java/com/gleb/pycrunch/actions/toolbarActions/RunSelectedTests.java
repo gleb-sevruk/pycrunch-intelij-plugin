@@ -12,11 +12,14 @@ import org.jetbrains.annotations.NotNull;
 public class RunSelectedTests extends AnAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getData(PlatformDataKeys.PROJECT);
+        if (project == null){
+            return;
+        }
         MessageBus bus = project.getMessageBus();
         try {
             ((PycrunchToolbarBus) bus.syncPublisher(PycrunchToolbarBus.CHANGE_ACTION_TOPIC)).runSelectedTests();

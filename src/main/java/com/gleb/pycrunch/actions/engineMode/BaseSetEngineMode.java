@@ -23,6 +23,9 @@ public abstract class BaseSetEngineMode extends ToggleAction {
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
         Project project = e.getProject();
+        if (project == null) {
+            return false;
+        }
         EngineMode uiState = project.getService(EngineMode.class);
         return uiState._mode.equals(currentMode);
     }
