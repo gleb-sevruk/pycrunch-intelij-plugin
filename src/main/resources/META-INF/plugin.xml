@@ -93,8 +93,9 @@ Official Site:
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
-<!--    <depends>PythonCore</depends>-->
-    <depends>Pythonid</depends>
+    <depends>PythonCore</depends>
+<!--    This is for pro version only-->
+<!--    <depends>Pythonid</depends>-->
 <!--    &ndash;&gt;-->
     <applicationListeners>
         <listener class="com.gleb.pycrunch.PluginLoadEvents" topic="com.intellij.ide.plugins.DynamicPluginListener"></listener>
