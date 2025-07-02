@@ -106,8 +106,8 @@ intellijPlatform {
     pluginConfiguration {
         version = '1.6.7-pro'
         ideaVersion {
-            sinceBuild = "241"
-            untilBuild = ""
+            sinceBuild = "251"
+            untilBuild = "251.*"
         }
     }
     
