@@ -9,7 +9,7 @@ plugins {
 
 
 group 'com.pycrunch'
-version '1.6.7-pro'
+version '1.6.8-pro'
 
 //sourceCompatibility = 1.8
 //sourceCompatibility = 11
@@ -26,10 +26,10 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        pycharmProfessional("2025.1.2")
-        
+        pycharmProfessional("2025.3.3")
+
         bundledPlugin("com.intellij.modules.json")
-//        bundledPlugin("PythonCore")
+        bundledPlugin("PythonCore")
         bundledPlugin("Pythonid")
     }
 
@@ -47,6 +47,8 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 patchPluginXml {
     changeNotes = """
+    1.6.8<br><br>
+    Updated compatibility with PyCharm 2025.3.
     1.6.7<br><br>
     Updated compatibility with PyCharm 2025.1.
     1.6.6<br><br>
@@ -104,10 +106,10 @@ intellijPlatform {
     buildSearchableOptions = false
     
     pluginConfiguration {
-        version = '1.6.7-pro'
+        version = '1.6.8-pro'
         ideaVersion {
             sinceBuild = "251"
-            untilBuild = "251.*"
+            untilBuild = "253.*"
         }
     }
     
