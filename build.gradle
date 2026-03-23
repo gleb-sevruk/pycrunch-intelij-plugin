@@ -9,7 +9,7 @@ plugins {
 
 
 group 'com.pycrunch'
-version '1.6.7-ce'
+version '1.6.8-ce'
 
 //sourceCompatibility = 1.8
 //sourceCompatibility = 11
@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        pycharmCommunity("2025.1.2")
+        pycharmCommunity("2025.2.6")
         
         bundledPlugin("com.intellij.modules.json")
         bundledPlugin("PythonCore")
@@ -104,10 +104,10 @@ intellijPlatform {
     buildSearchableOptions = false
     
     pluginConfiguration {
-        version = '1.6.7-ce'
+        version = '1.6.8-ce'
         ideaVersion {
             sinceBuild = "251"
-            untilBuild = "251.*"
+            untilBuild = "253.*"
         }
     }
     
