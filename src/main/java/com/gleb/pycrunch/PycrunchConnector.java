@@ -158,6 +158,13 @@ public class PycrunchConnector {
             }
         }
 
+        if (major == 1 && minor == 6) {
+            if (version_patch < 5) {
+                // fixes for pydevd_pycharm
+                should_show_warning_now = true;
+            }
+        }
+
         if (should_show_warning_now) {
             IdeNotifications.notify(_project,"New pycrunch-engine version is available!", "To install updated engine, please run \n\n pip install --upgrade pycrunch-engine\n\n ", NotificationType.WARNING);
             _upgradeNoticeAlreadyShownInCurrentSession = true;

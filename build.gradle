@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij.platform' version '2.6.0'
+    id 'org.jetbrains.intellij.platform' version '2.13.1'
 }
 //PY-232.8660.197
 //'2023.1.3'
@@ -13,7 +13,6 @@ version '1.6.8-pro'
 
 //sourceCompatibility = 1.8
 //sourceCompatibility = 11
-sourceCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -26,11 +25,12 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        pycharmProfessional("2025.3.3")
+        pycharm("2025.3.3")
 
         bundledPlugin("com.intellij.modules.json")
         bundledPlugin("PythonCore")
         bundledPlugin("Pythonid")
+
     }
 
     testImplementation("junit:junit:4.13.2")
@@ -102,9 +102,13 @@ patchPluginXml {
     """
 }
 
+
+
 intellijPlatform {
     buildSearchableOptions = false
-    
+//    Build Swing forms, otherwise - weird crashes
+    instrumentCode = true
+
     pluginConfiguration {
         version = '1.6.8-pro'
         ideaVersion {
@@ -113,6 +117,12 @@ intellijPlatform {
         }
     }
     
+    pluginVerification {
+        ides {
+            local("/Applications/PyCharm.app")
+        }
+    }
+
     publishing {
         token = providers.environmentVariable("PUBLISH_TOKEN")
     }

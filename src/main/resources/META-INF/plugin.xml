@@ -95,8 +95,9 @@ Official Site:
     <depends>com.intellij.modules.python</depends>
     <depends>com.intellij.modules.json</depends>
 
-    <!--    <depends>PythonCore</depends>-->
-    <depends>Pythonid</depends>
+        <depends>PythonCore</depends>
+<!--    Uncommenting this will mark plugin as only available to PRO and not CE -->
+<!--    <depends>Pythonid</depends>-->
 <!--    &ndash;&gt;-->
     <applicationListeners>
         <listener class="com.gleb.pycrunch.PluginLoadEvents" topic="com.intellij.ide.plugins.DynamicPluginListener"></listener>
@@ -209,8 +210,8 @@ Official Site:
 
         </group>
 
-        <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch" popup="true">
-            <add-to-group group-id="ToolsMenu" anchor="before" relative-to-action="ToolsMenu" />
+        <group id="PyChrunch.DevMenu" text="PyCrunch" description="PyCrunch" popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last" />
             <action id="PyChrunch.RunEngine"
                     class="com.gleb.pycrunch.actions.RunPycrunchEngineAction"
                     text="Run/Restart PyCrunch Engine"

@@ -709,6 +709,7 @@ public class PycrunchToolWindow {
     }
 
     private void preserveTreeSelection() {
+        if (_testTree == null) return;
         Object selectedValue = _testTree.getLastSelectedPathComponent();
         if (selectedValue != null) {
             DefaultMutableTreeNode t = (DefaultMutableTreeNode) selectedValue;
