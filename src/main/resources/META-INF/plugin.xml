@@ -210,7 +210,7 @@ Official Site:
 
         </group>
 
-        <group id="PyChrunch.DevMenu" text="PyCrunch" description="PyCrunch" popup="true">
+        <group id="PyChrunch.DevMenu" text="_PyCrunch" description="PyCrunch" popup="true">
             <add-to-group group-id="ToolsMenu" anchor="last" />
             <action id="PyChrunch.RunEngine"
                     class="com.gleb.pycrunch.actions.RunPycrunchEngineAction"
