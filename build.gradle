@@ -9,7 +9,7 @@ plugins {
 
 
 group 'com.pycrunch'
-version '1.6.8-pro'
+version '1.6.9-pro'
 
 //sourceCompatibility = 1.8
 //sourceCompatibility = 11
