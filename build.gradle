@@ -110,7 +110,7 @@ intellijPlatform {
     instrumentCode = true
 
     pluginConfiguration {
-        version = '1.6.8-pro'
+        version = '1.6.9-pro'
         ideaVersion {
             sinceBuild = "251"
             untilBuild = "253.*"
