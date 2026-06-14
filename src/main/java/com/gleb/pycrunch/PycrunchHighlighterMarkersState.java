@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.ex.MarkupModelEx;
 import com.intellij.openapi.editor.ex.RangeHighlighterEx;
 import com.intellij.openapi.editor.impl.DocumentMarkupModel;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -32,6 +33,9 @@ public class PycrunchHighlighterMarkersState {
         PycrunchConnector connector = project.getService(PycrunchConnector.class);
 
         VirtualFile virtualFile = file_from_document(project, document);
+        if (virtualFile == null) {
+            return;
+        }
         String absolute_path = virtualFile.getPath();
         ArrayList<RangeHighlighterEx> all_highlighters_per_current_file;
         if (_highlighters_per_file.containsKey(absolute_path)) {
@@ -109,7 +113,11 @@ public class PycrunchHighlighterMarkersState {
     }
 
     private VirtualFile file_from_document(Project project, Document document) {
-        PsiFile psiFile = PsiDocumentManagerImpl.getInstance(project).getPsiFile(document);
+        PsiFile psiFile = ReadAction.compute(
+                () -> PsiDocumentManagerImpl.getInstance(project).getPsiFile(document));
+        if (psiFile == null) {
+            return null;
+        }
         return psiFile.getVirtualFile();
     }
 

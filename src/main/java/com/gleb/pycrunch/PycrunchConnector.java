@@ -147,7 +147,7 @@ public class PycrunchConnector {
         }
         boolean should_show_warning_now = false;
         boolean reallyOld = major < 1;
-        boolean minorVersionIsOld = major == 1 && minor < 6;
+        boolean minorVersionIsOld = major == 1 && minor < 7;
         if (reallyOld || minorVersionIsOld) {
             should_show_warning_now = true;
         }

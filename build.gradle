@@ -9,7 +9,7 @@ plugins {
 
 
 group 'com.pycrunch'
-version '1.6.9-pro'
+version '1.7.0-pro'
 
 //sourceCompatibility = 1.8
 //sourceCompatibility = 11
@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        pycharm("2025.3.3")
+        pycharm("2026.1.2")
 
         bundledPlugin("com.intellij.modules.json")
         bundledPlugin("PythonCore")
@@ -47,10 +47,27 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 patchPluginXml {
     changeNotes = """
+    1.7.0<br><br>
+    Smarter test re-runs: pycrunch-engine now uses <b>smart</b> change detection by default.<br><br>
+    Instead of re-running every test that ever touched a changed file, the engine analyzes
+    exactly what changed (per-function AST fingerprint) and re-runs only the tests that
+    can be affected by that change. Editing one function or one test now triggers only the
+    relevant subset — making the feedback loop noticeably faster on large test suites.<br><br>
+    If you observe unexpected test selection behaviour, you can switch back via
+    <code>change-detection-mode: legacy</code> in your <code>.pycrunch-config.yaml</code>.
+    <br><br><br>
+    1.6.11<br><br>
+    Fixed issues regarding EDT/non-EDT thread usage in plugin
+    <br><br><br>
+    1.6.9<br><br>
+    Updated compatibility with PyCharm 2026.1.
+    <br><br><br>
     1.6.8<br><br>
     Updated compatibility with PyCharm 2025.3.
+    <br><br><br>
     1.6.7<br><br>
     Updated compatibility with PyCharm 2025.1.
+    <br><br><br>
     1.6.6<br><br>
     Updated compatibility with PyCharm 2024.3.
     1.6.4<br><br>
@@ -110,10 +127,10 @@ intellijPlatform {
     instrumentCode = true
 
     pluginConfiguration {
-        version = '1.6.9-pro'
+        version = '1.6.10-pro'
         ideaVersion {
             sinceBuild = "251"
-            untilBuild = "253.*"
+            untilBuild = "261.*"
         }
     }
     
